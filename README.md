@@ -18,5 +18,8 @@ We will use HTTP/1.1 and epoll as the single I/O function call.
 \[link the subject file?]
 
 # Resources
-\[link webserv-mindmap.html and it's references]
-
+## git conventions
+https://www.conventionalcommits.org/en/v1.0.0/
+https://conventional-branch.github.io/
+## HTTP
+https://www.rfc-editor.org/rfc/rfc9112.html
