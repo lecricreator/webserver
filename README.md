@@ -19,11 +19,11 @@ We will use HTTP/1.1 and epoll as the single I/O function call.
 
 # Resources
 ## git conventions
-https://www.conventionalcommits.org/en/v1.0.0/
-https://conventional-branch.github.io/
+- https://www.conventionalcommits.org/en/v1.0.0/
+- https://conventional-branch.github.io/
 
-https://github.com/Kaydooo/Webserv_42#server-core
-https://github.com/cclaude42/webserv
-https://www.alimnaqvi.com/blog/webserv#http-messages
+- https://github.com/Kaydooo/Webserv_42#server-core
+- https://github.com/cclaude42/webserv
+- https://www.alimnaqvi.com/blog/webserv#http-messages
 ## HTTP
 https://www.rfc-editor.org/rfc/rfc9112.html
