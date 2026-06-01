@@ -29,6 +29,11 @@ void	print(char c)
 	std::cout << c << std::endl;
 }
 
+void	print_error(std::string str)
+{
+	std::cerr << str << std::endl;
+}
+
 void	print_bool(bool value)
 {
   if (value)
