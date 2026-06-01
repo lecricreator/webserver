@@ -22,6 +22,7 @@ We will use HTTP/1.1 and epoll as the single I/O function call.
 - https://www.conventionalcommits.org/en/v1.0.0/
 - https://conventional-branch.github.io/
 
+## webserv references/guides
 - https://github.com/Kaydooo/Webserv_42#server-core
 - https://github.com/cclaude42/webserv
 - https://www.alimnaqvi.com/blog/webserv#http-messages
