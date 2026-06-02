@@ -1,7 +1,7 @@
 #include "webserv.hpp"
 
 //handles only IPv4
-int create_server_socket()
+static int create_server_socket()
 {
   int server_fd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -16,7 +16,7 @@ int create_server_socket()
 }
 
 //handles only IPv4
-int bind_address(int server_fd, int port)
+static int bind_address(int server_fd, int port)
 {
   struct sockaddr_in addr;
 
@@ -31,7 +31,7 @@ int bind_address(int server_fd, int port)
   return SUCCESS;
 }
 
-int listen_address(int server_fd, int connexion_queue_size)
+static int listen_address(int server_fd, int connexion_queue_size)
 {
   if (listen(server_fd, connexion_queue_size) == ERROR)
     return print_function_error("listen"), close(server_fd);
@@ -42,9 +42,9 @@ int listen_address(int server_fd, int connexion_queue_size)
 
 int create_listening_socket(int port)
 {
-  int server_fd;
   int connexion_queue_size = 10;
-  if ((server_fd = create_server_socket()) == ERROR)
+  int server_fd = create_server_socket();
+  if (server_fd == ERROR)
     return ERROR;
   if (bind_address(server_fd, port) == ERROR)
     return ERROR;
