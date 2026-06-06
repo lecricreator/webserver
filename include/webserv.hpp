@@ -1,4 +1,5 @@
 #include "support.hpp"
+#include "conf.hpp"
 
 #include <cerrno>
 #include <fcntl.h>
@@ -7,6 +8,8 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <iostream>
+#include <fstream>
 
 #define ERROR -1
 #define SUCCESS 0
