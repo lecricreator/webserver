@@ -14,6 +14,10 @@ std::string to_str(float n)
     return ss.str();
 }
 
+int         to_int(std::string str) {
+  return atoi(str);
+}
+
 void	print(std::string str)
 {
 	std::cout << str << std::endl;
