@@ -30,9 +30,9 @@ void    parse_conf(char *argv, t_data_web *data_web) {
             if (posi_index != std::string::npos) {
                 print("FIND LISTEN");
                 i = put_index_after_space(line, posi_index + str_listen.length());
-                /*for (i < line.length(); i++;){
+                for (;i < line.length(); i++){
                     if (line[i] >= '0' && line[i] <= '9') {
-                        content_parse += line[i]; 
+                        content_parse += line[i];
                     } else if (line[i] == ';') {
                         std::cout << "content parse is " << content_parse << std::endl;
                         data_web->server.port = to_int(content_parse);
@@ -40,7 +40,7 @@ void    parse_conf(char *argv, t_data_web *data_web) {
                     } else {
                         break ;
                     }
-                }*/
+                }
                 break ;
             }
         }

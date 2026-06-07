@@ -15,7 +15,7 @@ std::string to_str(float n)
 }
 
 int         to_int(std::string str) {
-  return atoi(str);
+  return atoi(str.c_str());
 }
 
 void	print(std::string str)

@@ -13,6 +13,4 @@ typedef struct s_location {
     std::string root;
 }t_location;
 
-void    parse_conf(char *argv, t_data_web *data_web);
-
 #endif
