@@ -11,9 +11,12 @@ void set_event(struct epoll_event *event, int flag, int fd)
 int manage_events(const char *response, int server_fd)
 {
   int epoll_fd = epoll_create1(0);
+  if (epoll_fd == ERROR)
+    return ERROR;
   struct epoll_event s_event;
   set_event(&s_event, EPOLLIN, server_fd);
-  epoll_ctl(epoll_fd, EPOLL_CTL_ADD, server_fd, &s_event);
+  if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, server_fd, &s_event) == ERROR)
+    return close(epoll_fd), ERROR;
 
   struct epoll_event events[MAX_EVENTS];
   while (true)
@@ -34,7 +37,7 @@ int manage_events(const char *response, int server_fd)
       {
         int client_fd = accept_client(server_fd);
         if (client_fd == ERROR)
-          return ERROR;
+          continue;
         set_nonblocking(client_fd);
         set_event(&s_event, EPOLLIN, client_fd);
         epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &s_event);
@@ -52,5 +55,6 @@ int manage_events(const char *response, int server_fd)
         send(fd, response, strlen(response), 0);
     }
   }
+  close(epoll_fd);
   return SUCCESS;
 }

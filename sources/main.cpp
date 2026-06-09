@@ -16,6 +16,7 @@ int main()
   if (server_fd == ERROR)
     return FAILURE;
   set_nonblocking(server_fd);
-  manage_events(response, server_fd);
+  if (manage_events(response, server_fd) == ERROR)
+    return FAILURE;
   return SUCCESS;
 }

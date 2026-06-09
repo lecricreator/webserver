@@ -8,7 +8,7 @@ int accept_client(int server_fd)
   int client_fd = accept(server_fd, (struct sockaddr*)&client_addr, &client_len);
   if (client_fd == ERROR)
     return print_function_error("accept"), ERROR;
-  if (fcntl(client_fd, F_SETFL, fcntl(client_fd, F_GETFD) | O_NONBLOCK) == ERROR)
+  if (fcntl(client_fd, F_SETFL, fcntl(client_fd, F_GETFL) | O_NONBLOCK) == ERROR)
     return print_function_error("fcntl"), ERROR;
   print_success("New client", "fd", client_fd);
   print_success("New client", "ip", (int)client_addr.sin_addr.s_addr);
