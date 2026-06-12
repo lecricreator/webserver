@@ -2,6 +2,29 @@
 # define CONF
 
 # include "webserv.hpp"
+# include "conf/server.hpp"
+# include "conf/events.hpp"
+
+
+class conf {
+    private:
+        std::string _user;
+        int         _worker_process;
+        std::string _error_log;
+        std::string _error_page;
+        std::string _access_log;
+        std::string _pid;
+        std::string _include;
+        std::string _default_type;
+        std::string _log_format;
+        std::string _sendfile;
+        int         _keepalive_timeout;
+        bool        _gzip;
+        events    *_events;
+        server    *_server;
+    public:
+        conf();
+};
 
 typedef struct s_events {
     std::string worker_connections;
@@ -54,7 +77,6 @@ typedef struct s_server {
     std::string access_log;
     std::string error_page;
     t_location  *location;
-
 }t_server;
 
 typedef struct s_data_conf {

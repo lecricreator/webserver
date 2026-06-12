@@ -1,0 +1,23 @@
+#ifndef SERVER
+# define SERVER
+# include "conf/location.hpp"
+
+
+class server {
+    private:
+        int         _port;
+        std::string _server_name;
+        std::string _include;
+        std::string _default_type;
+        std::string _log_format;
+        std::string _sendfile;
+        std::string _keepalive_timeout;
+        std::string _gzip;
+        std::string _access_log;
+        std::string _error_page;
+        location  *_location;
+    public:
+        server();
+};
+
+#endif

@@ -24,20 +24,24 @@ INC_DIR = ./include/
 SOCKET_DIR = sockets/
 CONF_DIR = conf/
 
-# files
-SOCKET_FILES = create_listening_socket.cpp manage_clients.cpp \
-	support.cpp
-CONF_FILES = pars_conf.cpp init_conf.cpp
-
-# include
-INC_FILES = support.hpp webserv.hpp pars_conf.hpp
-#connect folder and file
-FILES = $(addprefix $(SOCKET_DIR), $(SOCKET_FILES)) \
-	$(addprefix $(CONF_DIR), $(CONF_FILES)) \
-	main.cpp support.cpp \
 
 
-SRC = $(addprefix $(SRC_DIR), $(FILES))
+# files SRC
+SOCKET_SRC_FILES = 	create_listening_socket.cpp manage_clients.cpp \
+					support.cpp
+CONF_SRC_FILES = 	pars_conf.cpp init_conf.cpp conf.cpp server.cpp events.cpp location.cpp
+CONF_INC_FILES =	conf.hpp server.hpp events.hpp location.hpp
+
+#connect folder and file of src
+SRC_FILES = $(addprefix $(SOCKET_DIR), $(SOCKET_SRC_FILES)) \
+			$(addprefix $(CONF_DIR), $(CONF_SRC_FILES)) \
+			main.cpp support.cpp \
+
+#connect folder and file of include
+INC_FILES = $(addprefix $(CONF_DIR), $(CONF_INC_FILES)) \
+			support.hpp webserv.hpp \
+
+SRC = $(addprefix $(SRC_DIR), $(SRC_FILES))
 OBJ = $(patsubst $(SRC_DIR)%.cpp, $(OBJ_DIR)%.o, $(SRC))
 INC = $(addprefix $(INC_DIR)%.hpp, $(INC_FILES))
 
