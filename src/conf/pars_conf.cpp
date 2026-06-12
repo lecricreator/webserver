@@ -1,4 +1,5 @@
 #include "webserv.hpp"
+#include "conf/conf.hpp"
 
 size_t  put_index_after_space(std::string line, size_t index) {
     for (size_t i = index; i < line.length(); i++) {
@@ -77,24 +78,10 @@ void    create_blocks(t_parse_conf *conf, char *argv) {
     std::cout << "{ is : " << conf->start_bracket << " // } is : " << conf->end_bracket << std::endl;
 }
 
-void    parse_conf(char *argv, t_data_web *data_web) {
+void    parse_conf(char *argv) {
     std::ifstream   fd_file;
     std::string     line;
-    t_parse_conf    parse_conf;
-
-    init_conf(&parse_conf);
-    create_blocks(&parse_conf, argv);
-    if (parse_conf.start_bracket != parse_conf.end_bracket || parse_conf.nbr_events > 1 || parse_conf.nbr_server < 1 || parse_conf.nbr_location < 1) {
-        std::cout << "NOT SUFFISALY {} or not manage correctly events, locoation or server" << std::endl;
-        exit(0);
-    }
-    fd_file.open(argv, std::ifstream::in);
-    while (std::getline(fd_file, line)) {
-        for (size_t i = put_index_after_space(line, 0); i < line.length(); i++) {
-            if (line[i] == '#')
-                break ;
-            search_listen(data_web, line, i);
-            break ;
-        }
-    }
+    //t_parse_conf    parse_conf;
+    Conf            conf_c = Conf();
+    conf_c.parse(argv);
 }

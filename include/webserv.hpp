@@ -1,18 +1,19 @@
 #ifndef WEBSERV
 # define WEBSERV
 
-#include "support.hpp"
-#include "conf/conf.hpp"
+# include "support.hpp"
+# include "conf/conf.hpp"
 
-#include <cerrno>
-#include <fcntl.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <iostream>
-#include <fstream>
+# include <cerrno>
+# include <fcntl.h>
+# include <stdio.h>
+# include <string.h>
+# include <unistd.h>
+# include <sys/socket.h>
+# include <arpa/inet.h>
+# include <iostream>
+# include <fstream>
+# include <list>
 
 #define ERROR -1
 #define SUCCESS 0
@@ -35,6 +36,7 @@ void  print_success(std::string function_name, std::string output_name, int outp
 void    init_conf(t_parse_conf *parse_conf);
 
 //conf
-void    parse_conf(char *argv, t_data_web *data_web);
+void    parse_conf(char *argv);
+size_t  put_index_after_space(std::string line, size_t index);
 
 #endif

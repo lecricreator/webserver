@@ -4,26 +4,30 @@
 # include "webserv.hpp"
 # include "conf/server.hpp"
 # include "conf/events.hpp"
+# include <list>
 
-
-class conf {
+class Conf {
     private:
-        std::string _user;
-        int         _worker_process;
-        std::string _error_log;
-        std::string _error_page;
-        std::string _access_log;
-        std::string _pid;
-        std::string _include;
-        std::string _default_type;
-        std::string _log_format;
-        std::string _sendfile;
-        int         _keepalive_timeout;
-        bool        _gzip;
-        events    *_events;
-        server    *_server;
+        std::string             _user;
+        int                     _worker_process;
+        std::string             _error_log;
+        std::string             _error_page;
+        std::string             _access_log;
+        std::string             _pid;
+        std::string             _include;
+        std::string             _default_type;
+        std::string             _log_format;
+        std::string             _sendfile;
+        int                     _keepalive_timeout;
+        bool                    _gzip;
+        bool                    _http;
+        events                  *_events;
+        server                  *_server;
+        std::string             _list_token[15];
+        size_t                  _token_length;
     public:
-        conf();
+        Conf();
+        void                    parse(char *path_file);
 };
 
 typedef struct s_events {

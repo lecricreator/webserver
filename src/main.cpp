@@ -6,8 +6,7 @@ int main(int argc, char **argv) {
     print("Need 2 arguments.");
     return FAILURE;
   }
-  t_data_web  data_web;
-  parse_conf(argv[1], &data_web);
+  parse_conf(argv[1]);
   int port = 8080;
   int server_fd = create_listening_socket(port);
   if (server_fd == ERROR)

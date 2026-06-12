@@ -9,7 +9,7 @@ void    init_value_parse_conf(t_parse_conf *parse_conf) {
 }
 
 void    init_value_data_conf(t_data_web *data_web) {
-    data_web->conf.user = "a";
+    data_web->conf.user = "";
     data_web->conf.worker_process = -1;
     data_web->conf.error_log = "";
     data_web->conf.error_page = "";

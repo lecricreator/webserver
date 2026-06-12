@@ -29,7 +29,7 @@ CONF_DIR = conf/
 # files SRC
 SOCKET_SRC_FILES = 	create_listening_socket.cpp manage_clients.cpp \
 					support.cpp
-CONF_SRC_FILES = 	pars_conf.cpp init_conf.cpp conf.cpp server.cpp events.cpp location.cpp
+CONF_SRC_FILES = 	conf.cpp server.cpp events.cpp location.cpp pars_conf.cpp init_conf.cpp
 CONF_INC_FILES =	conf.hpp server.hpp events.hpp location.hpp
 
 #connect folder and file of src
