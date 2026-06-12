@@ -3,42 +3,10 @@
 
 # include "webserv.hpp"
 
-typedef struct s_data_conf {
-    std::string user;
-    int         worker_process;
-    std::string error_log;
-    std::string error_page;
-    std::string access_log;
-    std::string pid;
-    std::string include;
-    std::string default_type;
-    std::string log_format;
-    std::string sendfile;
-    int         keepalive_timeout;
-    bool        gzip;
-    t_events    *events;
-    t_server    *server;
-    t_location  *location;
-}t_data_conf;
-
 typedef struct s_events {
     std::string worker_connections;
     std::string use;
 }t_events;
-
-typedef struct s_server {
-    int         port;
-    std::string server_name;
-    std::string include;
-    std::string default_type;
-    std::string log_format;
-    std::string sendfile;
-    std::string keepalive_timeout;
-    std::string gzip;
-    std::string access_log;
-    std::string error_page;
-
-}t_server;
 
 typedef struct s_location {
     std::string root;
@@ -72,5 +40,52 @@ typedef struct s_location {
     std::string charset;
     std::string expires;
 }t_location;
+
+
+typedef struct s_server {
+    int         port;
+    std::string server_name;
+    std::string include;
+    std::string default_type;
+    std::string log_format;
+    std::string sendfile;
+    std::string keepalive_timeout;
+    std::string gzip;
+    std::string access_log;
+    std::string error_page;
+    t_location  *location;
+
+}t_server;
+
+typedef struct s_data_conf {
+    std::string user;
+    int         worker_process;
+    std::string error_log;
+    std::string error_page;
+    std::string access_log;
+    std::string pid;
+    std::string include;
+    std::string default_type;
+    std::string log_format;
+    std::string sendfile;
+    int         keepalive_timeout;
+    bool        gzip;
+    t_events    *events;
+    t_server    *server;
+}t_data_conf;
+
+
+typedef struct  s_parse_serv_conf{
+    int         nbr_location;
+}t_parse_serv_conf;
+
+
+typedef struct  s_parse_conf{
+    int                 start_bracket;
+    int                 end_bracket;
+    int                 nbr_events;
+    int                 nbr_http;
+    t_parse_serv_conf   *server;
+}t_parse_conf;
 
 #endif

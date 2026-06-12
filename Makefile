@@ -24,12 +24,12 @@ INC_DIR = ./include/
 SOCKET_DIR = sockets/
 CONF_DIR = conf/
 
-# files 
+# files
 SOCKET_FILES = create_listening_socket.cpp manage_clients.cpp \
 	support.cpp
-CONF_FILES = pars_conf.cpp
+CONF_FILES = pars_conf.cpp init_conf.cpp
 
-# include 
+# include
 INC_FILES = support.hpp webserv.hpp pars_conf.hpp
 #connect folder and file
 FILES = $(addprefix $(SOCKET_DIR), $(SOCKET_FILES)) \
