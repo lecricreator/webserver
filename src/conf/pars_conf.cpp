@@ -43,11 +43,10 @@ void    search_listen(t_data_web *data_web, std::string line, size_t i) {
     }
 }
 
-void    create_blocks(t_data_conf *conf, char *argv) {
+void    create_blocks(t_parse_conf *conf, char *argv) {
     std::ifstream   fd_file;
     std::string     line;
     size_t          posi_index;
-    (void)conf;
 
     fd_file.open(argv, std::ifstream::in);
     while (std::getline(fd_file, line)) {
@@ -55,24 +54,27 @@ void    create_blocks(t_data_conf *conf, char *argv) {
             if (line[i] == '#')
                 break ;
             posi_index = i;
-            if (find_part("events ", line, &posi_index)){
-                if (find_part(" {", line, &posi_index)) {
-                    print(line);
-                }
+            if (find_part("events ", line, &posi_index)) {
+                conf->nbr_events++;
+            } else if (find_part("http ", line, &posi_index)) {
+                conf->nbr_http++;
+            } else if (find_part("server ", line, &posi_index)) {
+                conf->nbr_server++;
+            } else if (find_part("location ", line, &posi_index)) {
+                conf->nbr_location++;
             }
-            if (find_part("http ", line, &posi_index)){
-                if (find_part(" {", line, &posi_index)) {
-                    print(line);
-                }
+            if (find_part("{", line, &posi_index)) {
+                conf->start_bracket++;
             }
-            if (find_part("server ", line, &posi_index)){
-                if (find_part(" {", line, &posi_index)) {
-                    print(line);
-                }
+            if (find_part("}", line, &posi_index)) {
+                conf->end_bracket++;
             }
             break ;
         }
     }
+    fd_file.close();
+    std::cout << "nbr events : " << conf->nbr_events << " // nbr http : " << conf->nbr_http << " // nbr serv : " << conf->nbr_server << " // nbr location : " << conf->nbr_location << std::endl;
+    std::cout << "{ is : " << conf->start_bracket << " // } is : " << conf->end_bracket << std::endl;
 }
 
 void    parse_conf(char *argv, t_data_web *data_web) {
@@ -81,7 +83,11 @@ void    parse_conf(char *argv, t_data_web *data_web) {
     t_parse_conf    parse_conf;
 
     init_conf(&parse_conf);
-    create_blocks(&data_web->conf, argv);
+    create_blocks(&parse_conf, argv);
+    if (parse_conf.start_bracket != parse_conf.end_bracket || parse_conf.nbr_events > 1 || parse_conf.nbr_server < 1 || parse_conf.nbr_location < 1) {
+        std::cout << "NOT SUFFISALY {} or not manage correctly events, locoation or server" << std::endl;
+        exit(0);
+    }
     fd_file.open(argv, std::ifstream::in);
     while (std::getline(fd_file, line)) {
         for (size_t i = put_index_after_space(line, 0); i < line.length(); i++) {

@@ -85,6 +85,8 @@ typedef struct  s_parse_conf{
     int                 end_bracket;
     int                 nbr_events;
     int                 nbr_http;
+    int                 nbr_server;
+    int                 nbr_location;
     t_parse_serv_conf   *server;
 }t_parse_conf;
 
