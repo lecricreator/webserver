@@ -2,7 +2,7 @@
 # define WEBSERV
 
 # include "support.hpp"
-# include "conf/conf.hpp"
+# include "conf/Conf.hpp"
 
 # include <cerrno>
 # include <fcntl.h>

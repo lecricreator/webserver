@@ -1,5 +1,5 @@
 #include "webserv.hpp"
-#include "conf/conf.hpp"
+#include "conf/Conf.hpp"
 
 void    add_in_var(std::string line, size_t posi, std::string *add_inside) {
     posi = put_index_after_space(line, posi);
@@ -26,8 +26,6 @@ Conf::Conf() {
     this->_keepalive_timeout = -1;
     this->_gzip = false;
     this->_http = false;
-    this->_events = NULL;
-    this->_server = NULL;
 }
 
 void    Conf::parse(char *path_file) {
@@ -37,10 +35,17 @@ void    Conf::parse(char *path_file) {
 
     fd_file.open(path_file, std::ifstream::in);
     while (std::getline(fd_file, line)) {
+        std::cout << "Conf : " << line << std::endl;
         if ((posi = line.find("server ")) != std::string::npos) {
-            print(line);
+            if ((posi = line.find("{", posi + 7)) != std::string::npos) {
+                Server  server = Server();
+                server.parse_server(&fd_file);
+                this->_server.push_back(server);
+            }
         } else if ((posi = line.find("events ")) != std::string::npos) {
-            print(line);
+            Events  events = Events();
+            events.parse_events(&fd_file);
+            this->_events.push_back(events);
         } else if ((posi = line.find("http ")) != std::string::npos) {
             this->_http = true;
         } else if ((posi = line.find("user ")) != std::string::npos) {

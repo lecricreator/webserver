@@ -2,9 +2,9 @@
 # define CONF
 
 # include "webserv.hpp"
-# include "conf/server.hpp"
-# include "conf/events.hpp"
-# include <list>
+# include "conf/Server.hpp"
+# include "conf/Events.hpp"
+# include <vector>
 
 class Conf {
     private:
@@ -21,10 +21,9 @@ class Conf {
         int                     _keepalive_timeout;
         bool                    _gzip;
         bool                    _http;
-        events                  *_events;
-        server                  *_server;
-        std::string             _list_token[15];
-        size_t                  _token_length;
+        std::vector<Events>     _events;
+        std::vector<Server>     _server;
+        int                     _nb_server;
     public:
         Conf();
         void                    parse(char *path_file);

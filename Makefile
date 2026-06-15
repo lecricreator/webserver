@@ -29,8 +29,8 @@ CONF_DIR = conf/
 # files SRC
 SOCKET_SRC_FILES = 	create_listening_socket.cpp manage_clients.cpp \
 					support.cpp
-CONF_SRC_FILES = 	conf.cpp server.cpp events.cpp location.cpp pars_conf.cpp init_conf.cpp
-CONF_INC_FILES =	conf.hpp server.hpp events.hpp location.hpp
+CONF_SRC_FILES = 	Conf.cpp Server.cpp Events.cpp Location.cpp pars_conf.cpp init_conf.cpp
+CONF_INC_FILES =	Conf.hpp Server.hpp Events.hpp Location.hpp
 
 #connect folder and file of src
 SRC_FILES = $(addprefix $(SOCKET_DIR), $(SOCKET_SRC_FILES)) \

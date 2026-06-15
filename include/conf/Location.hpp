@@ -1,7 +1,8 @@
 #ifndef LOCATION
 # define LOCATION
+# include <vector>
 
-class location {
+class Location {
     private:
         std::string _root;
         std::string _index;
@@ -34,7 +35,8 @@ class location {
         std::string _charset;
         std::string _expires;
     public:
-        location();
+        Location();
+        void    parse_location(std::ifstream *fd_file);
 };
 
 #endif

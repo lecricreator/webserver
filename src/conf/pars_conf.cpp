@@ -1,5 +1,5 @@
 #include "webserv.hpp"
-#include "conf/conf.hpp"
+#include "conf/Conf.hpp"
 
 size_t  put_index_after_space(std::string line, size_t index) {
     for (size_t i = index; i < line.length(); i++) {
