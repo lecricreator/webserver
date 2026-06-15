@@ -25,3 +25,6 @@ void  set_nonblocking(int fd);
 
 //epoll
 int   manage_events(const char *response, int client_fd);
+
+//cgi
+std::string execute_cgi(const char *filename, char **env, char *cgi_data);

@@ -1,21 +1,26 @@
 NAME		:= webserv
 
-CC			:= c++
+CC				:= c++
 CFLAGS		:= -Wall -Wextra -Werror -g -O0 -std=c++98 -pedantic
-RM			:= rm -rf
+RM				:= rm -rf
 
 INC_DIR		:= includes
 SRC_DIR		:= sources
 OBJ_DIR		:= objects
 
-SOCKET_DIR	:= sockets
-SOCKET_PREFIX:= $(SRC_DIR)/$(SOCKET_DIR)/
+SOCKET_DIR		:= sockets
+SOCKET_PREFIX := $(SRC_DIR)/$(SOCKET_DIR)/
 
-ROOT_SRC	:= main.cpp support.cpp
+CGI_DIR 			:= cgi
+CGI_PREFIX := $(SRC_DIR)/$(CGI_DIR)/
+
+ROOT_SRC		:= main.cpp support.cpp
 SOCKET_SRC	:= 
+CGI_SRC			:= execute.cpp
 
 SRCS		:= $(addprefix $(SRC_DIR)/, $(ROOT_SRC)) \
-			   $(addprefix $(SOCKET_PREFIX), $(SOCKET_SRC))
+			   $(addprefix $(SOCKET_PREFIX), $(SOCKET_SRC)) \
+			   $(addprefix $(CGI_PREFIX), $(CGI_SRC))
 
 OBJS		:= $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
