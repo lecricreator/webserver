@@ -3,7 +3,6 @@
 httpRequest::httpRequest() : _headers()
 {
 	_requestBuffer = "";
-	_startLine = "";
 	_body = "";
 	_method = "";
 	_httpVersion = "";
@@ -13,7 +12,6 @@ httpRequest::httpRequest() : _headers()
 httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
 {
 	_requestBuffer = copy._requestBuffer;
-	_startLine = copy._startLine;
 	_body = copy._body;
 	_method = copy._method;
 	_httpVersion = _httpVersion;
@@ -24,7 +22,6 @@ httpRequest&	httpRequest::operator=(const httpRequest& copy)
 {
 	_headers = copy._headers;
 	_requestBuffer = copy._requestBuffer;
-	_startLine = copy._startLine;
 	_body = copy._body;
 	_method = copy._method;
 	_httpVersion = _httpVersion;
@@ -33,16 +30,60 @@ httpRequest&	httpRequest::operator=(const httpRequest& copy)
 
 httpRequest::~httpRequest() {}
 
-bool	httpRequest::parseRequest(std::string str)
+bool	httpRequest::parseStartLine(std::string &startLine)
+{
+	std::string buffer;
+	if (startLine.find(" ") != std::string::npos)
+	{
+		buffer = startLine.substr(0, startLine.find(" "));
+		startLine.erase(0, startLine.find(" ") + 1);
+		_method = buffer;
+		buffer.clear();
+
+		if (_method != "GET" && _method != "POST" && _method != "DELETE")
+			return false; //wrong method
+	}
+	else
+		return false; //not enough params
+	if (startLine.find(" ") != std::string::npos)
+	{
+		buffer = startLine.substr(0, startLine.find(" "));
+		startLine.erase(0, startLine.find(" ") + 1);
+		_path = buffer;
+		buffer.clear();
+
+		//idk how to check for correct path
+	}
+	else
+		return false; //not enough params
+	if (startLine.find(" ") != std::string::npos)
+	{
+		buffer = startLine.substr(0, startLine.find(" "));
+		startLine.erase(0, startLine.find(" ") + 1);
+		_httpVersion = buffer;
+		buffer.clear();
+
+		if (_httpVersion != "HTTP/1.1")
+			return false; //wrong http version
+	}
+	else
+		return false; //not enough params
+	if (startLine.find(" ") != std::string::npos)
+		return false; //too many params
+	return true;
+}
+
+bool	httpRequest::parseRequest(std::string &str)
 {
 	_requestBuffer.append(str);
 	if (_status == REQ_START_LINE)
 	{
 		if (_requestBuffer.find("\r\n") != std::string::npos)
 		{
-			_startLine = _requestBuffer;
-			_requestBuffer.clear();
-			//insert parsing/error checking here
+			std::string	startLine = _requestBuffer.substr(0, _requestBuffer.find("\r\n"));
+			_requestBuffer.erase(0, _requestBuffer.find("\r\n") + 2);
+			if (!parseStartLine(startLine))
+				return false; //send appropriate error code
 			_status = REQ_HEADERS;
 		}
 	}
@@ -52,18 +93,20 @@ bool	httpRequest::parseRequest(std::string str)
 		{
 			if (_requestBuffer.find("\r\n\r\n") != std::string::npos)
 			{
-				//set status to body/complete accordingly
-				_status = REQ_BODY;
+				if (_method == "POST")
+					_status = REQ_BODY;
+				else
+					_status = REQ_PARSED;
 				break;
 			}
 			else
-			{	//very ugly, might not even work
-				std::string	key = _requestBuffer;
-				key.erase(key.begin() + key.find(": "), key.end());
-				std::string	value = _requestBuffer;
-				value.erase(0, value.find(": ") + 2);
-				value.erase(value.begin() + value.find("\r\n"), value.end());
+			{
+				size_t	sep = _requestBuffer.find(": ");
+				size_t	crlf = _requestBuffer.find("\r\n");
+				std::string	key = _requestBuffer.substr(0, sep);
+				std::string	value = _requestBuffer.substr(sep + 2, crlf);
 				_headers.insert(key, value);
+				_requestBuffer.erase(0, crlf + 2);
 			}
 		}
 	}

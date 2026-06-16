@@ -17,13 +17,14 @@ enum RequestStatus {
 class httpRequest
 {
 private:
+	RequestStatus						_status;
 	std::string							_requestBuffer;
-	std::string							_startLine;
 	std::map<std::string, std::string>	_headers;
 	std::string							_body;
+
 	std::string							_method;
+	std::string							_path;
 	std::string							_httpVersion;
-	RequestStatus						_status;
 
 
 public:
@@ -32,7 +33,8 @@ public:
 	httpRequest	&operator=(const httpRequest& copy);
 	~httpRequest();
 
-	bool	parseRequest(std::string str);
+	bool	parseStartLine(std::string &startLine);
+	bool	parseRequest(std::string &str);
 };
 
 #endif
