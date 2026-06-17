@@ -29,6 +29,8 @@ class Conf {
         void                    parse(char *path_file);
         void                    add_in_var(std::string line, size_t posi, std::string *at_replace);
         void                    add_in_var(std::string line, size_t posi, int *at_replace);
+        void                    add_in_var(std::string line, size_t posi, bool *at_replace);
+        //void                    add_in_var(std::string line, size_t posi, std::vector<int> *at_replace);
 };
 
 #endif

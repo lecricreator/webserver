@@ -19,7 +19,10 @@ class Server {
         int                     _nb_location;
     public:
         Server();
-        void    parse_server(std::ifstream *fd_file);
+        void                    parse_server(std::ifstream *fd_file);
+        void                    add_in_var(std::string line, size_t posi, std::string *at_replace);
+        void                    add_in_var(std::string line, size_t posi, int *at_replace);
+
 };
 
 #endif

@@ -38,7 +38,5 @@ void    print_success(std::string function_name, std::string output_name, int ou
 //conf
 void    parse_conf(char *argv);
 size_t  put_index_after_space(std::string line, size_t index);
-void    add_str_in_var(std::string line, size_t posi, std::string *add_inside);
-void    add_int_in_var(std::string line, size_t posi, int *add_inside);
 
 #endif

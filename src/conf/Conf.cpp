@@ -39,32 +39,29 @@ void    Conf::parse(char *path_file) {
         } else if ((posi = line.find("http ")) != std::string::npos) {
             this->_http = true;
         } else if ((posi = line.find("user ")) != std::string::npos) {
-            add_in_var(line, posi + 4, &this->_user);
+            this->add_in_var(line, posi + 4, &this->_user);
         } else if ((posi = line.find("worker_process ")) != std::string::npos) {
-            //add_in_var(line, posi + 14, &this->_worker_process);
+            //this->add_in_var(line, posi + 14, &this->_worker_process);
         } else if ((posi = line.find("error_log ")) != std::string::npos) {
-            add_in_var(line, posi + 9, &this->_error_log);
+            this->add_in_var(line, posi + 9, &this->_error_log);
         } else if ((posi = line.find("error_page ")) != std::string::npos) {
-            add_in_var(line, posi + 10, &this->_error_page);
+            this->add_in_var(line, posi + 10, &this->_error_page);
         } else if ((posi = line.find("access_log ")) != std::string::npos) {
-            add_in_var(line, posi + 10, &this->_access_log);
+            this->add_in_var(line, posi + 10, &this->_access_log);
         } else if ((posi = line.find("pid")) != std::string::npos) {
-            add_in_var(line, posi + 3, &this->_pid);
+            this->add_in_var(line, posi + 3, &this->_pid);
         } else if ((posi = line.find("include ")) != std::string::npos) {
-            add_in_var(line, posi + 7, &this->_include);
+            this->add_in_var(line, posi + 7, &this->_include);
         } else if ((posi = line.find("default_type ")) != std::string::npos) {
-            add_in_var(line, posi + 12, &this->_default_type);
+            this->add_in_var(line, posi + 12, &this->_default_type);
         } else if ((posi = line.find("log_format ")) != std::string::npos) {
-            add_in_var(line, posi + 10, &this->_log_format);
+            this->add_in_var(line, posi + 10, &this->_log_format);
         } else if ((posi = line.find("sendfile ")) != std::string::npos) {
-            add_in_var(line, posi + 8, &this->_sendfile);
+            this->add_in_var(line, posi + 8, &this->_sendfile);
         } else if ((posi = line.find("keepalive_timeout ")) != std::string::npos) {
-            add_in_var(line, posi + 17, &this->_keepalive_timeout);
-            std::cout << "keeeeeeeeeeppp is :" << this->_keepalive_timeout;
+            this->add_in_var(line, posi + 17, &this->_keepalive_timeout);
         } else if ((posi = line.find("gzip ")) != std::string::npos) {
-            if ((posi = line.find("true")) != std::string::npos) {
-                this->_gzip = true;
-            }
+            this->add_in_var(line, posi + 5, &this->_gzip);
         }
         std::cout << "Conf : " << line << std::endl;
     }
@@ -105,4 +102,10 @@ void    Conf::add_in_var(std::string line, size_t posi, int *at_replace) {
     print("Error need to add ';'. Next step need to replace by another file\nconf.cpp:13 / add_in_var");
     *at_replace = -1;
     return ;
+}
+
+void    Conf::add_in_var(std::string line, size_t posi, bool *at_replace) {
+    if ((posi = line.find("true")) != std::string::npos) {
+        *at_replace = true;
+    }
 }
