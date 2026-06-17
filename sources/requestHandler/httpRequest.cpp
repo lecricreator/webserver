@@ -35,11 +35,36 @@ httpRequest::~httpRequest() {}
 
 void	httpRequest::setErrorCode(unsigned int code) { _errorCode = code; }
 
+bool isValidPercentEncoding(const std::string& path) {
+    for (size_t i = 0; i < path.length(); i++) {
+        if (path[i] == '%') {
+            if (i + 2 >= path.length() || !isxdigit(path[i+1]) || !isxdigit(path[i+2]))
+                return false;
+            i += 2;  // skip the two hex digits
+        }
+    }
+    return true;
+}
+
 bool	httpRequest::checkPath()
 {
 	if (_path.empty() || _path[0] != '/')
 		return false;
-	
+	if (_path.find("/../") != std::string::npos 
+	|| _path.rfind("/..") == _path.length() - 3 
+	|| _path == "/.." || _path == "..")
+		return false;
+	if (!isValidPercentEncoding(_path))
+		return false;
+	for (int i = 0; i < _path.size(); i++)
+	{
+		if (_path[i] <= 32 || _path[i] == 127)
+			return false;
+	}
+	if (_path.size() > 2048)
+		return false; //error code 414
+	if (_path.find('\0') != std::string::npos)
+		return false;
 	return true;
 } 
 
