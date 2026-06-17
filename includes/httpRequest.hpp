@@ -14,27 +14,35 @@ enum RequestStatus {
     REQ_ERROR			// Error during parsing
 };
 
+typedef std::map<std::string, std::string> HeaderMap;
+
 class httpRequest
 {
-private:
-	RequestStatus						_status;
-	std::string							_requestBuffer;
-	std::map<std::string, std::string>	_headers;
-	std::string							_body;
+	private:
+		RequestStatus	_status;
+		std::string		_requestBuffer;
+		HeaderMap		_headers;
+		std::string		_body;
+		
+		std::string		_method;
+		std::string		_path;
+		std::string		_httpVersion;
+		unsigned int	_errorCode;
 
-	std::string							_method;
-	std::string							_path;
-	std::string							_httpVersion;
 
+	public:
+		httpRequest();
+		httpRequest(const httpRequest& copy);
+		httpRequest	&operator=(const httpRequest& copy);
+		~httpRequest();
 
-public:
-	httpRequest();
-	httpRequest(const httpRequest& copy);
-	httpRequest	&operator=(const httpRequest& copy);
-	~httpRequest();
+		void	setErrorCode(unsigned int code);
 
-	bool	parseStartLine(std::string &startLine);
-	bool	parseRequest(std::string &str);
+		bool	parseStartLine(std::string &startLine);
+		bool	parseRequest(std::string &str);
+		bool	checkPath();
 };
+
+std::string code_to_string(const unsigned int code);
 
 #endif
