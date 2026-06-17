@@ -10,9 +10,11 @@ void    Events::parse_events(std::ifstream *fd_file) {
     size_t      posi;
 
     while (std::getline(*fd_file, line)) {
-        std::cout << "Events : " << line << std::endl;
-        if ((posi = line.find("}")) != std::string::npos) {
+        if ((posi = line.find("#")) != std::string::npos) {
+            continue ;
+        } else if ((posi = line.find("}")) != std::string::npos) {
             break;
         }
+        std::cout << "Events : " << line << std::endl;
     }
 }

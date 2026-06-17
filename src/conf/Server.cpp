@@ -2,6 +2,7 @@
 #include "conf/Server.hpp"
 
 Server::Server() {
+
 }
 
 
@@ -10,11 +11,12 @@ void    Server::parse_server(std::ifstream *fd_file) {
     size_t      posi;
 
     while (std::getline(*fd_file, line)) {
-        std::cout << "Server : " << line << std::endl;
-        if ((posi = line.find("}")) != std::string::npos) {
+        if ((posi = line.find("#")) != std::string::npos) {
+            continue ;
+        } else if ((posi = line.find("}")) != std::string::npos) {
             return ;
         } else if ((posi = line.find("port ")) != std::string::npos) {
-            //print(line);
+            put_index_after_space(line, posi + 5);
         } else if ((posi = line.find("location ")) != std::string::npos) {
             if ((posi = line.find("{", posi + 9)) != std::string::npos) {
                 Location location = Location();
@@ -40,5 +42,6 @@ void    Server::parse_server(std::ifstream *fd_file) {
         } else if ((posi = line.find("error_page ")) != std::string::npos) {
             //print(line);
         }
+        std::cout << "Server : " << line << std::endl;
     }
 }
