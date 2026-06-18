@@ -31,7 +31,7 @@ class Conf {
     public:
         Conf();
         Set_variable            set;
-        void                    parse(char *path_file);
+        void                    parse(char *argv);
 };
 
 #endif

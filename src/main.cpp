@@ -6,7 +6,8 @@ int main(int argc, char **argv) {
     print("Need 2 arguments.");
     return FAILURE;
   }
-  parse_conf(argv[1]);
+  Conf  conf_c = Conf();
+  conf_c.parse(argv[1]);
   int port = 8080;
   int server_fd = create_listening_socket(port);
   if (server_fd == ERROR)
