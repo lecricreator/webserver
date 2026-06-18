@@ -63,7 +63,6 @@ void    Conf::parse(char *path_file) {
         } else if ((posi = line.find("gzip ")) != std::string::npos) {
             this->add_in_var(line, posi + 5, &this->_gzip);
         }
-        std::cout << "Conf : " << line << std::endl;
     }
     fd_file.close();
 }
@@ -71,7 +70,7 @@ void    Conf::parse(char *path_file) {
 void    Conf::add_in_var(std::string line, size_t posi, std::string *at_replace) {
     posi = put_index_after_space(line, posi);
     for (; posi < line.length(); posi++) {
-        if (line[posi] == ';') {
+        if (line[posi] == ';' || line[posi] == ' ' || line[posi] == '{') {
             return ;
         } else if (line[posi] >= 33 && line[posi] <= 125) {
             *at_replace += line[posi];

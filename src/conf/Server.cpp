@@ -16,11 +16,12 @@ void    Server::parse_server(std::ifstream *fd_file) {
         } else if ((posi = line.find("}")) != std::string::npos) {
             return ;
         } else if ((posi = line.find("port ")) != std::string::npos) {
-            this->add_in_var(line, posi + 5, &this->_port);
+            this->add_in_var(line, posi + 5, &this->_port_listen);
         } else if ((posi = line.find("location ")) != std::string::npos) {
-            if ((posi = line.find("{", posi + 9)) != std::string::npos) {
+            size_t endposi;
+            if ((endposi = line.find("{", posi + 9)) != std::string::npos) {
                 Location location = Location();
-                location.parse_location(fd_file);
+                location.parse_location(fd_file, line, posi + 9);
                 this->_location.push_back(location);
             }
         } else if ((posi = line.find("server_name ")) != std::string::npos) {
@@ -38,11 +39,10 @@ void    Server::parse_server(std::ifstream *fd_file) {
         } else if ((posi = line.find("gzip ")) != std::string::npos) {
             this->add_in_var(line, posi + 5, &this->_gzip);
         } else if ((posi = line.find("access_log ")) != std::string::npos) {
-            this->add_in_var(line, posi + 11, &this->_gzip);
+            this->add_in_var(line, posi + 11, &this->_access_log);
         } else if ((posi = line.find("error_page ")) != std::string::npos) {
-            this->add_in_var(line, posi + 11, &this->_gzip);
+            this->add_in_var(line, posi + 11, &this->_error_page);
         }
-        std::cout << "Server : " << line << std::endl;
     }
 }
 
@@ -50,7 +50,7 @@ void    Server::parse_server(std::ifstream *fd_file) {
 void    Server::add_in_var(std::string line, size_t posi, std::string *at_replace) {
     posi = put_index_after_space(line, posi);
     for (; posi < line.length(); posi++) {
-        if (line[posi] == ';') {
+        if (line[posi] == ';' || line[posi] == ' ' || line[posi] == '{') {
             return ;
         } else if (line[posi] >= 33 && line[posi] <= 125) {
             *at_replace += line[posi];
@@ -81,4 +81,10 @@ void    Server::add_in_var(std::string line, size_t posi, int *at_replace) {
     print("Error need to add ';'. Next step need to replace by another file\nServer.cpp:13 / add_in_var");
     *at_replace = -1;
     return ;
+}
+
+void    Server::add_in_var(std::string line, size_t posi, bool *at_replace) {
+    if ((posi = line.find("true")) != std::string::npos) {
+        *at_replace = true;
+    }
 }

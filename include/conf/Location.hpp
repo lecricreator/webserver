@@ -4,6 +4,7 @@
 
 class Location {
     private:
+        std::string _path_location;
         std::string _root;
         std::string _index;
         std::string _deny;
@@ -36,7 +37,10 @@ class Location {
         std::string _expires;
     public:
         Location();
-        void    parse_location(std::ifstream *fd_file);
+        void        parse_location(std::ifstream *fd_file, std::string pline, size_t posi);
+        void        add_in_var(std::string line, size_t posi, std::string *at_replace);
+        void        add_in_var(std::string line, size_t posi, int *at_replace);
+        void        add_in_var(std::string line, size_t posi, bool *at_replace);
 };
 
 #endif
