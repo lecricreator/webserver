@@ -1,6 +1,7 @@
 #ifndef LOCATION
 # define LOCATION
 # include <vector>
+# include "Set_variable.hpp"
 
 class Location {
     private:
@@ -37,10 +38,8 @@ class Location {
         std::string _expires;
     public:
         Location();
-        void        parse_location(std::ifstream *fd_file, std::string pline, size_t posi);
-        void        add_in_var(std::string line, size_t posi, std::string *at_replace);
-        void        add_in_var(std::string line, size_t posi, int *at_replace);
-        void        add_in_var(std::string line, size_t posi, bool *at_replace);
+        void            parse_location(std::ifstream *fd_file, std::string pline, size_t posi);
+        Set_variable    set;
 };
 
 #endif

@@ -1,5 +1,16 @@
-#include "webserv.hpp"
 #include "conf/Conf.hpp"
+//# include "support.hpp"
+
+size_t  put_index_after_space(std::string line, size_t index) {
+    for (size_t i = index; i < line.length(); i++) {
+        if (line[i] != ' '){
+            return (i);
+        } else {
+            continue ;
+        }
+    }
+    return (0);
+}
 
 Conf::Conf() {
     this->_user = "";
@@ -39,72 +50,30 @@ void    Conf::parse(char *path_file) {
         } else if ((posi = line.find("http ")) != std::string::npos) {
             this->_http = true;
         } else if ((posi = line.find("user ")) != std::string::npos) {
-            this->add_in_var(line, posi + 4, &this->_user);
+            this->set.add_in_var(line, posi + 4, &this->_user);
         } else if ((posi = line.find("worker_process ")) != std::string::npos) {
-            //this->add_in_var(line, posi + 14, &this->_worker_process);
+            //this->set.add_in_var(line, posi + 14, &this->_worker_process);
         } else if ((posi = line.find("error_log ")) != std::string::npos) {
-            this->add_in_var(line, posi + 9, &this->_error_log);
+            this->set.add_in_var(line, posi + 9, &this->_error_log);
         } else if ((posi = line.find("error_page ")) != std::string::npos) {
-            this->add_in_var(line, posi + 10, &this->_error_page);
+            this->set.add_in_var(line, posi + 10, &this->_error_page);
         } else if ((posi = line.find("access_log ")) != std::string::npos) {
-            this->add_in_var(line, posi + 10, &this->_access_log);
+            this->set.add_in_var(line, posi + 10, &this->_access_log);
         } else if ((posi = line.find("pid")) != std::string::npos) {
-            this->add_in_var(line, posi + 3, &this->_pid);
+            this->set.add_in_var(line, posi + 3, &this->_pid);
         } else if ((posi = line.find("include ")) != std::string::npos) {
-            this->add_in_var(line, posi + 7, &this->_include);
+            this->set.add_in_var(line, posi + 7, &this->_include);
         } else if ((posi = line.find("default_type ")) != std::string::npos) {
-            this->add_in_var(line, posi + 12, &this->_default_type);
+            this->set.add_in_var(line, posi + 12, &this->_default_type);
         } else if ((posi = line.find("log_format ")) != std::string::npos) {
-            this->add_in_var(line, posi + 10, &this->_log_format);
+            this->set.add_in_var(line, posi + 10, &this->_log_format);
         } else if ((posi = line.find("sendfile ")) != std::string::npos) {
-            this->add_in_var(line, posi + 8, &this->_sendfile);
+            this->set.add_in_var(line, posi + 8, &this->_sendfile);
         } else if ((posi = line.find("keepalive_timeout ")) != std::string::npos) {
-            this->add_in_var(line, posi + 17, &this->_keepalive_timeout);
+            this->set.add_in_var(line, posi + 17, &this->_keepalive_timeout);
         } else if ((posi = line.find("gzip ")) != std::string::npos) {
-            this->add_in_var(line, posi + 5, &this->_gzip);
+            this->set.add_in_var(line, posi + 5, &this->_gzip);
         }
     }
     fd_file.close();
-}
-
-void    Conf::add_in_var(std::string line, size_t posi, std::string *at_replace) {
-    posi = put_index_after_space(line, posi);
-    for (; posi < line.length(); posi++) {
-        if (line[posi] == ';' || line[posi] == ' ' || line[posi] == '{') {
-            return ;
-        } else if (line[posi] >= 33 && line[posi] <= 125) {
-            *at_replace += line[posi];
-        } else {
-            *at_replace = "NULL";
-            return ;
-        }
-    }
-    print("Error need to add ';'. Next step need to replace by another file\nconf.cpp:13 / add_in_var");
-    *at_replace = "NULL";
-    return ;
-}
-
-void    Conf::add_in_var(std::string line, size_t posi, int *at_replace) {
-    std::string tmp_val = "";
-    posi = put_index_after_space(line, posi);
-    for (; posi < line.length(); posi++) {
-        if (line[posi] == ';') {
-            *at_replace = to_int(tmp_val);
-            return ;
-        } else if (line[posi] >= '0' && line[posi] <= '9') {
-            tmp_val += line[posi];
-        } else {
-            *at_replace = -1;
-            return ;
-        }
-    }
-    print("Error need to add ';'. Next step need to replace by another file\nconf.cpp:13 / add_in_var");
-    *at_replace = -1;
-    return ;
-}
-
-void    Conf::add_in_var(std::string line, size_t posi, bool *at_replace) {
-    if ((posi = line.find("true")) != std::string::npos) {
-        *at_replace = true;
-    }
 }

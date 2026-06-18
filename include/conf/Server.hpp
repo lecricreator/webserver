@@ -1,7 +1,7 @@
 #ifndef SERVER
 # define SERVER
-# include "conf/Location.hpp"
 # include <vector>
+# include "conf/Location.hpp"
 
 class Server {
     private:
@@ -20,9 +20,7 @@ class Server {
     public:
         Server();
         void                    parse_server(std::ifstream *fd_file);
-        void                    add_in_var(std::string line, size_t posi, std::string *at_replace);
-        void                    add_in_var(std::string line, size_t posi, int *at_replace);
-        void                    add_in_var(std::string line, size_t posi, bool *at_replace);
+        Set_variable            set;
 };
 
 #endif

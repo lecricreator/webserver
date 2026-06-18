@@ -1,10 +1,14 @@
 #ifndef CONF
 # define CONF
 
-# include "webserv.hpp"
+//# include "webserv.hpp"
+# include <string>
 # include "conf/Server.hpp"
 # include "conf/Events.hpp"
+# include "conf/Location.hpp"
 # include <vector>
+
+size_t  put_index_after_space(std::string line, size_t index);
 
 class Conf {
     private:
@@ -26,11 +30,8 @@ class Conf {
         int                     _nb_server;
     public:
         Conf();
+        Set_variable            set;
         void                    parse(char *path_file);
-        void                    add_in_var(std::string line, size_t posi, std::string *at_replace);
-        void                    add_in_var(std::string line, size_t posi, int *at_replace);
-        void                    add_in_var(std::string line, size_t posi, bool *at_replace);
-        //void                    add_in_var(std::string line, size_t posi, std::vector<int> *at_replace);
 };
 
 #endif

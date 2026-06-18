@@ -1,16 +1,6 @@
 #include "webserv.hpp"
 #include "conf/Conf.hpp"
-
-size_t  put_index_after_space(std::string line, size_t index) {
-    for (size_t i = index; i < line.length(); i++) {
-        if (line[i] != ' '){
-            return (i);
-        } else {
-            continue ;
-        }
-    }
-    return (0);
-}
+/*
 
 bool    find_part(std::string at_find, std::string line, size_t *i) {
     size_t  tmp_i = *i;
@@ -77,7 +67,7 @@ void    create_blocks(t_parse_conf *conf, char *argv) {
     std::cout << "nbr events : " << conf->nbr_events << " // nbr http : " << conf->nbr_http << " // nbr serv : " << conf->nbr_server << " // nbr location : " << conf->nbr_location << std::endl;
     std::cout << "{ is : " << conf->start_bracket << " // } is : " << conf->end_bracket << std::endl;
 }
-
+*/
 void    parse_conf(char *argv) {
     std::ifstream   fd_file;
     std::string     line;
