@@ -16,7 +16,7 @@
 //socket
 int   create_listening_socket(int port);
 int   accept_client(int server_fd);
-void  handle_client(int client_fd, const char *response);
+void  handle_client(int client_fd);
 
 //socket support
 void  print_function_error(std::string function_name);
@@ -24,4 +24,4 @@ void  print_success(std::string function_name, std::string output_name, int outp
 void  set_nonblocking(int fd);
 
 //epoll
-int   manage_events(const char *response, int client_fd);
+int   manage_events(int client_fd);
