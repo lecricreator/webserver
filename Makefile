@@ -12,7 +12,7 @@ SOCKET_DIR	:= sockets
 SOCKET_PREFIX:= $(SRC_DIR)/$(SOCKET_DIR)/
 
 ROOT_SRC	:= main.cpp support.cpp
-SOCKET_SRC	:= create_listening_socket.cpp manage_clients.cpp support.cpp
+SOCKET_SRC	:= create_listening_socket.cpp manage_clients.cpp support.cpp epoll.cpp
 
 SRCS		:= $(addprefix $(SRC_DIR)/, $(ROOT_SRC)) \
 			   $(addprefix $(SOCKET_PREFIX), $(SOCKET_SRC))
