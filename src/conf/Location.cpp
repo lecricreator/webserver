@@ -2,7 +2,7 @@
 #include "conf/Set_variable.hpp"
 
 Location::Location() {
-    //Set_variable this->
+
 }
 
 

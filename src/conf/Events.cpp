@@ -2,6 +2,7 @@
 #include "conf/Events.hpp"
 
 Events::Events() {
+    this->_worker_connections = 5000;
 }
 
 
@@ -15,6 +16,5 @@ void    Events::parse_events(std::ifstream *fd_file) {
         } else if ((posi = line.find("}")) != std::string::npos) {
             break;
         }
-        std::cout << "Events : " << line << std::endl;
     }
 }

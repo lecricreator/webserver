@@ -15,15 +15,15 @@ size_t  put_index_after_space(std::string line, size_t index) {
 Conf::Conf() {
     this->_user = "";
     this->_worker_process = -1;
-    this->_error_log = "";
-    this->_error_page = "";
-    this->_access_log = "";
+    //this->_error_log = NULL;
+    //this->_error_page = NULL;
+    //this->_access_log = NULL;
     this->_pid = "";
     this->_include = "";
     this->_default_type = "";
     this->_log_format = "";
     this->_sendfile = "";
-    this->_keepalive_timeout = -1;
+    //this->_keepalive_timeout = NULL;
     this->_gzip = false;
     this->_http = false;
 }

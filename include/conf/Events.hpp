@@ -3,7 +3,7 @@
 
 class Events {
     private:
-        std::string _worker_connections;
+        int         _worker_connections;
         std::string _use;
     public:
         Events();
