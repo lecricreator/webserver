@@ -3,9 +3,6 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-#include <deque>
-#include <cstdlib>
-#include <ctime>
 
 std::string	to_str(int n);
 std::string to_str(float n);
