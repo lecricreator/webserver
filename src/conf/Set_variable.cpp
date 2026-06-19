@@ -71,12 +71,10 @@ void        Set_variable::add_in_var(const std::string line, size_t posi, std::v
         if (line[posi] == ';' || line[posi] == '{') {
             if (!tmp_val.empty()){
                 at_replace->push_back(to_int(tmp_val));
-                print(tmp_val);
             }
             return ;
         } else if (line[posi] == ' ') {
             at_replace->push_back(to_int(tmp_val));
-            print(tmp_val);
             tmp_val = "";
         } else if (line[posi] >= 33 && line[posi] <= 126) {
             tmp_val += line[posi];

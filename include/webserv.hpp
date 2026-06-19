@@ -1,6 +1,8 @@
+# ifndef WEBSERV
+# define WEBSERV
+
 # include "support.hpp"
 # include "conf/Conf.hpp"
-
 
 # include <cerrno>
 # include <fcntl.h>
