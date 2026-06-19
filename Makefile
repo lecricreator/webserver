@@ -24,11 +24,9 @@ INC_DIR = ./include/
 SOCKET_DIR = sockets/
 CONF_DIR = conf/
 
-
-
 # files SRC
 SOCKET_SRC_FILES = 	create_listening_socket.cpp manage_clients.cpp \
-					support.cpp
+					support.cpp epoll.cpp
 CONF_SRC_FILES = 	Conf.cpp Server.cpp Events.cpp Location.cpp Set_variable.cpp
 CONF_INC_FILES =	Conf.hpp Server.hpp Events.hpp Location.hpp Set_variable.hpp
 
