@@ -1,17 +1,22 @@
-#include "support.hpp"
+# include "support.hpp"
+# include "conf/Conf.hpp"
 
-#include <cerrno>
-#include <fcntl.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <sys/epoll.h>
 
-#define ERROR -1
-#define SUCCESS 0
-#define FAILURE 1
+# include <cerrno>
+# include <fcntl.h>
+# include <stdio.h>
+# include <string.h>
+# include <unistd.h>
+# include <sys/socket.h>
+# include <sys/epoll.h>
+# include <arpa/inet.h>
+# include <iostream>
+# include <fstream>
+# include <list>
+
+# define ERROR -1
+# define SUCCESS 0
+# define FAILURE 1
 
 //socket
 int   create_listening_socket(int port);
@@ -25,3 +30,8 @@ void  set_nonblocking(int fd);
 
 //epoll
 int   manage_events(const char *response, int client_fd);
+
+//conf
+void    parse_conf(char *argv);
+
+#endif
