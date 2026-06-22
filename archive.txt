@@ -1,0 +1,33 @@
+# resolve an address. idk why or when it is useful though
+
+struct addrinfo  hints, *res;
+memset(&hints, 0, sizeof(hints));
+
+hints.ai_family   = AF_UNSPEC;    // accepte IPv4 et IPv6
+hints.ai_socktype = SOCK_STREAM;  // on veut du TCP
+hints.ai_flags    = AI_PASSIVE;   // NULL hostname → INADDR_ANY (toutes les interfaces)
+
+int status = getaddrinfo(NULL, "8080", &hints, &res);
+if (status != 0) {
+    std::cerr << gai_strerror(status) << "\n";
+    return 1;
+}
+
+// res est une liste chaînée — prendre le premier qui marche
+int fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+bind(fd, res->ai_addr, res->ai_addrlen);
+
+freeaddrinfo(res);  // ← TOUJOURS libérer après utilisation
+----------------------------------------------------------------------------
+
+# get and print an attributed port
+
+struct sockaddr_in actual;
+socklen_t          len = sizeof(actual);
+getsockname(fd, (struct sockaddr*)&actual, &len);
+
+std::cout << "Port attribué : " << ntohs(actual.sin_port) << "\n";
+
+----------------------------------------------------------------------------
+SIGPIPE — le crash silencieux : si tu fais send() sur un socket dont l'autre côté est fermé, le kernel envoie le signal SIGPIPE à ton processus — qui le tue par défaut.
+Solution : ignorer ce signal globalement avec signal(SIGPIPE, SIG_IGN) au démarrage, et gérer l'erreur EPIPE retournée par send(). 

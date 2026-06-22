@@ -2,7 +2,7 @@
 
 #define MAX_EVENTS 64
 
-static void set_event(struct epoll_event *event, int flag, int fd)
+void set_event(struct epoll_event *event, int flag, int fd)
 {
   event->events = flag;
   event->data.fd = fd;
@@ -16,9 +16,22 @@ const char* response =
     "\r\n"
     "<h1>Hello World!</h1>";
 
+int  send_response(int client_fd, std::string *response)
+{
+  ssize_t bytes_sent;
+  bytes_sent = send(client_fd, response->data(), response->size(), 0);
+  if (bytes_sent == ERROR)
+    print_error("Failed to send response");
+  if (bytes_sent == (ssize_t)response->size())
+    return DONE;
+  response->erase(0, bytes_sent);
+  return UNFINISHED;
+}
+
 static void manage_requests(struct epoll_event event, int server_fd, int epoll_fd)
 {
   int fd = event.data.fd;
+  std::string *response = NULL;
 
   if (fd == server_fd)
   {
@@ -28,7 +41,8 @@ static void manage_requests(struct epoll_event event, int server_fd, int epoll_f
     set_nonblocking(client_fd);
     struct epoll_event s_event;
     set_event(&s_event, EPOLLIN, client_fd);
-    epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &s_event);
+    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &s_event) == ERROR)
+      return print_error("epoll_ctl"), void();
   }
   else if (event.events & (EPOLLERR | EPOLLHUP))
   {
@@ -36,9 +50,23 @@ static void manage_requests(struct epoll_event event, int server_fd, int epoll_f
     close(fd);
   }
   else if (event.events & EPOLLIN)
-    handle_client(fd);
+  {
+    if (handle_client(fd, response) == SUCCESS)
+    {
+      set_event(&event, EPOLLIN, fd);
+      if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &event) == ERROR)
+        return print_error("epoll_ctl"), void();
+    }
+  }
   else
-    send(fd, response, strlen(response), 0);
+  {
+    if (send_response(fd, response) == DONE)
+    {
+      set_event(&event, EPOLLIN, fd);
+      if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &event) == ERROR)
+        return print_error("epoll_ctl"), void();
+    }
+  }
 }
 
 int manage_events(int server_fd)

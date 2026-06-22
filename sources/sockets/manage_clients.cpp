@@ -15,38 +15,40 @@ int accept_client(int server_fd)
   return client_fd;
 }
 
-static std::string get_sender_ip(int client_fd)
+int parse(char buf[4096]) {(void)buf; return SUCCESS;}
+
+static int build_response(std::string *response)
 {
-  struct sockaddr_in peer;
-  socklen_t len = sizeof(peer);
-  getpeername(client_fd, (struct sockaddr*)&peer, &len);
-  char ip[INET_ADDRSTRLEN];
-  inet_ntop(AF_INET, &peer.sin_addr, ip, sizeof(ip));
-  return ip;
+  *response =
+      "HTTP/1.1 200 OK\r\n"
+      "Content-Type: text/html\r\n"
+      "Content-Length: 21\r\n"
+      "Connection: close\r\n"
+      "\r\n"
+      "<h1>Hello World!</h1>";
+  return (SUCCESS);
 }
 
 //connection closed by client, error and no data received is answered the same way for now
 //recv([...], MSG_PEEK) wouldn't consume the buffer
-//for send we should send as much as possible and if theres too much (EAGAIN),
+//for send we should send as much as possible and if theres too much,
 //we mark the socket with EPOLLOUT
-//we should check EAGAIN on recv and send
-void handle_client(int client_fd)
+int handle_client(int client_fd, std::string *response)
 {
-    char buf[4096];
-    int bytes_received = recv(client_fd, buf, sizeof(buf) - 1, 0);
-    if (bytes_received <= 0)
-      return (close(client_fd), void());
-    buf[bytes_received] = '\0';
-    print("--- HTTP REQUEST ---\n");
-    print(buf);
-    const char* response =
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: text/html\r\n"
-        "Content-Length: 21\r\n"
-        "Connection: close\r\n"
-        "\r\n"
-        "<h1>Hello World!</h1>";
-    if (send(client_fd, response, strlen(response), 0) == ERROR)
-      print_error("Failed to send response to " + get_sender_ip(client_fd));
-    close(client_fd);
+  char buf[4096];
+  int bytes_received = recv(client_fd, buf, sizeof(buf) - 1, 0);
+  if (bytes_received <= 0)
+    return ERROR;
+  buf[bytes_received] = '\0';
+  print("--- HTTP REQUEST ---\n");
+  print(buf);
+
+  //things from parse's return should be given to build_response.
+  int is_parsing_done = parse(buf);
+
+  if (is_parsing_done == ERROR)
+    return ERROR;
+  if (build_response(response) == ERROR)
+    return ERROR;
+  return SUCCESS;
 }
