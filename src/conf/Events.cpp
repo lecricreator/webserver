@@ -6,7 +6,7 @@ Events::Events() {
 }
 
 
-void    Events::parse_events(std::ifstream *fd_file) {
+bool    Events::parse_events(std::ifstream *fd_file) {
     std::string line;
     size_t      posi;
 
@@ -14,7 +14,9 @@ void    Events::parse_events(std::ifstream *fd_file) {
         if ((posi = line.find("#")) != std::string::npos) {
             continue ;
         } else if ((posi = line.find("}")) != std::string::npos) {
-            break;
+            return (true);
         }
     }
+    print("No '}', end of file in Events.");
+    return (false);
 }

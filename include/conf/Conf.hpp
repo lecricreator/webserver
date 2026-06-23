@@ -8,6 +8,7 @@
 # include "conf/Location.hpp"
 # include <vector>
 
+
 size_t  put_index_after_space(std::string line, size_t index);
 
 class Conf {
@@ -27,8 +28,9 @@ class Conf {
         bool                        _http;
         std::vector<Events>         _events;
         std::vector<Server>         _servers;
+        bool                        _end_http;
     public:
-        Conf() {};
+        Conf();
         Set_variable            set;
         bool                    parse(char *argv);
 

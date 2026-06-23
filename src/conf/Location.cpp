@@ -1,7 +1,7 @@
 #include "conf/Location.hpp"
 #include "conf/Set_variable.hpp"
 
-void    Location::parse_location(std::ifstream *fd_file, std::string pline, size_t posi) {
+bool    Location::parse_location(std::ifstream *fd_file, std::string pline, size_t posi) {
     std::string line;
 
     this->set.add_in_var(pline, posi, &this->_path_location);
@@ -13,7 +13,9 @@ void    Location::parse_location(std::ifstream *fd_file, std::string pline, size
         } else if ((posi = line.find("index ")) != std::string::npos) {
             this->set.add_in_var(line, posi + 6, &this->_index);
         } else if ((posi = line.find("}")) != std::string::npos) {
-            break;
+            return (true);
         }
     }
+    print("No '}', end of file in Location.");
+    return (false);
 }

@@ -2,11 +2,11 @@
 #include "conf/Server.hpp"
 
 Server::Server() {
-    this->_listening_port = -1;
+    this->_listening_port = ERROR;
 }
 
 
-void    Server::parse_server(std::ifstream *fd_file) {
+bool    Server::parse_server(std::ifstream *fd_file) {
     std::string line;
     size_t      posi;
 
@@ -14,14 +14,16 @@ void    Server::parse_server(std::ifstream *fd_file) {
         if ((posi = line.find("#")) != std::string::npos) {
             continue ;
         } else if ((posi = line.find("}")) != std::string::npos) {
-            return ;
+            return (true);
         } else if ((posi = line.find("listen ")) != std::string::npos) {
             this->set.add_in_var(line, posi + 7, &this->_listening_port);
         } else if ((posi = line.find("location ")) != std::string::npos) {
             size_t endposi;
             if ((endposi = line.find("{", posi + 9)) != std::string::npos) {
                 Location location = Location();
-                location.parse_location(fd_file, line, posi + 9);
+                if (!location.parse_location(fd_file, line, posi + 9)) {
+                    return (false);
+                }
                 this->_location.push_back(location);
             }
         } else if ((posi = line.find("server_name ")) != std::string::npos) {
@@ -44,4 +46,6 @@ void    Server::parse_server(std::ifstream *fd_file) {
             this->set.add_in_var(line, posi + 11, &this->_error_page);
         }
     }
+    print("No '}', end of file in Server.");
+    return (false);
 }
