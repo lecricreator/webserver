@@ -8,6 +8,7 @@ httpRequest::httpRequest() : _headers()
 	_httpVersion = "";
 	_status = REQ_START_LINE;
 	_errorCode = 0;
+	_bodySize = -1;
 }
 
 httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
@@ -18,6 +19,7 @@ httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
 	_httpVersion = _httpVersion;
 	_status = copy._status;
 	_errorCode = copy._errorCode;
+	_bodySize = copy._bodySize;
 }
 
 httpRequest&	httpRequest::operator=(const httpRequest& copy)
@@ -29,6 +31,7 @@ httpRequest&	httpRequest::operator=(const httpRequest& copy)
 	_httpVersion = _httpVersion;
 	_status = copy._status;
 	_errorCode = copy._errorCode;
+	_bodySize = copy._bodySize;
 }
 
 httpRequest::~httpRequest() {}
@@ -133,6 +136,61 @@ bool	httpRequest::parseStartLine(std::string &startLine)
 	return true;
 }
 
+bool	httpRequest::parseChunked()
+{
+
+}
+
+int	ft_stoi(std::string str)
+{
+	for (size_t i = 0; i < str.size(); i++)
+	{
+		if (!isdigit(str[i]))
+			return -1;
+	}
+	std::stringstream	ss;
+	int n = 0;
+
+	ss << str;
+	ss >> n;
+	return n;
+}
+
+bool	httpRequest::parseFixedLength()
+{
+	if (_bodySize == -1)
+	{
+		_bodySize = ft_stoi(_headers.find("Content-Length")->second);
+		if (_bodySize < 0)
+		{
+			setErrorCode(400);
+			return false;
+		}
+	}
+
+	int	i = 0;
+	while (_body.size() < _bodySize && _requestBuffer[i])
+	{
+		_body += _requestBuffer[i];
+		i++;
+	}
+	return true;
+}
+
+// no body/fixed length/chunked
+bool	httpRequest::parseBody()
+{
+	bool	ret;
+
+	if (_headers.find("Transfer-Encoding") != _headers.end())
+		ret = parseChunked();
+	if (_headers.find("Content-Length") != _headers.end())
+		ret = parseFixedLength();
+	if (!ret)
+		return false;
+	return true;
+}
+
 bool	httpRequest::parseRequest(std::string &str)
 {
 	_requestBuffer.append(str);
@@ -153,6 +211,7 @@ bool	httpRequest::parseRequest(std::string &str)
 		{
 			if (_requestBuffer.find("\r\n\r\n") != std::string::npos)
 			{
+				_requestBuffer.erase(0, _requestBuffer.find("\r\n\r\n"));
 				if (_method == "POST")
 					_status = REQ_BODY;
 				else
@@ -169,6 +228,10 @@ bool	httpRequest::parseRequest(std::string &str)
 				_requestBuffer.erase(0, crlf + 2);
 			}
 		}
+	}
+	if (_status == REQ_BODY)
+	{
+		parseBody();
 	}
 }
 

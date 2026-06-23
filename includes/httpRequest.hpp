@@ -2,6 +2,7 @@
 # define HTTPREQUEST_HPP
 #include "webserv.hpp"
 #include <string>
+#include <sstream>
 #include <map>
 
 enum RequestStatus {
@@ -28,6 +29,7 @@ class httpRequest
 		std::string		_path;
 		std::string		_httpVersion;
 		unsigned int	_errorCode;
+		int				_bodySize;
 
 
 	public:
@@ -41,8 +43,12 @@ class httpRequest
 		bool	parseStartLine(std::string &startLine);
 		bool	parseRequest(std::string &str);
 		bool	checkPath();
+		bool	parseFixedLength();
+		bool	parseChunked();
+		bool	parseBody();
 };
 
 std::string code_to_string(const unsigned int code);
+int			ft_stoi(std::string n);
 
 #endif
