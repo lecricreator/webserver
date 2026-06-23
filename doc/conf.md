@@ -95,7 +95,8 @@ listen 127.0.0.1:8000;
 listen 127.0.0.1;
 listen 8000;
 listen localhost:8000;
-```
+``` 
+
 
 ## server_name
 ```
