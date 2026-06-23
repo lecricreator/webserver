@@ -37,7 +37,7 @@ class Location {
         std::string         _charset;
         std::string         _expires;
     public:
-        Location();
+        Location() {};
         void            parse_location(std::ifstream *fd_file, std::string pline, size_t posi);
         Set_variable    set;
 

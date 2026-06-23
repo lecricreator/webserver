@@ -28,9 +28,9 @@ class Conf {
         std::vector<Events>         _events;
         std::vector<Server>         _server;
     public:
-        Conf();
+        Conf() {};
         Set_variable            set;
-        void                    parse(char *argv);
+        bool                    parse(char *argv);
 
         //GET
         std::vector<Server>     get_server()    {return (this->_server);};

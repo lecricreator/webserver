@@ -15,7 +15,9 @@ int main(int argc, char **argv) {
     return FAILURE;
   }
   Conf  conf_c = Conf();
-  conf_c.parse(argv[1]);
+  if (!conf_c.parse(argv[1])) {
+    return FAILURE;
+  }
   int port = 8080;
   int server_fd = create_listening_socket(port);
   if (server_fd == ERROR)

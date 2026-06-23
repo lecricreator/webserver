@@ -17,7 +17,7 @@ class Server {
         std::vector<std::string>    _error_page;
         std::vector<Location>       _location;
     public:
-        Server();
+        Server() {};
         void                        parse_server(std::ifstream *fd_file);
         Set_variable                set;
 

@@ -1,11 +1,6 @@
 #include "conf/Location.hpp"
 #include "conf/Set_variable.hpp"
 
-Location::Location() {
-
-}
-
-
 void    Location::parse_location(std::ifstream *fd_file, std::string pline, size_t posi) {
     std::string line;
 
