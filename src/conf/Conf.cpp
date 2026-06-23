@@ -45,7 +45,7 @@ void    Conf::parse(char *path_file) {
                 }
                 Server  server = Server();
                 server.parse_server(&fd_file);
-                this->_server.push_back(server);
+                this->_servers.push_back(server);
             }
         } else if ((posi = line.find("events ")) != std::string::npos) {
             Events  events = Events();

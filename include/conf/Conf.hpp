@@ -26,14 +26,14 @@ class Conf {
         bool                        _gzip;
         bool                        _http;
         std::vector<Events>         _events;
-        std::vector<Server>         _server;
+        std::vector<Server>         _servers;
     public:
         Conf() {};
         Set_variable            set;
         bool                    parse(char *argv);
 
         //GET
-        std::vector<Server>     get_server()    {return (this->_server);};
+        std::vector<Server>     get_servers()    {return (this->_servers);};
         std::vector<Events>     get_events()    {return (this->_events);};
     };
 
