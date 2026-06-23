@@ -27,11 +27,14 @@ class Conf {
         bool                        _http;
         std::vector<Events>         _events;
         std::vector<Server>         _server;
-        int                         _nb_server;
     public:
         Conf();
         Set_variable            set;
         void                    parse(char *argv);
-};
+
+        //GET
+        std::vector<Server>     get_server()    {return (this->_server);};
+        std::vector<Events>     get_events()    {return (this->_events);};
+    };
 
 #endif

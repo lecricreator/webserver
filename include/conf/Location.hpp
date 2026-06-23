@@ -40,6 +40,11 @@ class Location {
         Location();
         void            parse_location(std::ifstream *fd_file, std::string pline, size_t posi);
         Set_variable    set;
+
+        //GET
+        std::string                 get_root()  {return (this->_root);};
+        std::vector<std::string>    get_index() {return (this->_index);};
+
 };
 
 #endif
