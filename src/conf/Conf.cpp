@@ -39,6 +39,10 @@ void    Conf::parse(char *path_file) {
             continue ;
         } else if ((posi = line.find("server ")) != std::string::npos) {
             if ((posi = line.find("{", posi + 7)) != std::string::npos) {
+                if (!this->_http) {
+                    print("Need http { ... } before server { ... } for use http.");
+                    return;
+                }
                 Server  server = Server();
                 server.parse_server(&fd_file);
                 this->_server.push_back(server);
