@@ -19,11 +19,13 @@
 # define ERROR -1
 # define SUCCESS 0
 # define FAILURE 1
+# define DONE 0
+# define UNFINISHED 1
 
 //socket
 int   create_listening_socket(int port);
 int   accept_client(int server_fd);
-void  handle_client(int client_fd, const char *response);
+int   handle_client(int client_fd, std::string *response);
 
 //socket support
 void  print_function_error(std::string function_name);
@@ -31,7 +33,7 @@ void  print_success(std::string function_name, std::string output_name, int outp
 void  set_nonblocking(int fd);
 
 //epoll
-int   manage_events(const char *response, int client_fd);
+int   manage_events(int client_fd);
 
 //conf
 void    parse_conf(char *argv);
