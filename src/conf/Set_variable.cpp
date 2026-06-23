@@ -28,7 +28,6 @@ void    Set_variable::add_in_var(const std::string line, size_t posi, int *at_re
         print(line);
         return ;
     }
-
     std::string tmp_val = "";
     posi = put_index_after_space(line, posi);
     for (; posi < line.length(); posi++) {
