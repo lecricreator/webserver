@@ -1,6 +1,11 @@
 #include "conf/Set_variable.hpp"
 
 void    Set_variable::add_in_var(const std::string line, size_t posi, std::string *at_replace) {
+    if (!at_replace->empty()) {
+        print("Same value is exist. Find an another nginx file.");
+        print(line);
+        return ;
+    }
     posi = put_index_after_space(line, posi);
     for (; posi < line.length(); posi++) {
         if (line[posi] == ';' || line[posi] == ' ' || line[posi] == '{') {
@@ -18,6 +23,12 @@ void    Set_variable::add_in_var(const std::string line, size_t posi, std::strin
 }
 
 void    Set_variable::add_in_var(const std::string line, size_t posi, int *at_replace) {
+    if (*at_replace != -1) {
+        print("Same value is exist. Find an another nginx file.");
+        print(line);
+        return ;
+    }
+
     std::string tmp_val = "";
     posi = put_index_after_space(line, posi);
     for (; posi < line.length(); posi++) {
@@ -37,12 +48,22 @@ void    Set_variable::add_in_var(const std::string line, size_t posi, int *at_re
 }
 
 void    Set_variable::add_in_var(const std::string line, size_t posi, bool *at_replace) {
+    if (*at_replace == true) {
+        print("Same value is exist. Find an another nginx file.");
+        print(line);
+        return ;
+    }
     if ((posi = line.find("true")) != std::string::npos) {
         *at_replace = true;
     }
 }
 
 void    Set_variable::add_in_var(const std::string line, size_t posi, std::vector<std::string> *at_replace) {
+    if (!at_replace->empty()) {
+        print("Same value is exist. Find an another nginx file.");
+        print(line);
+        return ;
+    }
     std::string tmp_val;
     posi = put_index_after_space(line, posi);
     for (; posi < line.length(); posi++) {
@@ -65,6 +86,10 @@ void    Set_variable::add_in_var(const std::string line, size_t posi, std::vecto
 }
 
 void        Set_variable::add_in_var(const std::string line, size_t posi, std::vector<int> *at_replace) {
+    if (!at_replace->empty()) {
+        print("Same value is exist. Find an another nginx file.");
+        return ;
+    }
     std::string tmp_val;
     posi = put_index_after_space(line, posi);
     for (; posi < line.length(); posi++) {
