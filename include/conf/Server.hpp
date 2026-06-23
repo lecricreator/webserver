@@ -5,7 +5,7 @@
 
 class Server {
     private:
-        int                         _port_listen;
+        int                         _listening_port;
         std::vector<std::string>    _server_name;
         std::string                 _include;
         std::string                 _default_type;
@@ -22,7 +22,7 @@ class Server {
         Set_variable                set;
 
         //GET
-        int                         get_port_listen()   {return (this->_port_listen);};
+        int                         get_port_listen()   {return (this->_listening_port);};
         std::vector<std::string>    get_server_name()   {return (this->_server_name);};
         std::vector<Location>       get_location()      {return (this->_location);};
 
