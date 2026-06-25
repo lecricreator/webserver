@@ -15,12 +15,18 @@ enum RequestStatus {
     REQ_ERROR			// Error during parsing
 };
 
+enum ChunkBodyStatus {
+	CHUNK_SIZE,
+	CHUNK_DATA
+};
+
 typedef std::map<std::string, std::string> HeaderMap;
 
 class httpRequest
 {
 	private:
 		RequestStatus	_status;
+		ChunkBodyStatus	_chunkStatus;
 		std::string		_requestBuffer;
 		HeaderMap		_headers;
 		std::string		_body;
@@ -46,9 +52,11 @@ class httpRequest
 		bool	parseFixedLength();
 		bool	parseChunked();
 		bool	parseBody();
+		size_t	parseHex();
 };
 
 std::string code_to_string(const unsigned int code);
 int			ft_stoi(std::string n);
+int 		hexToInt(const std::string& hexStr);
 
 #endif

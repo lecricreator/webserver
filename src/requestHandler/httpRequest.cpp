@@ -9,6 +9,7 @@ httpRequest::httpRequest() : _headers()
 	_status = REQ_START_LINE;
 	_errorCode = 0;
 	_bodySize = -1;
+	_chunkStatus = CHUNK_SIZE;
 }
 
 httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
@@ -20,6 +21,7 @@ httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
 	_status = copy._status;
 	_errorCode = copy._errorCode;
 	_bodySize = copy._bodySize;
+	_chunkStatus = copy._chunkStatus;
 }
 
 httpRequest&	httpRequest::operator=(const httpRequest& copy)
@@ -32,6 +34,7 @@ httpRequest&	httpRequest::operator=(const httpRequest& copy)
 	_status = copy._status;
 	_errorCode = copy._errorCode;
 	_bodySize = copy._bodySize;
+	_chunkStatus = copy._chunkStatus;
 }
 
 httpRequest::~httpRequest() {}
@@ -136,9 +139,52 @@ bool	httpRequest::parseStartLine(std::string &startLine)
 	return true;
 }
 
+int hexToInt(const std::string& hexStr) {
+    // Using stringstream with hex manipulator
+    std::stringstream ss;
+    ss << std::hex << hexStr;
+    int result;
+    ss >> result;
+    
+    if (ss.fail()) 
+		return -1;
+    return result;
+}
+
+size_t	httpRequest::parseHex()
+{
+	std::string	hexStr = _requestBuffer.substr(0, _requestBuffer.find("\r\n"));
+	int	res;
+
+	res = hexToInt(hexStr);
+	if (res == -1)
+}
+
 bool	httpRequest::parseChunked()
 {
-
+	//lis dans le buffer
+	//while (find(crlf)) switch entre parser la taille/parser la data
+	//si le chunk == 0 tu stop
+	size_t	chunkSize;
+	while (_requestBuffer.find("\r\n") != std::string::npos)
+	{
+		if (_chunkStatus == CHUNK_SIZE)
+		{
+			chunkSize = parseHex();
+			if (chunkSize == 0)
+			{
+				_requestBuffer.clear();
+				return true;
+			}
+			_chunkStatus = CHUNK_DATA;
+		}
+		else
+		{
+			//parse data
+			_chunkStatus = CHUNK_SIZE;
+		}
+	}
+	
 }
 
 int	ft_stoi(std::string str)
