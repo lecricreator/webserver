@@ -1,5 +1,5 @@
 #include "httpRequest.hpp"
-//test
+
 httpRequest::httpRequest() : _headers()
 {
 	_requestBuffer = "";
