@@ -14,11 +14,13 @@ int main(int argc, char **argv) {
     print("Need 2 arguments.");
     return FAILURE;
   }
-  Conf  conf_c = Conf();
-  if (!conf_c.parse(argv[1])) {
+  Conf  *conf_c = new Conf();
+  if (!conf_c->parse(argv[1])) {
     std::cout << "The syntax of your conf is not correct, replace by the file: " << CONF_SAFE << '\n';
-    if (!conf_c.parse(CONF_SAFE)) {
-    std::cout << "ERROR of syntax with the file: " << CONF_SAFE << ". Stop the program.\n";
+    delete conf_c;
+    Conf  *conf_c = new Conf();
+    if (!conf_c->parse(CONF_SAFE)) {
+      std::cout << "ERROR of syntax with the file: " << CONF_SAFE << ". Stop the program.\n";
       return FAILURE;
     }
   }

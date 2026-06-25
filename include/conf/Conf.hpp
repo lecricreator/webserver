@@ -33,6 +33,7 @@ class Conf {
         bool                        _end_http;
     public:
         Conf();
+        ~Conf() {};
         Set_variable            set;
         bool                    parse(const char *argv);
 
