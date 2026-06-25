@@ -14,22 +14,19 @@ int main(int argc, char **argv) {
     print("Need 2 arguments.");
     return FAILURE;
   }
-  Conf  *conf_c = new Conf();
-  if (!conf_c->parse(argv[1])) {
-    std::cout << "The syntax of your conf is not correct, replace by the file: " << CONF_SAFE << '\n';
-    delete conf_c;
-    Conf  *conf_c = new Conf();
-    if (!conf_c->parse(CONF_SAFE)) {
-      std::cout << "ERROR of syntax with the file: " << CONF_SAFE << ". Stop the program.\n";
-      return FAILURE;
-    }
+  Conf *conf_c = init_conf(argv[1]);
+  if (conf_c == NULL) {
+    return FAILURE;
   }
   int port = 8080;
   int server_fd = create_listening_socket(port);
   if (server_fd == ERROR)
     return FAILURE;
   set_nonblocking(server_fd);
-  if (manage_events(response, server_fd) == ERROR)
+  if (manage_events(response, server_fd) == ERROR) {
+    delete conf_c;
     return FAILURE;
+  }
+  delete conf_c;
   return SUCCESS;
 }
