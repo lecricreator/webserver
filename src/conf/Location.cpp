@@ -1,7 +1,7 @@
 #include "conf/Location.hpp"
 #include "conf/Set_variable.hpp"
 
-bool    Location::parse_location(std::ifstream *fd_file, std::string pline, size_t posi) {
+bool    Location::parse_location(std::ifstream *fd_file, const std::string pline, size_t posi) {
     std::string line;
 
     this->set.add_in_var(pline, posi, &this->_path_location);

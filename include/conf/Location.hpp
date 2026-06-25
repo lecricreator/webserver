@@ -36,7 +36,7 @@ class Location {
         std::string                 _expires;
     public:
         Location() {};
-        bool            parse_location(std::ifstream *fd_file, std::string pline, size_t posi);
+        bool            parse_location(std::ifstream *fd_file, const std::string pline, size_t posi);
         Set_variable    set;
 
         //GET

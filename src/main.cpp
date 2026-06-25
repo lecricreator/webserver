@@ -16,7 +16,11 @@ int main(int argc, char **argv) {
   }
   Conf  conf_c = Conf();
   if (!conf_c.parse(argv[1])) {
-    return FAILURE;
+    std::cout << "The syntax of your conf is not correct, replace by the file: " << CONF_SAFE << '\n';
+    if (!conf_c.parse(CONF_SAFE)) {
+    std::cout << "ERROR of syntax with the file: " << CONF_SAFE << ". Stop the program.\n";
+      return FAILURE;
+    }
   }
   int port = 8080;
   int server_fd = create_listening_socket(port);

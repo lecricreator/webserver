@@ -1,6 +1,8 @@
 #ifndef CONF
 # define CONF
 
+# define CONF_SAFE "conf/safe.conf"
+
 //# include "webserv.hpp"
 # include <string>
 # include "conf/Server.hpp"
@@ -32,7 +34,7 @@ class Conf {
     public:
         Conf();
         Set_variable            set;
-        bool                    parse(char *argv);
+        bool                    parse(const char *argv);
 
         //GET
         std::vector<Server>     get_servers()    {return (this->_servers);};

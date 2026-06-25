@@ -29,7 +29,7 @@ Conf::Conf() {
     this->_end_http = false;
 }
 
-bool    Conf::parse(char *path_file) {
+bool    Conf::parse(const char *path_file) {
     std::ifstream   fd_file;
     std::string     line;
     size_t          posi;
