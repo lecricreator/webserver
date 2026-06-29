@@ -36,6 +36,7 @@ class httpRequest
 		std::string		_httpVersion;
 		unsigned int	_errorCode;
 		int				_bodySize;
+		int				_chunkSize;
 
 
 	public:
@@ -46,13 +47,15 @@ class httpRequest
 
 		void	setErrorCode(unsigned int code);
 
+		bool	parseRequest(std::string str);
 		bool	parseStartLine(std::string &startLine);
-		bool	parseRequest(std::string &str);
-		bool	checkPath();
+		bool	parseHeaders();
+		bool	checkPath(); //not implemented
 		bool	parseFixedLength();
 		bool	parseChunked();
 		bool	parseBody();
-		size_t	parseHex();
+		bool	parseHexSize(); //not implemented
+		bool	parseChunkData(); //not implemented
 };
 
 std::string code_to_string(const unsigned int code);
