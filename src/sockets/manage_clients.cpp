@@ -17,9 +17,9 @@ int accept_client(int server_fd)
 
 int parse(char buf[4096]) {(void)buf; return SUCCESS;}
 
-static int build_response(std::string *response)
+static int build_response(std::string &response)
 {
-  *response =
+  response =
       "HTTP/1.1 200 OK\r\n"
       "Content-Type: text/html\r\n"
       "Content-Length: 21\r\n"
@@ -33,7 +33,7 @@ static int build_response(std::string *response)
 //recv([...], MSG_PEEK) wouldn't consume the buffer
 //for send we should send as much as possible and if theres too much,
 //we mark the socket with EPOLLOUT
-int handle_client(int client_fd, std::string *response)
+int get_request(int client_fd, std::string &response)
 {
   char buf[4096];
   int bytes_received = recv(client_fd, buf, sizeof(buf) - 1, 0);
@@ -52,3 +52,15 @@ int handle_client(int client_fd, std::string *response)
     return ERROR;
   return SUCCESS;
 }
+
+int send_response(int client_fd, std::string &response)
+{
+  ssize_t bytes_sent = send(client_fd, response.data(), response.size(), 0);
+  if (bytes_sent == ERROR)
+    print_error("Failed to send response");
+  if (bytes_sent == (ssize_t)response.size())
+    return DONE;
+  response.erase(0, bytes_sent);
+  return UNFINISHED;
+}
+

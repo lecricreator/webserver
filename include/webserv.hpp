@@ -17,6 +17,7 @@
 # include <list>
 # include <algorithm>
 # include <vector>
+# include <map>
 
 # define ERROR -1
 # define SUCCESS 0
@@ -27,7 +28,8 @@
 //socket
 int   create_listening_socket(int port);
 int   accept_client(int server_fd);
-int   handle_client(int client_fd, std::string *response);
+int   get_request(int client_fd, std::string &response);
+int   send_response(int client_fd, std::string &response);
 
 //socket support
 void  print_function_error(std::string function_name);

@@ -8,19 +8,7 @@ void set_event(struct epoll_event *event, int flag, int fd)
   event->data.fd = fd;
 }
 
-int  send_response(int client_fd, std::string *response)
-{
-  ssize_t bytes_sent;
-  bytes_sent = send(client_fd, response->data(), response->size(), 0);
-  if (bytes_sent == ERROR)
-    print_error("Failed to send response");
-  if (bytes_sent == (ssize_t)response->size())
-    return DONE;
-  response->erase(0, bytes_sent);
-  return UNFINISHED;
-}
-
-static void manage_requests(struct epoll_event event, std::vector<int> server_fds, int epoll_fd, std::string *response)
+static void manage_requests(struct epoll_event event, std::vector<int> server_fds, int epoll_fd, std::map<int, std::string> &responses)
 {
   int fd = event.data.fd;
 
@@ -34,6 +22,7 @@ static void manage_requests(struct epoll_event event, std::vector<int> server_fd
     set_event(&s_event, EPOLLIN, client_fd);
     if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &s_event) == ERROR)
       return print_error("epoll_ctl"), void();
+    responses[fd] = "";
   }
   else if (event.events & (EPOLLERR | EPOLLHUP))
   {
@@ -43,7 +32,7 @@ static void manage_requests(struct epoll_event event, std::vector<int> server_fd
   }
   else if (event.events & EPOLLIN)
   {
-    if (handle_client(fd, response) == SUCCESS)
+    if (get_request(fd, responses[fd]) == SUCCESS)
     {
       set_event(&event, EPOLLOUT, fd);
       if (epoll_ctl(epoll_fd, EPOLL_CTL_MOD, fd, &event) == ERROR)
@@ -52,7 +41,7 @@ static void manage_requests(struct epoll_event event, std::vector<int> server_fd
   }
   else
   {
-    if (send_response(fd, response) == DONE)
+    if (send_response(fd, responses[fd]) == DONE)
     {
       set_event(&event, EPOLLOUT, fd);
       if (epoll_ctl(epoll_fd, EPOLL_CTL_MOD, fd, &event) == ERROR)
@@ -77,7 +66,7 @@ int manage_events(std::vector<int> server_fds)
   }
 
   struct epoll_event events[MAX_EVENTS];
-  std::string response;
+  std::map<int, std::string> response;
   while (true)
   {
     int nfds = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
@@ -88,7 +77,7 @@ int manage_events(std::vector<int> server_fds)
       return ERROR;
     }
     for (int i = 0; i < nfds; i++)
-      manage_requests(events[i], server_fds, epoll_fd, &response);
+      manage_requests(events[i], server_fds, epoll_fd, response);
   }
   close(epoll_fd);
   return SUCCESS;
