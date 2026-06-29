@@ -56,7 +56,7 @@ int get_request(int client_fd, std::string &response)
 int send_response(int client_fd, std::string &response)
 {
   ssize_t bytes_sent = send(client_fd, response.data(), response.size(), 0);
-  if (bytes_sent == ERROR)
+  if (bytes_sent == ERROR && errno != EAGAIN)
     print_error("Failed to send response");
   if (bytes_sent == (ssize_t)response.size())
     return DONE;
