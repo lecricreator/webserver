@@ -8,12 +8,19 @@ int main(int argc, char **argv) {
   }
   Conf  conf_c = Conf();
   conf_c.parse(argv[1]);
-  int port = 8080;
-  int server_fd = create_listening_socket(port);
-  if (server_fd == ERROR)
-    return FAILURE;
-  set_nonblocking(server_fd);
-  if (manage_events(server_fd) == ERROR)
+  std::vector<Server> servers = conf_c.get_servers();
+  size_t nbr_of_servers = (size_t)servers.size();
+  std::vector<int> server_fds;
+  for (size_t server_index = 0; server_index < nbr_of_servers; server_index++)
+  {
+    int port = servers[server_index].get_port_listen();
+    int server_fd = create_listening_socket(port);
+    if (server_fd == ERROR)
+      return FAILURE;
+    set_nonblocking(server_fd);
+    server_fds.push_back(server_fd);
+  }
+  if (manage_events(server_fds) == ERROR)
     return FAILURE;
   return SUCCESS;
 }

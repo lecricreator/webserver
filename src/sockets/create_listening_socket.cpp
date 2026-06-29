@@ -31,12 +31,12 @@ static int bind_address(int server_fd, int port)
   return SUCCESS;
 }
 
-static int listen_address(int server_fd, int connexion_queue_size)
+static int listen_address(int server_fd, int connexion_queue_size, int port)
 {
   if (listen(server_fd, connexion_queue_size) == ERROR)
     return print_function_error("listen"), close(server_fd);
   print_success("listen", "queue", connexion_queue_size);
-  print("Server listening on http://localhost:8080");
+  print("Server listening on http://localhost:" + to_str(port));
   return SUCCESS;
 }
 
@@ -48,7 +48,7 @@ int create_listening_socket(int port)
     return ERROR;
   if (bind_address(server_fd, port) == ERROR)
     return ERROR;
-  if (listen_address(server_fd, connexion_queue_size) == ERROR)
+  if (listen_address(server_fd, connexion_queue_size, port) == ERROR)
     return ERROR;
   return server_fd;
 }

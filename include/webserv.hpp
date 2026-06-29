@@ -15,6 +15,8 @@
 # include <iostream>
 # include <fstream>
 # include <list>
+# include <algorithm>
+# include <vector>
 
 # define ERROR -1
 # define SUCCESS 0
@@ -33,9 +35,9 @@ void  print_success(std::string function_name, std::string output_name, int outp
 void  set_nonblocking(int fd);
 
 //epoll
-int   manage_events(int client_fd);
+int   manage_events(std::vector<int> server_fds);
 
 //conf
-void    parse_conf(char *argv);
+void  parse_conf(char *argv);
 
 #endif
