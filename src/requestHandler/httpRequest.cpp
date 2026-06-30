@@ -44,6 +44,21 @@ httpRequest::~httpRequest() {}
 
 void	httpRequest::setErrorCode(unsigned int code) { _errorCode = code; }
 
+void	httpRequest::printRequest()
+{
+	std::cout << "method: " << _method << std::endl;
+	std::cout << "path: " << _path << std::endl;
+	std::cout << "httpVersion: " << _httpVersion << std::endl << std::endl;
+	
+	std::cout << "headers: " << std::endl;
+	for (HeaderMap::iterator it = _headers.begin(); it != _headers.end(); it++)
+		std::cout << it->first << ": " << it->second << std::endl;
+	std::cout << std::endl;
+
+	std::cout << "body: " << std::endl;
+	std::cout << _body << std::endl;
+}
+
 bool isValidPercentEncoding(const std::string& path) {
     for (size_t i = 0; i < path.length(); i++) {
         if (path[i] == '%') {

@@ -28,12 +28,13 @@ class httpRequest
 		RequestStatus	_status;
 		ChunkBodyStatus	_chunkStatus;
 		std::string		_requestBuffer;
-		HeaderMap		_headers;
-		std::string		_body;
 		
 		std::string		_method;
 		std::string		_path;
 		std::string		_httpVersion;
+		HeaderMap		_headers;
+		std::string		_body;
+
 		unsigned int	_errorCode;
 		int				_bodySize;
 		int				_chunkSize;
@@ -46,16 +47,17 @@ class httpRequest
 		~httpRequest();
 
 		void	setErrorCode(unsigned int code);
+		void	printRequest();
 
 		bool	parseRequest(std::string str);
 		bool	parseStartLine(std::string &startLine);
 		bool	parseHeaders();
-		bool	checkPath(); //not implemented
+		bool	checkPath(); //not fully implemented
 		bool	parseFixedLength();
 		bool	parseChunked();
 		bool	parseBody();
-		bool	parseHexSize(); //not implemented
-		bool	parseChunkData(); //not implemented
+		bool	parseHexSize();
+		bool	parseChunkData();
 };
 
 std::string code_to_string(const unsigned int code);
