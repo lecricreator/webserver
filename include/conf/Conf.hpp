@@ -3,15 +3,28 @@
 
 # define CONF_SAFE "conf/safe.conf"
 
+enum ErrorConf {
+    TOO_MUCH_BRACKET,
+    NO_END_BRACKET_HTTP,
+    NO_END_BRACKET_SERVER,
+    NO_END_BRACKET_LOCATION,
+    NO_END_BRACKET_EVENTS,
+    EMPTY_OR_MISSING,
+    FILE_NOT_EXIST,
+    HTTP_BEFORE_SERVER,
+    NO_SEMICOLON,
+    VALUE_NOT_EMPTY,
+};
+
+size_t  put_index_after_space(std::string line, size_t index);
+void    print_error_conf(ErrorConf error_numb);
+
 //# include "webserv.hpp"
 # include <string>
+# include <vector>
 # include "conf/Server.hpp"
 # include "conf/Events.hpp"
 # include "conf/Location.hpp"
-# include <vector>
-
-
-size_t  put_index_after_space(std::string line, size_t index);
 
 class Conf {
     private:

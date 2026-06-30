@@ -17,6 +17,6 @@ bool    Events::parse_events(std::ifstream *fd_file) {
             return (true);
         }
     }
-    print("No '}', end of file in Events.");
+    print_error_conf(NO_END_BRACKET_EVENTS);
     return (false);
 }

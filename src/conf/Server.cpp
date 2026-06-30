@@ -50,6 +50,6 @@ bool    Server::parse_server(std::ifstream *fd_file) {
             this->set.add_in_var(line, posi + 11, &this->_error_page);
         }
     }
-    print("No '}', end of file in Server.");
+    print_error_conf(NO_END_BRACKET_SERVER);
     return (false);
 }

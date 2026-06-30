@@ -41,7 +41,7 @@ bool    Conf::parse(const char *path_file) {
         } else if ((posi = line.find("server ")) != std::string::npos) {
             if ((posi = line.find("{", posi + 7)) != std::string::npos) {
                 if (!this->_http) {
-                    print("Need http { ... } before server { ... } for use http.");
+                    print_error_conf(HTTP_BEFORE_SERVER);
                     return (false);
                 }
                 Server  server = Server();
@@ -86,17 +86,17 @@ bool    Conf::parse(const char *path_file) {
             if (!this->_end_http && this->_http) {
                 this->_end_http = true;
             } else {
-                print("No '}', end of file in Server.");
+                print_error_conf(TOO_MUCH_BRACKET);
                 return (false);
             }
         }
     }
     if (this->_http && !this->_end_http) {
-        print("No '}', end of file in HTTP.");
+        print_error_conf(NO_END_BRACKET_HTTP);
         return (false);
     }
     if (!this->_http || this->_servers.empty()) {
-        print("The file is empty or an element is missing.");
+        print_error_conf(EMPTY_OR_MISSING);
         return false;
     }
     fd_file.close();

@@ -1,5 +1,6 @@
 #include "conf/Location.hpp"
 #include "conf/Set_variable.hpp"
+#include "conf/Conf.hpp"
 
 bool    Location::parse_location(std::ifstream *fd_file, const std::string pline, size_t posi) {
     std::string line;
@@ -16,6 +17,6 @@ bool    Location::parse_location(std::ifstream *fd_file, const std::string pline
             return (true);
         }
     }
-    print("No '}', end of file in Location.");
+    print_error_conf(NO_END_BRACKET_LOCATION);
     return (false);
 }

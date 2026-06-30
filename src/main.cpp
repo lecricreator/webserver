@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
   if (conf_c == NULL) {
     return FAILURE;
   }
-  int port = 8080;
+  int port = 8000;
   int server_fd = create_listening_socket(port);
   if (server_fd == ERROR)
     return FAILURE;
