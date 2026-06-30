@@ -2,6 +2,9 @@
 # define CONF
 
 # define CONF_SAFE "conf/safe.conf"
+# include <cstddef>
+# include <string>
+# include <vector>
 
 enum ErrorConf {
     TOO_MUCH_BRACKET,
@@ -20,8 +23,6 @@ size_t  put_index_after_space(std::string line, size_t index);
 void    print_error_conf(ErrorConf error_numb);
 
 //# include "webserv.hpp"
-# include <string>
-# include <vector>
 # include "conf/Server.hpp"
 # include "conf/Events.hpp"
 # include "conf/Location.hpp"
@@ -48,11 +49,11 @@ class Conf {
         Conf();
         ~Conf() {};
         Set_variable            set;
-        bool                    parse(const char *argv);
+        bool                    parse(std::ifstream &fd_file);
 
         //GET
-        std::vector<Server>     get_servers()    {return (this->_servers);};
-        std::vector<Events>     get_events()    {return (this->_events);};
+        std::vector<Server>     get_servers() const {return (this->_servers);};
+        std::vector<Events>     get_events() const  {return (this->_events);};
     };
 
 #endif

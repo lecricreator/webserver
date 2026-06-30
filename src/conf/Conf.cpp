@@ -29,12 +29,10 @@ Conf::Conf() {
     this->_end_http = false;
 }
 
-bool    Conf::parse(const char *path_file) {
-    std::ifstream   fd_file;
+bool    Conf::parse(std::ifstream &fd_file) {
     std::string     line;
     size_t          posi;
 
-    fd_file.open(path_file, std::ifstream::in);
     while (std::getline(fd_file, line)) {
         if ((posi = line.find("#")) != std::string::npos) {
             continue ;

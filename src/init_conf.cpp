@@ -15,7 +15,7 @@ void    print_error_conf(ErrorConf error_numb) {
     } else if (error_numb == EMPTY_OR_MISSING) {
         std::cout << "The file is empty or an element is missing" << std::endl;
     } else if (error_numb == FILE_NOT_EXIST) {
-        std::cout << "The file not existing" << std::endl;
+        std::cout << "The path file not existing" << std::endl;
     } else if (error_numb == NO_SEMICOLON) {
         std::cout << "';' is missing" << std::endl;
     } else if (error_numb == VALUE_NOT_EMPTY) {
@@ -24,21 +24,38 @@ void    print_error_conf(ErrorConf error_numb) {
 }
 
 Conf    *init_conf(char *path_conf) {
+    std::ifstream   fd_file;
+
+    fd_file.open(path_conf);
+
     Conf  *conf_c = new Conf();
-    if (!conf_c->parse(path_conf)) {
-        std::string str_path = path_conf;
-        if (str_path == CONF_SAFE) {
-            print("You use the safe file and his wrong. he canno't continue. Stop the program.");
+    if (fd_file.is_open()) {
+        if (!conf_c->parse(fd_file)) {
+            std::string str_path = path_conf;
+            if (str_path == CONF_SAFE) {
+                print("You use the safe file and he's wrong. he canno't continue. Stop the program.");
+                fd_file.close();
+                return NULL;
+            }
+            std::cout << "The syntax of your conf is not correct or an element is missing, replace by the file: " << CONF_SAFE << '\n';
+            delete conf_c;
+            conf_c = new Conf();
+        }
+    } else {
+        print_error_conf(FILE_NOT_EXIST);
+    }
+    fd_file.close();
+    fd_file.open(CONF_SAFE);
+    if (fd_file.is_open()) {
+        if (!conf_c->parse(fd_file)) {
+            std::cout << "ERROR of syntax with the file: " << CONF_SAFE << ". Stop the program.\n";
+            delete conf_c;
+            fd_file.close();
             return NULL;
         }
-        std::cout << "The syntax of your conf is not correct or an element is missing, replace by the file: " << CONF_SAFE << '\n';
-        delete conf_c;
-        conf_c = new Conf();
-    if (!conf_c->parse(CONF_SAFE)) {
-        std::cout << "ERROR of syntax with the file: " << CONF_SAFE << ". Stop the program.\n";
-        delete conf_c;
-        return NULL;
+    } else {
+        print_error_conf(FILE_NOT_EXIST);
     }
-  }
-  return (conf_c);
+    fd_file.close();
+    return (conf_c);
 }
