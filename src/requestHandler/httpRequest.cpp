@@ -174,7 +174,8 @@ bool	httpRequest::parseHeaders()
 	return true;
 }
 
-int hexToInt(const std::string& hexStr) {
+int hexToInt(const std::string& hexStr) 
+{
     // Using stringstream with hex manipulator
     std::stringstream ss;
     ss << std::hex << hexStr;
@@ -188,17 +189,44 @@ int hexToInt(const std::string& hexStr) {
 
 bool	httpRequest::parseHexSize()
 {
-	//separer la taille du reste du buffer
-	//check si c bien du hex
-	//check si la taille est pas trop grande
-	//trim le buffer et return
+	size_t		crlf = _requestBuffer.find("\r\n");
+	std::string	hexStr = "";
+
+	for (size_t i = 0; i < crlf; i++)
+	{
+		if (!isxdigit(_requestBuffer[i]))
+		{
+			if (i > 0 && _requestBuffer[i] == ';')
+				break;
+			setErrorCode(400);
+			return false;
+		}
+		hexStr += _requestBuffer[i];
+	}
+
+	_bodySize = hexToInt(hexStr);
+	if (_bodySize == -1)
+	{
+		setErrorCode(400);
+		return false;
+	}
+	_requestBuffer.erase(0, crlf + 2);
+	return true;
 }
 
 bool	httpRequest::parseChunkData()
 {
-	//le message finit forcement par crlf pcq la boucle while de parseChunked() attend un crlf pour iterer
-	//check si la data est plus grande/petite que la taille
-	//c tout lol mais la partie difficile c comment check si le message est plus petit que la taille sans segfault
+	/*this will return 400 if the body is the right size
+	but contains a crlf, compare against nginx maybe*/
+	size_t	trueSize = _requestBuffer.find("\r\n");
+	if (_chunkSize != trueSize)
+	{
+		setErrorCode(400);
+		return false;
+	}
+	_body.append(_requestBuffer.substr(0, trueSize));
+	_requestBuffer.erase(0, trueSize + 2);
+	return true;
 }
 
 bool	httpRequest::parseChunked()
