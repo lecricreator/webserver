@@ -14,7 +14,11 @@ bool    Server::parse_server(std::ifstream *fd_file) {
         if ((posi = line.find("#")) != std::string::npos) {
             continue ;
         } else if ((posi = line.find("}")) != std::string::npos) {
-            return (true);
+            if (this->_listening_port == -1 || this->_server_name.empty() || this->_locations.empty()) {
+                return (false);
+            } else {
+                return (true);
+            }
         } else if ((posi = line.find("listen ")) != std::string::npos) {
             this->set.add_in_var(line, posi + 7, &this->_listening_port);
         } else if ((posi = line.find("location ")) != std::string::npos) {
@@ -24,7 +28,7 @@ bool    Server::parse_server(std::ifstream *fd_file) {
                 if (!location.parse_location(fd_file, line, posi + 9)) {
                     return (false);
                 }
-                this->_location.push_back(location);
+                this->_locations.push_back(location);
             }
         } else if ((posi = line.find("server_name ")) != std::string::npos) {
             this->set.add_in_var(line, posi + 12, &this->_server_name);

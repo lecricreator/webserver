@@ -95,6 +95,10 @@ bool    Conf::parse(const char *path_file) {
         print("No '}', end of file in HTTP.");
         return (false);
     }
+    if (!this->_http || this->_servers.empty()) {
+        print("The file is empty or an element is missing.");
+        return false;
+    }
     fd_file.close();
     return (true);
 }

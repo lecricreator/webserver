@@ -8,7 +8,7 @@ Conf    *init_conf(char *path_conf) {
             print("You use the safe file and his wrong. he canno't continue. Stop the program.");
             return NULL;
         }
-        std::cout << "The syntax of your conf is not correct, replace by the file: " << CONF_SAFE << '\n';
+        std::cout << "The syntax of your conf is not correct or an element is missing, replace by the file: " << CONF_SAFE << '\n';
         delete conf_c;
         conf_c = new Conf();
     if (!conf_c->parse(CONF_SAFE)) {
