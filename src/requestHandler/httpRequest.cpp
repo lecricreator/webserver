@@ -38,6 +38,7 @@ httpRequest&	httpRequest::operator=(const httpRequest& copy)
 	_bodySize = copy._bodySize;
 	_chunkSize = copy._chunkSize;
 	_chunkStatus = copy._chunkStatus;
+	return *this;
 }
 
 httpRequest::~httpRequest() {}
@@ -46,17 +47,20 @@ void	httpRequest::setErrorCode(unsigned int code) { _errorCode = code; }
 
 void	httpRequest::printRequest()
 {
-	std::cout << "method: " << _method << std::endl;
-	std::cout << "path: " << _path << std::endl;
-	std::cout << "httpVersion: " << _httpVersion << std::endl << std::endl;
+	std::cout << "status: " << _status << ";" << std::endl;
+	std::cout << "errorCode: " << _errorCode << ";" << std::endl << std::endl;
+
+	std::cout << "method: " << _method << ";" << std::endl;
+	std::cout << "path: " << _path << ";" << std::endl;
+	std::cout << "httpVersion: " << _httpVersion << ";" << std::endl << std::endl;
 	
 	std::cout << "headers: " << std::endl;
 	for (HeaderMap::iterator it = _headers.begin(); it != _headers.end(); it++)
-		std::cout << it->first << ": " << it->second << std::endl;
+		std::cout << it->first << ": " << it->second << ";" << std::endl;
 	std::cout << std::endl;
 
 	std::cout << "body: " << std::endl;
-	std::cout << _body << std::endl;
+	std::cout << _body << ";" << std::endl;
 }
 
 bool isValidPercentEncoding(const std::string& path) {
@@ -80,7 +84,7 @@ bool	httpRequest::checkPath()
 		return false;
 	if (!isValidPercentEncoding(_path))
 		return false;
-	for (int i = 0; i < _path.size(); i++)
+	for (size_t i = 0; i < _path.size(); i++)
 	{
 		if (_path[i] <= 32 || _path[i] == 127)
 			return false;
@@ -95,7 +99,7 @@ bool	httpRequest::checkPath()
 bool	httpRequest::parseStartLine(std::string &startLine)
 {
 	std::string buffer;
-	if (startLine.find(" ") != std::string::npos)
+	if (startLine.find(" ") != std::string::npos) //method
 	{
 		buffer = startLine.substr(0, startLine.find(" "));
 		startLine.erase(0, startLine.find(" ") + 1);
@@ -104,16 +108,17 @@ bool	httpRequest::parseStartLine(std::string &startLine)
 
 		if (_method != "GET" && _method != "POST" && _method != "DELETE")
 		{
-			setErrorCode(405);
+			setErrorCode(401); //405
 			return false;
 		}
 	}
 	else
 	{
-		setErrorCode(400);
+		setErrorCode(402);
 		return false;
 	}
-	if (startLine.find(" ") != std::string::npos)
+
+	if (startLine.find(" ") != std::string::npos) //path
 	{
 		buffer = startLine.substr(0, startLine.find(" "));
 		startLine.erase(0, startLine.find(" ") + 1);
@@ -122,16 +127,16 @@ bool	httpRequest::parseStartLine(std::string &startLine)
 
 		if (!checkPath()) //not implemented
 		{
-			setErrorCode(400);
+			setErrorCode(403);
 			return false;
 		}
 	}
 	else
 	{
-		setErrorCode(400);
+		setErrorCode(404);
 		return false;
 	}
-	if (startLine.find(" ") != std::string::npos)
+	if (startLine.find("HTTP/1.1") == 0 && startLine.size() == 8) //http version, hard coded the condition
 	{
 		buffer = startLine.substr(0, startLine.find(" "));
 		startLine.erase(0, startLine.find(" ") + 1);
@@ -140,18 +145,19 @@ bool	httpRequest::parseStartLine(std::string &startLine)
 
 		if (_httpVersion != "HTTP/1.1")
 		{
-			setErrorCode(400);
+			setErrorCode(405);
 			return false;
 		}
 	}
 	else
 	{
-		setErrorCode(400);
+		setErrorCode(406);
 		return false;
 	}
+
 	if (startLine.find(" ") != std::string::npos)
 	{
-		setErrorCode(400);
+		setErrorCode(407);
 		return false;
 	}
 	_status = REQ_HEADERS;
@@ -160,8 +166,21 @@ bool	httpRequest::parseStartLine(std::string &startLine)
 
 bool	httpRequest::parseHeaders()
 {
+	std::cout << "parseHeaders() call\n";
 	while (_requestBuffer.find("\r\n") != std::string::npos)
 	{
+		if (_requestBuffer.find(": ") == std::string::npos)
+		{
+			setErrorCode(408);
+			return false;
+		}
+		size_t	sep = _requestBuffer.find(": ");
+		size_t	crlf = _requestBuffer.find("\r\n");
+		std::string	key = _requestBuffer.substr(0, sep);
+		std::string	value = _requestBuffer.substr(sep + 2, crlf);
+		_headers.insert(std::pair<std::string, std::string>(key, value));
+		_requestBuffer.erase(0, crlf + 2);
+
 		if (_requestBuffer.find("\r\n\r\n") != std::string::npos)
 		{
 			_requestBuffer.erase(0, _requestBuffer.find("\r\n\r\n"));
@@ -170,20 +189,6 @@ bool	httpRequest::parseHeaders()
 			else
 				_status = REQ_PARSED;
 			break;
-		}
-		else
-		{
-			if (_requestBuffer.find(": ") == std::string::npos)
-			{
-				setErrorCode(400);
-				return false;
-			}
-			size_t	sep = _requestBuffer.find(": ");
-			size_t	crlf = _requestBuffer.find("\r\n");
-			std::string	key = _requestBuffer.substr(0, sep);
-			std::string	value = _requestBuffer.substr(sep + 2, crlf);
-			_headers.insert(key, value);
-			_requestBuffer.erase(0, crlf + 2);
 		}
 	}
 	return true;
@@ -213,7 +218,7 @@ bool	httpRequest::parseHexSize()
 		{
 			if (i > 0 && _requestBuffer[i] == ';')
 				break;
-			setErrorCode(400);
+			setErrorCode(409);
 			return false;
 		}
 		hexStr += _requestBuffer[i];
@@ -222,7 +227,7 @@ bool	httpRequest::parseHexSize()
 	_bodySize = hexToInt(hexStr);
 	if (_bodySize == -1)
 	{
-		setErrorCode(400);
+		setErrorCode(410);
 		return false;
 	}
 	_requestBuffer.erase(0, crlf + 2);
@@ -233,10 +238,10 @@ bool	httpRequest::parseChunkData()
 {
 	/*this will return 400 if the body is the right size
 	but contains a crlf, compare against nginx maybe*/
-	size_t	trueSize = _requestBuffer.find("\r\n");
+	int	trueSize = _requestBuffer.find("\r\n");
 	if (_chunkSize != trueSize)
 	{
-		setErrorCode(400);
+		setErrorCode(411);
 		return false;
 	}
 	_body.append(_requestBuffer.substr(0, trueSize));
@@ -295,13 +300,13 @@ bool	httpRequest::parseFixedLength()
 		_bodySize = ft_stoi(_headers.find("Content-Length")->second);
 		if (_bodySize < 0)
 		{
-			setErrorCode(400);
+			setErrorCode(412);
 			return false;
 		}
 	}
 
 	int	i = 0;
-	while (_body.size() < _bodySize && _requestBuffer[i])
+	while (_body.size() < (size_t)_bodySize && _requestBuffer[i])
 	{
 		_body += _requestBuffer[i];
 		i++;
@@ -324,6 +329,7 @@ bool	httpRequest::parseBody()
 			return false;
 		return true;
 	}
+	return true;
 }
 
 /**
