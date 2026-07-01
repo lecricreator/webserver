@@ -1,5 +1,18 @@
 #include "httpRequest.hpp"
 
+/**
+ * Errors not handled yet:
+ * -any path syntax error
+ * -uri overflow
+ * -duplicate headers
+ * -negative Content-Length (?)
+ * -Content-Length overflow
+ * -Header name/value containing invalid characters
+ * -size 0 body handling/POST without Tranfer-Encoding/Content-Length header
+ * -too many headers
+ * -100-continue (idk what that is)
+ */
+
 httpRequest::httpRequest() : _headers()
 {
 	_requestBuffer = "";
@@ -166,9 +179,17 @@ bool	httpRequest::parseStartLine(std::string &startLine)
 
 bool	httpRequest::parseHeaders()
 {
-	std::cout << "parseHeaders() call\n";
 	while (_requestBuffer.find("\r\n") != std::string::npos)
 	{
+		if (_requestBuffer.find("\r\n") == 0)
+		{
+			_requestBuffer.erase(0, 2);
+			if (_method == "POST")
+				_status = REQ_BODY;
+			else
+				_status = REQ_PARSED;
+			return true;
+		}
 		if (_requestBuffer.find(": ") == std::string::npos)
 		{
 			setErrorCode(408);
@@ -177,19 +198,9 @@ bool	httpRequest::parseHeaders()
 		size_t	sep = _requestBuffer.find(": ");
 		size_t	crlf = _requestBuffer.find("\r\n");
 		std::string	key = _requestBuffer.substr(0, sep);
-		std::string	value = _requestBuffer.substr(sep + 2, crlf);
+		std::string	value = _requestBuffer.substr(sep + 2, crlf - (sep + 2));
 		_headers.insert(std::pair<std::string, std::string>(key, value));
 		_requestBuffer.erase(0, crlf + 2);
-
-		if (_requestBuffer.find("\r\n\r\n") != std::string::npos)
-		{
-			_requestBuffer.erase(0, _requestBuffer.find("\r\n\r\n"));
-			if (_method == "POST")
-				_status = REQ_BODY;
-			else
-				_status = REQ_PARSED;
-			break;
-		}
 	}
 	return true;
 }
@@ -212,6 +223,11 @@ bool	httpRequest::parseHexSize()
 	size_t		crlf = _requestBuffer.find("\r\n");
 	std::string	hexStr = "";
 
+	if (crlf == 0)
+	{
+		_chunkSize = 0;
+		return true;
+	}
 	for (size_t i = 0; i < crlf; i++)
 	{
 		if (!isxdigit(_requestBuffer[i]))
@@ -224,8 +240,8 @@ bool	httpRequest::parseHexSize()
 		hexStr += _requestBuffer[i];
 	}
 
-	_bodySize = hexToInt(hexStr);
-	if (_bodySize == -1)
+	_chunkSize = hexToInt(hexStr);
+	if (_chunkSize == -1)
 	{
 		setErrorCode(410);
 		return false;
@@ -241,6 +257,8 @@ bool	httpRequest::parseChunkData()
 	int	trueSize = _requestBuffer.find("\r\n");
 	if (_chunkSize != trueSize)
 	{
+		std::cout << "chunkSize: " << _chunkSize << std::endl;
+		std::cout << "trueSize: " << trueSize << std::endl;
 		setErrorCode(411);
 		return false;
 	}
@@ -252,6 +270,7 @@ bool	httpRequest::parseChunkData()
 bool	httpRequest::parseChunked()
 {
 	//decoder la taille en hex, check la syntax
+	std::cout << "parseChunked() call\n";
 	while (_requestBuffer.find("\r\n") != std::string::npos)
 	{
 		if (_chunkSize == 0)
@@ -293,6 +312,11 @@ int	ft_stoi(std::string str)
 	return n;
 }
 
+/**
+ * if the client sends a body size larger than the actual body,
+ * the function will never set the status to REQ_PARSED, eventually
+ * causing a timeout, this is expected behavior
+ */
 bool	httpRequest::parseFixedLength()
 {
 	if (_bodySize == -1)
@@ -306,8 +330,11 @@ bool	httpRequest::parseFixedLength()
 	}
 
 	int	i = 0;
-	while (_body.size() < (size_t)_bodySize && _requestBuffer[i])
+	size_t	bytesRead = _body.size();
+	while (bytesRead < (size_t)_bodySize && _requestBuffer[i])
 	{
+		if (bytesRead == (size_t)_bodySize)
+			_status = REQ_PARSED;
 		_body += _requestBuffer[i];
 		i++;
 	}
@@ -317,6 +344,7 @@ bool	httpRequest::parseFixedLength()
 // no body/fixed length/chunked
 bool	httpRequest::parseBody()
 {
+	std::cout << "parseBody() call\n";
 	if (_headers.find("Transfer-Encoding") != _headers.end())
 	{
 		if (!parseChunked())
