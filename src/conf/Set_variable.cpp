@@ -52,10 +52,14 @@ void    Set_variable::add_in_var(const std::string line, size_t posi, bool *at_r
         print_error_conf(VALUE_NOT_EMPTY);
         print(line);
         return ;
-    } else if (line[line.length()] != ';') {
-        print_error_conf(VALUE_NOT_EMPTY);
-    } else if ((posi = line.find("true")) != std::string::npos) {
+    } else if ((posi = line.find("on")) != std::string::npos) {
         *at_replace = true;
+    }
+    if ((posi = line.find(";")) != std::string::npos) {
+        return ;
+    } else {
+        print_error_conf(NO_SEMICOLON);
+        print(line);
     }
 }
 

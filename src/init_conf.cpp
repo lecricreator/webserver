@@ -37,9 +37,12 @@ Conf    *init_conf(char *path_conf) {
                 fd_file.close();
                 return NULL;
             }
-            std::cout << "The syntax of your conf is not correct or an element is missing, replace by the file: " << CONF_SAFE << '\n';
+            std::cout << "Replace by the file: " << CONF_SAFE << '\n';
             delete conf_c;
             conf_c = new Conf();
+        } else {
+            fd_file.close();
+            return (conf_c);
         }
     } else {
         print_error_conf(FILE_NOT_EXIST);
