@@ -1,16 +1,13 @@
 #include "httpRequest.hpp"
 
+#define URI_MAX 8192
+#define	BODY_MAX 8192
+#define	HEADER_MAX 100
 /**
  * Errors not handled yet:
  * -any path syntax error
- * -uri overflow
- * -duplicate headers
- * -negative Content-Length (?)
- * -Content-Length overflow
- * -Header name/value containing invalid characters
- * -size 0 body handling/POST without Tranfer-Encoding/Content-Length header
- * -too many headers
- * -100-continue (idk what that is)
+ * -Header name/value containing invalid characters (havent tested)
+ * -size 0 body handling/POST without Tranfer-Encoding/Content-Length header (havent tested)
  */
 
 httpRequest::httpRequest() : _headers()
@@ -177,6 +174,13 @@ bool	httpRequest::parseStartLine(std::string &startLine)
 	return true;
 }
 
+bool httpRequest::isTchar(char c) {
+    return std::isalnum(static_cast<unsigned char>(c))
+        || c == '!' || c == '#' || c == '$' || c == '%' || c == '&'
+        || c == '\'' || c == '*' || c == '+' || c == '-' || c == '.'
+        || c == '^' || c == '_' || c == '`' || c == '|' || c == '~';
+}
+
 bool	httpRequest::parseHeaders()
 {
 	while (_requestBuffer.find("\r\n") != std::string::npos)
@@ -190,6 +194,11 @@ bool	httpRequest::parseHeaders()
 				_status = REQ_PARSED;
 			return true;
 		}
+		if (_headers.size() > HEADER_MAX)
+		{
+			setErrorCode(400); //idk if this should be 400 or 413
+			return false;
+		}
 		if (_requestBuffer.find(": ") == std::string::npos)
 		{
 			setErrorCode(408);
@@ -199,6 +208,28 @@ bool	httpRequest::parseHeaders()
 		size_t	crlf = _requestBuffer.find("\r\n");
 		std::string	key = _requestBuffer.substr(0, sep);
 		std::string	value = _requestBuffer.substr(sep + 2, crlf - (sep + 2));
+		for (size_t i = 0; i < key.size(); i++)
+		{
+			if (!isTchar(key[i]))
+			{
+				setErrorCode(400);
+				return false;
+			}
+		}
+		for (size_t i = 0; i < value.size(); i++)
+		{
+			if (!isTchar(value[i]))
+			{
+				setErrorCode(400);
+				return false;
+			}
+		}
+		
+		if (_headers.find(key) != _headers.end())
+		{
+			setErrorCode(400);
+			return false;
+		}
 		_headers.insert(std::pair<std::string, std::string>(key, value));
 		_requestBuffer.erase(0, crlf + 2);
 	}
@@ -273,6 +304,11 @@ bool	httpRequest::parseChunked()
 	std::cout << "parseChunked() call\n";
 	while (_requestBuffer.find("\r\n") != std::string::npos)
 	{
+		if (_body.size() > BODY_MAX)
+		{
+			setErrorCode(413); //413 Payload too large
+			return false;
+		}
 		if (_chunkSize == 0)
 		{
 			//maybe add syntax checking here
@@ -324,7 +360,12 @@ bool	httpRequest::parseFixedLength()
 		_bodySize = ft_stoi(_headers.find("Content-Length")->second);
 		if (_bodySize < 0)
 		{
-			setErrorCode(412);
+			setErrorCode(400);
+			return false;
+		}
+		if (_bodySize > BODY_MAX)
+		{
+			setErrorCode(413); //413 Payload too large
 			return false;
 		}
 	}
@@ -374,6 +415,11 @@ bool	httpRequest::parseRequest(std::string str)
 	_requestBuffer.append(str);
 	if (_status == REQ_START_LINE)
 	{
+		if (_requestBuffer.size() > URI_MAX)
+		{
+			setErrorCode(414); //414 URI too long
+			return false;
+		}
 		if (_requestBuffer.find("\r\n") != std::string::npos)
 		{
 			std::string	startLine = _requestBuffer.substr(0, _requestBuffer.find("\r\n"));
