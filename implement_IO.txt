@@ -1,5 +1,0 @@
-Send immediately.
-
- manages I/O readiness, not application logic. When  indicates the socket is readable, you  the request. After processing, you  the response directly—provided the socket is still writable.
-
-If the output buffer is full,  would block or return . In that case, you register the socket for  and wait for  to signal writability before retrying. Otherwise, send without waiting.
