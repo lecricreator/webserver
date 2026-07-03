@@ -64,7 +64,8 @@ class httpRequest
 
 		bool	parseRequest(std::string str);
 		bool	parseStartLine(std::string &startLine);
-		bool	isTchar(char c);
+		bool	isValidHeaderKey(std::string key);
+		bool	isValidHeaderValue(std::string value);
 		bool	parseHeaders();
 		bool	checkPath(); //not fully implemented
 		bool	parseFixedLength();

@@ -6,7 +6,6 @@
 /**
  * Errors not handled yet:
  * -any path syntax error
- * -Header name/value containing invalid characters (havent tested)
  */
 
 httpRequest::httpRequest() : _headers()
@@ -173,11 +172,20 @@ bool	httpRequest::parseStartLine(std::string &startLine)
 	return true;
 }
 
-bool httpRequest::isTchar(char c) {
-    return std::isalnum(static_cast<unsigned char>(c))
-        || c == '!' || c == '#' || c == '$' || c == '%' || c == '&'
-        || c == '\'' || c == '*' || c == '+' || c == '-' || c == '.'
-        || c == '^' || c == '_' || c == '`' || c == '|' || c == '~';
+bool	httpRequest::isValidHeaderKey(std::string key)
+{
+	std::string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
+	if (key.find_first_not_of(validChars) != std::string::npos)
+		return false;
+	return true;
+}
+
+bool	httpRequest::isValidHeaderValue(std::string value)
+{
+	std::string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_ :;.,\\/\"'?!(){}[]@<>=-+*#$&`|~^%";
+	if (value.find_first_not_of(validChars) != std::string::npos)
+		return false;
+	return true;
 }
 
 bool	httpRequest::parseHeaders()
@@ -195,8 +203,7 @@ bool	httpRequest::parseHeaders()
 		}
 		if (_headers.size() > HEADER_MAX)
 		{
-			std::cout << "debug1\n";
-			setErrorCode(400); //idk if this should be 400 or 413
+			setErrorCode(413); //413 Payload Too Large
 			return false;
 		}
 		if (_requestBuffer.find(": ") == std::string::npos)
@@ -209,27 +216,11 @@ bool	httpRequest::parseHeaders()
 		size_t	crlf = _requestBuffer.find("\r\n");
 		std::string	key = _requestBuffer.substr(0, sep);
 		std::string	value = _requestBuffer.substr(sep + 2, crlf - (sep + 2));
-		for (size_t i = 0; i < key.size(); i++)
+		if (!isValidHeaderKey(key) || !isValidHeaderValue(value))
 		{
-			if (!isTchar(key[i]))
-			{
-				std::cout << "debug2\n";
-				setErrorCode(400);
-				return false;
-			}
+			setErrorCode(400);
+			return false;
 		}
-		for (size_t i = 0; i < value.size(); i++)
-		{
-			if (!isTchar(value[i]))
-			{
-				std::cout << "key: " << key << std::endl;
-				std::cout << "value: " << value << std::endl;
-				std::cout << value[i] << "debug3\n";
-				setErrorCode(400);
-				return false;
-			}
-		}
-		
 		if (_headers.find(key) != _headers.end())
 		{
 			std::cout << "debug4\n";
