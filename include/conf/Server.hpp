@@ -15,17 +15,16 @@ class Server {
         std::string                 _gzip;
         std::vector<std::string>    _access_log;
         std::vector<std::string>    _error_page;
-        std::vector<Location>       _location;
+        std::vector<Location>       _locations;
     public:
         Server();
-        void                        parse_server(std::ifstream *fd_file);
+        bool                        parse_server(std::ifstream *fd_file);
         Set_variable                set;
 
         //GET
         int                         get_port_listen()   {return (this->_listening_port);};
         std::vector<std::string>    get_server_name()   {return (this->_server_name);};
-        std::vector<Location>       get_location()      {return (this->_location);};
-
+        std::vector<Location>       get_location()      {return (this->_locations);};
 };
 
 #endif

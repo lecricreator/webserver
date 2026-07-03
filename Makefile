@@ -33,7 +33,7 @@ CONF_INC_FILES =	Conf.hpp Server.hpp Events.hpp Location.hpp Set_variable.hpp
 #connect folder and file of src
 SRC_FILES = $(addprefix $(SOCKET_DIR), $(SOCKET_SRC_FILES)) \
 			$(addprefix $(CONF_DIR), $(CONF_SRC_FILES)) \
-			main.cpp support.cpp \
+			main.cpp support.cpp init_conf.cpp \
 
 #connect folder and file of include
 INC_FILES = $(addprefix $(CONF_DIR), $(CONF_INC_FILES)) \

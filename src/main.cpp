@@ -14,14 +14,19 @@ int main(int argc, char **argv) {
     print("Need 2 arguments.");
     return FAILURE;
   }
-  Conf  conf_c = Conf();
-  conf_c.parse(argv[1]);
-  int port = 8080;
+  Conf *conf_c = init_conf(argv[1]);
+  if (conf_c == NULL) {
+    return FAILURE;
+  }
+  int port = 8000;
   int server_fd = create_listening_socket(port);
   if (server_fd == ERROR)
     return FAILURE;
   set_nonblocking(server_fd);
-  if (manage_events(response, server_fd) == ERROR)
+  if (manage_events(response, server_fd) == ERROR) {
+    delete conf_c;
     return FAILURE;
+  }
+  delete conf_c;
   return SUCCESS;
 }

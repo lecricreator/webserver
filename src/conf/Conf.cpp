@@ -26,26 +26,33 @@ Conf::Conf() {
     //this->_keepalive_timeout = NULL;
     this->_gzip = false;
     this->_http = false;
+    this->_end_http = false;
 }
 
-void    Conf::parse(char *path_file) {
-    std::ifstream   fd_file;
+bool    Conf::parse(std::ifstream &fd_file) {
     std::string     line;
     size_t          posi;
 
-    fd_file.open(path_file, std::ifstream::in);
     while (std::getline(fd_file, line)) {
         if ((posi = line.find("#")) != std::string::npos) {
             continue ;
         } else if ((posi = line.find("server ")) != std::string::npos) {
             if ((posi = line.find("{", posi + 7)) != std::string::npos) {
+                if (!this->_http) {
+                    print_error_conf(HTTP_BEFORE_SERVER);
+                    return (false);
+                }
                 Server  server = Server();
-                server.parse_server(&fd_file);
+                if (!server.parse_server(&fd_file)) {
+                    return (false);
+                }
                 this->_servers.push_back(server);
             }
         } else if ((posi = line.find("events ")) != std::string::npos) {
             Events  events = Events();
-            events.parse_events(&fd_file);
+            if (!events.parse_events(&fd_file)) {
+                return (false);
+            }
             this->_events.push_back(events);
         } else if ((posi = line.find("http ")) != std::string::npos) {
             this->_http = true;
@@ -73,7 +80,23 @@ void    Conf::parse(char *path_file) {
             this->set.add_in_var(line, posi + 17, &this->_keepalive_timeout);
         } else if ((posi = line.find("gzip ")) != std::string::npos) {
             this->set.add_in_var(line, posi + 5, &this->_gzip);
+        } else if ((posi = line.find("}")) != std::string::npos) {
+            if (!this->_end_http && this->_http) {
+                this->_end_http = true;
+            } else {
+                print_error_conf(TOO_MUCH_BRACKET);
+                return (false);
+            }
         }
     }
+    if (this->_http && !this->_end_http) {
+        print_error_conf(NO_END_BRACKET_HTTP);
+        return (false);
+    }
+    if (!this->_http || this->_servers.empty()) {
+        print_error_conf(EMPTY_OR_MISSING);
+        return false;
+    }
     fd_file.close();
+    return (true);
 }
