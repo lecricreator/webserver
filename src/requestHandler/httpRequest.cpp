@@ -196,11 +196,13 @@ bool	httpRequest::parseHeaders()
 		}
 		if (_headers.size() > HEADER_MAX)
 		{
+			std::cout << "debug1\n";
 			setErrorCode(400); //idk if this should be 400 or 413
 			return false;
 		}
 		if (_requestBuffer.find(": ") == std::string::npos)
 		{
+			std::cout << "requestBuffer:" << _requestBuffer << ";" << std::endl;
 			setErrorCode(408);
 			return false;
 		}
@@ -212,6 +214,7 @@ bool	httpRequest::parseHeaders()
 		{
 			if (!isTchar(key[i]))
 			{
+				std::cout << "debug2\n";
 				setErrorCode(400);
 				return false;
 			}
@@ -220,6 +223,9 @@ bool	httpRequest::parseHeaders()
 		{
 			if (!isTchar(value[i]))
 			{
+				std::cout << "key: " << key << std::endl;
+				std::cout << "value: " << value << std::endl;
+				std::cout << value[i] << "debug3\n";
 				setErrorCode(400);
 				return false;
 			}
@@ -227,6 +233,7 @@ bool	httpRequest::parseHeaders()
 		
 		if (_headers.find(key) != _headers.end())
 		{
+			std::cout << "debug4\n";
 			setErrorCode(400);
 			return false;
 		}
@@ -300,8 +307,12 @@ bool	httpRequest::parseChunkData()
 
 bool	httpRequest::parseChunked()
 {
-	//decoder la taille en hex, check la syntax
-	std::cout << "parseChunked() call\n";
+	if (_headers["Transfer-Encoding"] != "chunked")
+	{
+		std::cout << "header:" << _headers["Transfer-Encoding"] << "debug5\n";
+		setErrorCode(400);
+		return false;
+	}
 	while (_requestBuffer.find("\r\n") != std::string::npos)
 	{
 		if (_body.size() > BODY_MAX)
@@ -309,18 +320,17 @@ bool	httpRequest::parseChunked()
 			setErrorCode(413); //413 Payload too large
 			return false;
 		}
-		if (_chunkSize == 0)
-		{
-			//maybe add syntax checking here
-			_status = REQ_PARSED;
-			return true;
-		}
 		if (_chunkStatus == CHUNK_SIZE)
 		{
 			if (!parseHexSize())
 				return false;
 			_chunkStatus = CHUNK_DATA;
 			continue;
+		}
+		if (_chunkSize == 0)
+		{
+			_status = REQ_PARSED;
+			return true;
 		}
 		if (_chunkStatus == CHUNK_DATA)
 		{
@@ -360,8 +370,14 @@ bool	httpRequest::parseFixedLength()
 		_bodySize = ft_stoi(_headers.find("Content-Length")->second);
 		if (_bodySize < 0)
 		{
+			std::cout << "debug6\n";
 			setErrorCode(400);
 			return false;
+		}
+		if (_bodySize == 0)
+		{
+			_status = REQ_PARSED;
+			return true;
 		}
 		if (_bodySize > BODY_MAX)
 		{
@@ -371,11 +387,18 @@ bool	httpRequest::parseFixedLength()
 	}
 
 	int	i = 0;
+	std::cout << "body:" << _body << std::endl;
+	std::cout << "body.size():" << _body.size() << std::endl;
+	std::cout << "bodySize:" << _bodySize << std::endl;
 	size_t	bytesRead = _body.size();
-	while (bytesRead < (size_t)_bodySize && _requestBuffer[i])
+	while (_requestBuffer[i])
 	{
 		if (bytesRead == (size_t)_bodySize)
+		{
 			_status = REQ_PARSED;
+			return true;
+		}
+		bytesRead++;
 		_body += _requestBuffer[i];
 		i++;
 	}
@@ -392,10 +415,15 @@ bool	httpRequest::parseBody()
 			return false;
 		return true;
 	}
-	if (_headers.find("Content-Length") != _headers.end())
+	else if (_headers.find("Content-Length") != _headers.end())
 	{
 		if (!parseFixedLength())
 			return false;
+		return true;
+	}
+	else
+	{
+		_status = REQ_PARSED;
 		return true;
 	}
 	return true;

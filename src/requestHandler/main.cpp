@@ -5,7 +5,7 @@
 int main()
 {
     std::string getTest = "GET / HTTP/1.1\r\nHost: localhost\r\nTest: hello\r\n\r\n";
-    std::string postTest = "POST / HTTP/1.1\r\nHost: localhost\r\nTransfer-Encoding: chunked\r\nTest: hello\r\n\r\n2\r\nbo\r\n5\r\nnjour\r\n\r\n";
+    std::string postTest = "POST / HTTP/1.1\r\nHost: localhost\r\nTest: hello\r\n\r\n3\r\n123\r\n0\r\n\r\n";
     std::string test1 = "POST / HTTP/1.1\r\nHos";
     std::string test2 = "t: localhost\r\nTransfer-Encoding: chunked";
     std::string test3 = "\r\nTest: hello\r\n\r\n2\r\nbo\r\n5\r\nnjour\r\n\r\n";
