@@ -7,7 +7,6 @@
  * Errors not handled yet:
  * -any path syntax error
  * -Header name/value containing invalid characters (havent tested)
- * -size 0 body handling/POST without Tranfer-Encoding/Content-Length header (havent tested)
  */
 
 httpRequest::httpRequest() : _headers()
