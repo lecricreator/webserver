@@ -15,10 +15,11 @@ int accept_client(int server_fd)
   return client_fd;
 }
 
-int parse(char buf[4096], Conf conf_c) {(void)buf, (void)conf_c; return SUCCESS;}
+int parse(char buf[4096]) {(void)buf; return SUCCESS;}
 
-static int build_response(std::string &response)
+static int build_response(std::string &response, Conf conf_c)
 {
+  (void)conf_c;
   response =
       "HTTP/1.1 200 OK\r\n"
       "Content-Type: text/html\r\n"
@@ -44,11 +45,11 @@ int get_request(int client_fd, std::string &response, Conf conf_c)
   print(buf);
 
   //things from parse's return should be given to build_response.
-  int is_parsing_done = parse(buf, conf_c);
+  int is_parsing_done = parse(buf);
 
   if (is_parsing_done == ERROR)
     return ERROR;
-  if (build_response(response) == ERROR)
+  if (build_response(response, conf_c) == ERROR)
     return ERROR;
   return SUCCESS;
 }
