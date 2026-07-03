@@ -1,6 +1,19 @@
 #ifndef HTTPREQUEST_HPP
 # define HTTPREQUEST_HPP
-#include "webserv.hpp"
+//#include "webserv.hpp"
+
+# include <cerrno>
+# include <fcntl.h>
+# include <stdio.h>
+# include <string.h>
+# include <unistd.h>
+# include <sys/socket.h>
+# include <sys/epoll.h>
+# include <arpa/inet.h>
+# include <iostream>
+# include <fstream>
+# include <list>
+
 #include <string>
 #include <sstream>
 #include <map>
@@ -51,6 +64,8 @@ class httpRequest
 
 		bool	parseRequest(std::string str);
 		bool	parseStartLine(std::string &startLine);
+		bool	isValidHeaderKey(std::string key);
+		bool	isValidHeaderValue(std::string value);
 		bool	parseHeaders();
 		bool	checkPath(); //not fully implemented
 		bool	parseFixedLength();
