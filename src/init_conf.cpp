@@ -19,7 +19,7 @@ void    print_error_conf(ErrorConf error_numb) {
     } else if (error_numb == NO_SEMICOLON) {
         std::cout << "';' is missing" << std::endl;
     } else if (error_numb == VALUE_NOT_EMPTY) {
-        std::cout << "The variable in not empty, has already been write" << std::endl;
+        std::cout << "The variable in not empty, has already been writen" << std::endl;
     }
 }
 
