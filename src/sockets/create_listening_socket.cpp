@@ -20,6 +20,8 @@ static int bind_address(int server_fd, int port)
 {
   struct sockaddr_in addr;
 
+  if (port < 0)
+    return print_error("negative port isn't valid"), ERROR;
   memset(&addr, 0, sizeof(addr));
   addr.sin_family      = AF_INET;
   addr.sin_port        = htons(port);
