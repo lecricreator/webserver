@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
     set_nonblocking(server_fd);
     server_fds.push_back(server_fd);
   }
-  if (manage_events(server_fds) == ERROR)
+  if (manage_events(server_fds, conf_c) == ERROR)
     return FAILURE;
   return SUCCESS;
 }

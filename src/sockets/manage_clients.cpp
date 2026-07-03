@@ -15,7 +15,7 @@ int accept_client(int server_fd)
   return client_fd;
 }
 
-int parse(char buf[4096]) {(void)buf; return SUCCESS;}
+int parse(char buf[4096], Conf conf_c) {(void)buf, (void)conf_c; return SUCCESS;}
 
 static int build_response(std::string &response)
 {
@@ -33,7 +33,7 @@ static int build_response(std::string &response)
 //recv([...], MSG_PEEK) wouldn't consume the buffer
 //for send we should send as much as possible and if theres too much,
 //we mark the socket with EPOLLOUT
-int get_request(int client_fd, std::string &response)
+int get_request(int client_fd, std::string &response, Conf conf_c)
 {
   char buf[4096];
   int bytes_received = recv(client_fd, buf, sizeof(buf) - 1, 0);
@@ -44,7 +44,7 @@ int get_request(int client_fd, std::string &response)
   print(buf);
 
   //things from parse's return should be given to build_response.
-  int is_parsing_done = parse(buf);
+  int is_parsing_done = parse(buf, conf_c);
 
   if (is_parsing_done == ERROR)
     return ERROR;

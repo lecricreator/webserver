@@ -8,7 +8,7 @@ void set_event(struct epoll_event *event, int flag, int fd)
   event->data.fd = fd;
 }
 
-static void manage_requests(struct epoll_event event, std::vector<int> server_fds, int epoll_fd, std::map<int, std::string> &responses)
+static void manage_requests(struct epoll_event event, std::vector<int> server_fds, int epoll_fd, std::map<int, std::string> &responses, Conf conf_c)
 {
   int fd = event.data.fd;
 
@@ -32,7 +32,7 @@ static void manage_requests(struct epoll_event event, std::vector<int> server_fd
   }
   else if (event.events & EPOLLIN)
   {
-    if (get_request(fd, responses[fd]) == SUCCESS)
+    if (get_request(fd, responses[fd], conf_c) == SUCCESS)
     {
       set_event(&event, EPOLLOUT, fd);
       if (epoll_ctl(epoll_fd, EPOLL_CTL_MOD, fd, &event) == ERROR)
@@ -50,7 +50,7 @@ static void manage_requests(struct epoll_event event, std::vector<int> server_fd
   }
 }
 
-int manage_events(std::vector<int> server_fds)
+int manage_events(std::vector<int> server_fds, Conf conf_c)
 {
   int epoll_fd = epoll_create1(0);
   if (epoll_fd == ERROR)
@@ -66,7 +66,7 @@ int manage_events(std::vector<int> server_fds)
   }
 
   struct epoll_event events[MAX_EVENTS];
-  std::map<int, std::string> response;
+  std::map<int, std::string> responses;
   while (true)
   {
     int nfds = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
@@ -77,7 +77,7 @@ int manage_events(std::vector<int> server_fds)
       return ERROR;
     }
     for (int i = 0; i < nfds; i++)
-      manage_requests(events[i], server_fds, epoll_fd, response);
+      manage_requests(events[i], server_fds, epoll_fd, responses, conf_c);
   }
   close(epoll_fd);
   return SUCCESS;
