@@ -1,12 +1,8 @@
-#include "httpRequest.hpp"
+#include "webserv.hpp"
 
-#define URI_MAX 8192
+#define URI_MAX 2048
 #define	BODY_MAX 8192
 #define	HEADER_MAX 100
-/**
- * Errors not handled yet:
- * -any path syntax error
- */
 
 httpRequest::httpRequest() : _headers()
 {
@@ -51,200 +47,7 @@ httpRequest&	httpRequest::operator=(const httpRequest& copy)
 
 httpRequest::~httpRequest() {}
 
-void	httpRequest::setErrorCode(unsigned int code) { _errorCode = code; }
-
-void	httpRequest::printRequest()
-{
-	std::cout << "status: " << _status << ";" << std::endl;
-	std::cout << "errorCode: " << _errorCode << ";" << std::endl << std::endl;
-
-	std::cout << "method: " << _method << ";" << std::endl;
-	std::cout << "path: " << _path << ";" << std::endl;
-	std::cout << "httpVersion: " << _httpVersion << ";" << std::endl << std::endl;
-	
-	std::cout << "headers: " << std::endl;
-	for (HeaderMap::iterator it = _headers.begin(); it != _headers.end(); it++)
-		std::cout << it->first << ": " << it->second << ";" << std::endl;
-	std::cout << std::endl;
-
-	std::cout << "body: " << std::endl;
-	std::cout << _body << ";" << std::endl;
-}
-
-bool isValidPercentEncoding(const std::string& path) {
-    for (size_t i = 0; i < path.length(); i++) {
-        if (path[i] == '%') {
-            if (i + 2 >= path.length() || !isxdigit(path[i+1]) || !isxdigit(path[i+2]))
-                return false;
-            i += 2;  // skip the two hex digits
-        }
-    }
-    return true;
-}
-
-bool	httpRequest::checkPath()
-{
-	if (_path.empty() || _path[0] != '/')
-		return false;
-	if (_path.find("/../") != std::string::npos 
-	|| _path.rfind("/..") == _path.length() - 3 
-	|| _path == "/.." || _path == "..")
-		return false;
-	if (!isValidPercentEncoding(_path))
-		return false;
-	for (size_t i = 0; i < _path.size(); i++)
-	{
-		if (_path[i] <= 32 || _path[i] == 127)
-			return false;
-	}
-	if (_path.size() > 2048)
-		return false; //error code 414
-	if (_path.find('\0') != std::string::npos)
-		return false;
-	return true;
-} 
-
-bool	httpRequest::parseStartLine(std::string &startLine)
-{
-	std::string buffer;
-	if (startLine.find(" ") != std::string::npos) //method
-	{
-		buffer = startLine.substr(0, startLine.find(" "));
-		startLine.erase(0, startLine.find(" ") + 1);
-		_method = buffer;
-		buffer.clear();
-
-		if (_method != "GET" && _method != "POST" && _method != "DELETE")
-		{
-			setErrorCode(401); //405
-			return false;
-		}
-	}
-	else
-	{
-		setErrorCode(402);
-		return false;
-	}
-
-	if (startLine.find(" ") != std::string::npos) //path
-	{
-		buffer = startLine.substr(0, startLine.find(" "));
-		startLine.erase(0, startLine.find(" ") + 1);
-		_path = buffer;
-		buffer.clear();
-
-		if (!checkPath()) //not implemented
-		{
-			setErrorCode(403);
-			return false;
-		}
-	}
-	else
-	{
-		setErrorCode(404);
-		return false;
-	}
-	if (startLine.find("HTTP/1.1") == 0 && startLine.size() == 8) //http version, hard coded the condition
-	{
-		buffer = startLine.substr(0, startLine.find(" "));
-		startLine.erase(0, startLine.find(" ") + 1);
-		_httpVersion = buffer;
-		buffer.clear();
-
-		if (_httpVersion != "HTTP/1.1")
-		{
-			setErrorCode(405);
-			return false;
-		}
-	}
-	else
-	{
-		setErrorCode(406);
-		return false;
-	}
-
-	if (startLine.find(" ") != std::string::npos)
-	{
-		setErrorCode(407);
-		return false;
-	}
-	_status = REQ_HEADERS;
-	return true;
-}
-
-bool	httpRequest::isValidHeaderKey(std::string key)
-{
-	std::string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
-	if (key.find_first_not_of(validChars) != std::string::npos)
-		return false;
-	return true;
-}
-
-bool	httpRequest::isValidHeaderValue(std::string value)
-{
-	std::string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_ :;.,\\/\"'?!(){}[]@<>=-+*#$&`|~^%";
-	if (value.find_first_not_of(validChars) != std::string::npos)
-		return false;
-	return true;
-}
-
-bool	httpRequest::parseHeaders()
-{
-	while (_requestBuffer.find("\r\n") != std::string::npos)
-	{
-		if (_requestBuffer.find("\r\n") == 0)
-		{
-			_requestBuffer.erase(0, 2);
-			if (_method == "POST")
-				_status = REQ_BODY;
-			else
-				_status = REQ_PARSED;
-			return true;
-		}
-		if (_headers.size() > HEADER_MAX)
-		{
-			setErrorCode(413); //413 Payload Too Large
-			return false;
-		}
-		if (_requestBuffer.find(": ") == std::string::npos)
-		{
-			std::cout << "requestBuffer:" << _requestBuffer << ";" << std::endl;
-			setErrorCode(408);
-			return false;
-		}
-		size_t	sep = _requestBuffer.find(": ");
-		size_t	crlf = _requestBuffer.find("\r\n");
-		std::string	key = _requestBuffer.substr(0, sep);
-		std::string	value = _requestBuffer.substr(sep + 2, crlf - (sep + 2));
-		if (!isValidHeaderKey(key) || !isValidHeaderValue(value))
-		{
-			setErrorCode(400);
-			return false;
-		}
-		if (_headers.find(key) != _headers.end())
-		{
-			std::cout << "debug4\n";
-			setErrorCode(400);
-			return false;
-		}
-		_headers.insert(std::pair<std::string, std::string>(key, value));
-		_requestBuffer.erase(0, crlf + 2);
-	}
-	return true;
-}
-
-int hexToInt(const std::string& hexStr) 
-{
-    // Using stringstream with hex manipulator
-    std::stringstream ss;
-    ss << std::hex << hexStr;
-    int result;
-    ss >> result;
-    
-    if (ss.fail()) 
-		return -1;
-    return result;
-}
+/**********************************************************************************************/
 
 bool	httpRequest::parseHexSize()
 {
@@ -333,21 +136,6 @@ bool	httpRequest::parseChunked()
 	return true;
 }
 
-int	ft_stoi(std::string str)
-{
-	for (size_t i = 0; i < str.size(); i++)
-	{
-		if (!isdigit(str[i]))
-			return -1;
-	}
-	std::stringstream	ss;
-	int n = 0;
-
-	ss << str;
-	ss >> n;
-	return n;
-}
-
 /**
  * if the client sends a body size larger than the actual body,
  * the function will never set the status to REQ_PARSED, eventually
@@ -395,10 +183,8 @@ bool	httpRequest::parseFixedLength()
 	return true;
 }
 
-// no body/fixed length/chunked
 bool	httpRequest::parseBody()
 {
-	std::cout << "parseBody() call\n";
 	if (_headers.find("Transfer-Encoding") != _headers.end())
 	{
 		if (!parseChunked())
@@ -419,16 +205,254 @@ bool	httpRequest::parseBody()
 	return true;
 }
 
+/**********************************************************************************************/
+
+bool	httpRequest::isValidHeaderValue(const std::string& value)
+{
+	std::string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_ :;.,\\/\"'?!(){}[]@<>=-+*#$&`|~^%";
+	if (value.find_first_not_of(validChars) != std::string::npos)
+		return false;
+	return true;
+}
+
+bool	httpRequest::isValidHeaderKey(const std::string& key)
+{
+	std::string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.~:/?#[]@!$&'()*+,;=";
+	if (key.find_first_not_of(validChars) != std::string::npos)
+		return false;
+	return true;
+}
+
+bool	httpRequest::parseHeaders()
+{
+	while (_requestBuffer.find("\r\n") != std::string::npos)
+	{
+		if (_requestBuffer.find("\r\n") == 0)
+		{
+			_requestBuffer.erase(0, 2);
+			if (_method == "POST")
+				_status = REQ_BODY;
+			else
+				_status = REQ_PARSED;
+			return true;
+		}
+		if (_headers.size() > HEADER_MAX)
+		{
+			setErrorCode(413); //413 Payload Too Large
+			return false;
+		}
+		if (_requestBuffer.find(": ") == std::string::npos)
+		{
+			std::cout << "requestBuffer:" << _requestBuffer << ";" << std::endl;
+			setErrorCode(408);
+			return false;
+		}
+		size_t	sep = _requestBuffer.find(": ");
+		size_t	crlf = _requestBuffer.find("\r\n");
+		std::string	key = _requestBuffer.substr(0, sep);
+		std::string	value = _requestBuffer.substr(sep + 2, crlf - (sep + 2));
+		if (!isValidHeaderKey(key) || !isValidHeaderValue(value))
+		{
+			setErrorCode(400);
+			return false;
+		}
+		if (_headers.find(key) != _headers.end())
+		{
+			std::cout << "debug4\n";
+			setErrorCode(400);
+			return false;
+		}
+		_headers.insert(std::pair<std::string, std::string>(key, value));
+		_requestBuffer.erase(0, crlf + 2);
+	}
+	return true;
+}
+
+/**********************************************************************************************/
+
+std::string httpRequest::decodePath()
+{
+    std::string decoded;
+    decoded.reserve(_path.size());
+
+    for (size_t i = 0; i < _path.size(); ++i) {
+        if (_path[i] == '%') {
+            if (i + 2 < _path.size()) {
+                std::string hexStr;
+                hexStr += _path[i + 1];
+                hexStr += _path[i + 2];
+                int hexInt = hexToInt(hexStr);
+                decoded += static_cast<char>(hexInt);
+                i += 2;
+                continue;
+            }
+        }
+        decoded += _path[i];
+    }
+    return decoded;
+}
+
+bool httpRequest::isValidPercentEncoding(const std::string& path) {
+    for (size_t i = 0; i < path.length(); i++) {
+        if (path[i] == '%') {
+            if (i + 2 >= path.length() || !isxdigit(path[i+1]) || !isxdigit(path[i+2]))
+                return false;
+            i += 2;  // skip the two hex digits
+        }
+    }
+    return true;
+}
+
+bool	httpRequest::isValidUriString(const std::string& uri)
+{
+	std::string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_ :;.,\\/\"'?!(){}[]@<>=-+*#$&`|~^%";
+	if (uri.find_first_not_of(validChars) != std::string::npos)
+		return false;
+	return true;
+}
+
+bool	httpRequest::checkPath()
+{
+	if (_path.empty() || _path[0] != '/')
+	{
+		setErrorCode(400);
+		return false;
+	}
+	if (_path.find("/../") != std::string::npos 
+	|| _path.rfind("/..") == _path.length() - 3 
+	|| _path == "/.." || _path == "..")
+		return false;
+	if (!isValidUriString(_path))
+	{
+		setErrorCode(400);
+		return false;
+	}
+	if (!isValidPercentEncoding(_path))
+	{
+		setErrorCode(400);
+		return false;
+	}
+	for (size_t i = 0; i < _path.size(); i++)
+	{
+		if (_path[i] <= 32 || _path[i] == 127)
+		{
+			setErrorCode(400);
+			return false;
+		}
+	}
+	if (_path.size() > URI_MAX)
+	{
+		setErrorCode(414); //414 Uri Too Long
+		return false;
+	}
+	if (_path.find('\0') != std::string::npos)
+	{
+		setErrorCode(400);
+		return false;
+	}
+	return true;
+} 
+
+bool	httpRequest::parseStartLine(std::string &startLine)
+{
+	std::string buffer;
+	if (startLine.find(" ") != std::string::npos) //method
+	{
+		buffer = startLine.substr(0, startLine.find(" "));
+		startLine.erase(0, startLine.find(" ") + 1);
+		_method = buffer;
+		buffer.clear();
+
+		if (_method != "GET" && _method != "POST" && _method != "DELETE")
+		{
+			setErrorCode(401); //405
+			return false;
+		}
+	}
+	else
+	{
+		setErrorCode(402);
+		return false;
+	}
+
+	if (startLine.find(" ") != std::string::npos) //path
+	{
+		buffer = startLine.substr(0, startLine.find(" "));
+		startLine.erase(0, startLine.find(" ") + 1);
+		_path = buffer;
+		buffer.clear();
+		if (!checkPath()) //the error code is set inside checkPath
+			return false;
+		_path = decodePath();
+	}
+	else
+	{
+		setErrorCode(400);
+		return false;
+	}
+	if (startLine.find("HTTP/1.1") == 0 && startLine.size() == 8) //http version, hard coded the condition
+	{
+		buffer = startLine.substr(0, startLine.find(" "));
+		startLine.erase(0, startLine.find(" ") + 1);
+		_httpVersion = buffer;
+		buffer.clear();
+
+		if (_httpVersion != "HTTP/1.1")
+		{
+			setErrorCode(405);
+			return false;
+		}
+	}
+	else
+	{
+		setErrorCode(406);
+		return false;
+	}
+
+	if (startLine.find(" ") != std::string::npos)
+	{
+		setErrorCode(407);
+		return false;
+	}
+	_status = REQ_HEADERS;
+	return true;
+}
+
+/**********************************************************************************************/
+
+void	httpRequest::setErrorCode(unsigned int code) { _errorCode = code; }
+
+unsigned int	httpRequest::getErrorCode() const { return _errorCode; }
+
+void	httpRequest::printRequest()
+{
+	std::cout << "status:" << _status << ";" << std::endl;
+	std::cout << "errorCode:" << _errorCode << ";" << std::endl << std::endl;
+
+	std::cout << "method:" << _method << ";" << std::endl;
+	std::cout << "path:" << _path << ";" << std::endl;
+	std::cout << "httpVersion:" << _httpVersion << ";" << std::endl << std::endl;
+	
+	std::cout << "headers:" << std::endl;
+	for (HeaderMap::iterator it = _headers.begin(); it != _headers.end(); it++)
+		std::cout << it->first << ":" << it->second << ";" << std::endl;
+	std::cout << std::endl;
+
+	std::cout << "body:" << std::endl;
+	std::cout << _body << ";" << std::endl;
+}
+
+/**********************************************************************************************/
+
 /**
  * The status of the request gets updated inside the functions parseRequest() calls.
- * TODO: set the status to REQ_PARSED and make the process function look for that flag before processing
  * 
  * In case of an error parseRequest() (or the functions it calls)
  * will set the appropriate error code and return false.
  * It is then up to the function that called parseRequest()
  * to check the error code and handle it appropriately.
   */
-bool	httpRequest::parseRequest(std::string str)
+bool	httpRequest::parseRequest(std::string& str)
 {
 	_requestBuffer.append(str);
 	if (_status == REQ_START_LINE)
@@ -458,6 +482,8 @@ bool	httpRequest::parseRequest(std::string str)
 	}
 	return true;
 }
+
+/**********************************************************************************************/
 
 /**
  * @brief Converts an HTTP status code into an appropriate reason string.
@@ -568,33 +594,30 @@ std::string code_to_string(const unsigned int code) {
     }
 }
 
+int	ft_stoi(std::string str)
+{
+	for (size_t i = 0; i < str.size(); i++)
+	{
+		if (!isdigit(str[i]))
+			return -1;
+	}
+	std::stringstream	ss;
+	int n = 0;
 
-/*
--le serv ne va pas recevoir toute la request d'un coup, donc tu dois 
-	call parse jusqu'a que tu soies sur que la request est complete
--figure out comment savoir que la request est complete
+	ss << str;
+	ss >> n;
+	return n;
+}
 
-function parse(data):
-    buffer += data
+int hexToInt(const std::string& hexStr) 
+{
+    // Using stringstream with hex manipulator
+    std::stringstream ss;
+    ss << std::hex << hexStr;
+    int result;
+    ss >> result;
     
-    if state == START_LINE:
-        if buffer has \r\n:
-            extract first line
-            split into method, path, version
-            state = HEADERS
-    
-    if state == HEADERS:
-        while buffer has complete lines:
-            if line is empty (\r\n):
-                state = BODY or COMPLETE
-                break
-            else:
-                add header to map
-    
-    if state == BODY:
-        if buffer size >= content_length:
-            body = first content_length bytes
-            state = COMPLETE
-    
-    return state == COMPLETE
-*/
+    if (ss.fail()) 
+		return -1;
+    return result;
+}
