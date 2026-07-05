@@ -3,6 +3,7 @@
 
 # include "support.hpp"
 # include "conf/Conf.hpp"
+# include "httpRequest.hpp"
 
 # include <cerrno>
 # include <fcntl.h>

@@ -1,6 +1,5 @@
 #ifndef HTTPREQUEST_HPP
 # define HTTPREQUEST_HPP
-//#include "webserv.hpp"
 
 # include <cerrno>
 # include <fcntl.h>
@@ -52,27 +51,35 @@ class httpRequest
 		int				_bodySize;
 		int				_chunkSize;
 
+		httpRequest(const httpRequest& copy);
+		httpRequest	&operator=(const httpRequest& copy);
+	
+		bool	parseHexSize();
+		bool	parseChunkData();
+		bool	parseChunked();
+		bool	parseFixedLength();
+		bool	parseBody();
+		
+		bool	isValidHeaderValue(const std::string& value);
+		bool	isValidHeaderKey(const std::string& key);
+		bool	parseHeaders();
+		
+		std::string	decodePath();
+		bool		isValidPercentEncoding(const std::string& path);
+		bool		isValidUriString(const std::string& uri);
+		bool		checkPath();
+		bool		parseStartLine(std::string& startLine);
 
 	public:
 		httpRequest();
-		httpRequest(const httpRequest& copy);
-		httpRequest	&operator=(const httpRequest& copy);
 		~httpRequest();
 
-		void	setErrorCode(unsigned int code);
-		void	printRequest();
+		unsigned int	getErrorCode() const;
+		void			setErrorCode(unsigned int code);
+		void			printRequest();
 
-		bool	parseRequest(std::string str);
-		bool	parseStartLine(std::string &startLine);
-		bool	isValidHeaderKey(std::string key);
-		bool	isValidHeaderValue(std::string value);
-		bool	parseHeaders();
-		bool	checkPath(); //not fully implemented
-		bool	parseFixedLength();
-		bool	parseChunked();
-		bool	parseBody();
-		bool	parseHexSize();
-		bool	parseChunkData();
+		bool	parseRequest(std::string& str);
+
 };
 
 std::string code_to_string(const unsigned int code);
