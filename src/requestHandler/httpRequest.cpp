@@ -65,7 +65,7 @@ bool	httpRequest::parseHexSize()
 		{
 			if (i > 0 && _requestBuffer[i] == ';')
 				break;
-			setErrorCode(409);
+			setErrorCode(400);
 			return false;
 		}
 		hexStr += _requestBuffer[i];
@@ -74,7 +74,7 @@ bool	httpRequest::parseHexSize()
 	_chunkSize = hexToInt(hexStr);
 	if (_chunkSize == -1)
 	{
-		setErrorCode(410);
+		setErrorCode(400);
 		return false;
 	}
 	_requestBuffer.erase(0, crlf + 2);
@@ -88,9 +88,7 @@ bool	httpRequest::parseChunkData()
 	int	trueSize = _requestBuffer.find("\r\n");
 	if (_chunkSize != trueSize)
 	{
-		std::cout << "chunkSize: " << _chunkSize << std::endl;
-		std::cout << "trueSize: " << trueSize << std::endl;
-		setErrorCode(411);
+		setErrorCode(400);
 		return false;
 	}
 	_body.append(_requestBuffer.substr(0, trueSize));
@@ -102,7 +100,6 @@ bool	httpRequest::parseChunked()
 {
 	if (_headers["Transfer-Encoding"] != "chunked")
 	{
-		std::cout << "header:" << _headers["Transfer-Encoding"] << "debug5\n";
 		setErrorCode(400);
 		return false;
 	}
@@ -148,7 +145,6 @@ bool	httpRequest::parseFixedLength()
 		_bodySize = ft_stoi(_headers.find("Content-Length")->second);
 		if (_bodySize < 0)
 		{
-			std::cout << "debug6\n";
 			setErrorCode(400);
 			return false;
 		}
@@ -165,9 +161,6 @@ bool	httpRequest::parseFixedLength()
 	}
 
 	int	i = 0;
-	std::cout << "body:" << _body << std::endl;
-	std::cout << "body.size():" << _body.size() << std::endl;
-	std::cout << "bodySize:" << _bodySize << std::endl;
 	size_t	bytesRead = _body.size();
 	while (_requestBuffer[i])
 	{
@@ -243,8 +236,7 @@ bool	httpRequest::parseHeaders()
 		}
 		if (_requestBuffer.find(": ") == std::string::npos)
 		{
-			std::cout << "requestBuffer:" << _requestBuffer << ";" << std::endl;
-			setErrorCode(408);
+			setErrorCode(400);
 			return false;
 		}
 		size_t	sep = _requestBuffer.find(": ");
@@ -258,7 +250,6 @@ bool	httpRequest::parseHeaders()
 		}
 		if (_headers.find(key) != _headers.end())
 		{
-			std::cout << "debug4\n";
 			setErrorCode(400);
 			return false;
 		}
@@ -365,13 +356,13 @@ bool	httpRequest::parseStartLine(std::string &startLine)
 
 		if (_method != "GET" && _method != "POST" && _method != "DELETE")
 		{
-			setErrorCode(401); //405
+			setErrorCode(405); //405
 			return false;
 		}
 	}
 	else
 	{
-		setErrorCode(402);
+		setErrorCode(400);
 		return false;
 	}
 
@@ -399,19 +390,19 @@ bool	httpRequest::parseStartLine(std::string &startLine)
 
 		if (_httpVersion != "HTTP/1.1")
 		{
-			setErrorCode(405);
+			setErrorCode(400);
 			return false;
 		}
 	}
 	else
 	{
-		setErrorCode(406);
+		setErrorCode(400);
 		return false;
 	}
 
 	if (startLine.find(" ") != std::string::npos)
 	{
-		setErrorCode(407);
+		setErrorCode(400);
 		return false;
 	}
 	_status = REQ_HEADERS;
