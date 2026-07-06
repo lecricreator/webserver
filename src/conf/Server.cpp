@@ -14,6 +14,9 @@ bool    Server::parse_server(std::ifstream *fd_file) {
         if ((posi = line.find("#")) != std::string::npos) {
             continue ;
         } else if ((posi = line.find("}")) != std::string::npos) {
+            return ;
+        } else if ((posi = line.find("port ")) != std::string::npos) {
+            this->set.add_in_var(line, posi + 5, &this->_port_listen);
             if (this->get_port_listen() == ERROR || this->get_server_name().empty() || this->get_location().empty()) {
                 print_error_conf(EMPTY_OR_MISSING);
                 return (false);
