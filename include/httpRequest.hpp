@@ -54,6 +54,9 @@ class httpRequest
 		int				_bodySize;
 		int				_chunkSize;
 
+		//response-related variables
+		std::string	_responseBody;
+
 		//copy constructors
 		httpRequest(const httpRequest& copy);
 		httpRequest	&operator=(const httpRequest& copy);
@@ -84,6 +87,10 @@ class httpRequest
 		//deleteRequest
 		bool	deleteRequest();//not implemented
 
+		//requestProcessing
+		void	appendError();
+		bool	addHeaders();
+
 	public:
 		httpRequest();
 		~httpRequest();
@@ -92,9 +99,12 @@ class httpRequest
 		void			setErrorCode(unsigned int code);
 		void			printRequest();
 
+		//requestParser
 		bool		parseRequest(std::string& str);
-		bool		processRequest();	//not implemented
+		
+		//requestProcessing
 		std::string	generateResponse();	//not implemented
+		std::string	processRequest();	//not implemented
 
 };
 
