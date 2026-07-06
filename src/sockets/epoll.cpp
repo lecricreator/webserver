@@ -25,6 +25,14 @@ t_parse_data create_parse_data(Conf conf_c, Server server)
   return client_info;
 }
 
+void end_connection(int fd, int epoll_fd, std::map<int, t_parse_data> &client_infos)
+{
+  print("Connection ceased with fd " + to_str(fd));
+  epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
+  close(fd);
+  client_infos.erase(fd);
+}
+
 static void manage_requests(struct epoll_event event,
             int epoll_fd, Conf &conf_c, std::map<int, Server> &servers)
 {
@@ -43,19 +51,12 @@ static void manage_requests(struct epoll_event event,
     client_infos[client_fd] = create_parse_data(conf_c, servers[fd]);
   }
   else if (event.events & (EPOLLERR | EPOLLHUP))
-  {
-    print("Connection ceased with fd " + to_str(fd));
-    epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
-    close(fd);
-    client_infos.erase(fd);
-  }
+    end_connection(fd, epoll_fd, client_infos);
   else if (event.events & EPOLLIN)
   {
     if (get_request(fd, client_infos[fd]) == SUCCESS)
-    {
       if (set_epoll_event(event, fd, epoll_fd, EPOLLOUT, EPOLL_CTL_MOD) == ERROR)
         return ;
-    }
   }
   else
   {
@@ -64,6 +65,8 @@ static void manage_requests(struct epoll_event event,
       if (set_epoll_event(event, fd, epoll_fd, EPOLLOUT, EPOLL_CTL_MOD) == ERROR)
         return ;
     }
+    else
+      end_connection(fd, epoll_fd, client_infos);
   }
 }
 

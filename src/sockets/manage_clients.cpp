@@ -58,7 +58,7 @@ int send_response(int client_fd, std::string &response)
 {
   ssize_t bytes_sent = send(client_fd, response.data(), response.size(), 0);
   if (bytes_sent == ERROR && errno != EAGAIN)
-    print_error("Failed to send response");
+    return print_error("Failed to send response"), ERROR;
   if (bytes_sent == (ssize_t)response.size())
     return DONE;
   if (bytes_sent > 0)
