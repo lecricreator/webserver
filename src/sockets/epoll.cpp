@@ -8,65 +8,80 @@ void set_event(struct epoll_event *event, int flag, int fd)
   event->data.fd = fd;
 }
 
-static void manage_requests(struct epoll_event event, std::vector<int> server_fds, int epoll_fd, std::map<int, std::string> &responses, Conf conf_c)
+int  set_epoll_event(struct epoll_event &event, int fd, int epoll_fd, int new_flag, int change_flag)
 {
+  set_event(&event, new_flag, fd);
+  if (epoll_ctl(epoll_fd, change_flag, fd, &event) == ERROR)
+    return print_error("epoll_ctl"), ERROR;
+  return SUCCESS;
+}
+
+t_parse_data create_parse_data(Conf conf_c, Server server)
+{
+  t_parse_data client_info;
+  client_info.response = "";
+  client_info.conf = &conf_c;
+  client_info.server = &server;
+  return client_info;
+}
+
+static void manage_requests(struct epoll_event event,
+            int epoll_fd, Conf &conf_c, std::map<int, Server> &servers)
+{
+  static std::map<int, t_parse_data> client_infos;
   int fd = event.data.fd;
 
-  if (std::find(server_fds.begin(), server_fds.end(), fd) != server_fds.end())
+  if (servers.find(fd) != servers.end())
   {
     int client_fd = accept_client(fd);
     if (client_fd == ERROR)
       return ;
     set_nonblocking(client_fd);
     struct epoll_event s_event;
-    set_event(&s_event, EPOLLIN, client_fd);
-    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &s_event) == ERROR)
-      return print_error("epoll_ctl"), void();
-    responses[fd] = "";
+    if (set_epoll_event(s_event, client_fd, epoll_fd, EPOLLIN, EPOLL_CTL_ADD) == ERROR)
+      return ;
+    client_infos[client_fd] = create_parse_data(conf_c, servers[fd]);
   }
   else if (event.events & (EPOLLERR | EPOLLHUP))
   {
     print("Connection ceased with fd " + to_str(fd));
     epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
     close(fd);
+    client_infos.erase(fd);
   }
   else if (event.events & EPOLLIN)
   {
-    if (get_request(fd, responses[fd], conf_c) == SUCCESS)
+    if (get_request(fd, client_infos[fd]) == SUCCESS)
     {
-      set_event(&event, EPOLLOUT, fd);
-      if (epoll_ctl(epoll_fd, EPOLL_CTL_MOD, fd, &event) == ERROR)
-        return print_error("epoll_ctl"), void();
+      if (set_epoll_event(event, fd, epoll_fd, EPOLLOUT, EPOLL_CTL_MOD) == ERROR)
+        return ;
     }
   }
   else
   {
-    if (send_response(fd, responses[fd]) == DONE)
+    if (send_response(fd, client_infos[fd].response) == UNFINISHED)
     {
-      set_event(&event, EPOLLOUT, fd);
-      if (epoll_ctl(epoll_fd, EPOLL_CTL_MOD, fd, &event) == ERROR)
-        return print_error("epoll_ctl"), void();
+      if (set_epoll_event(event, fd, epoll_fd, EPOLLOUT, EPOLL_CTL_MOD) == ERROR)
+        return ;
     }
   }
 }
 
-int manage_events(std::vector<int> server_fds, Conf conf_c)
+int manage_events(std::map<int, Server> &servers, Conf &conf_c)
 {
   int epoll_fd = epoll_create1(0);
   if (epoll_fd == ERROR)
     return ERROR;
   struct epoll_event s_event;
-  size_t nbr_of_fds = (size_t)server_fds.size();
-  for (size_t server_index = 0; server_index < nbr_of_fds; server_index++)
+  for (std::map<int, Server>::iterator it = servers.begin(); it != servers.end(); ++it)
   {
-    int server_fd = server_fds[server_index];
+    int server_fd = it->first;
     set_event(&s_event, EPOLLIN, server_fd);
     if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, server_fd, &s_event) == ERROR)
       return close(epoll_fd), ERROR;
   }
 
   struct epoll_event events[MAX_EVENTS];
-  std::map<int, std::string> responses;
   while (true)
   {
     int nfds = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
@@ -77,7 +92,7 @@ int manage_events(std::vector<int> server_fds, Conf conf_c)
       return ERROR;
     }
     for (int i = 0; i < nfds; i++)
-      manage_requests(events[i], server_fds, epoll_fd, responses, conf_c);
+      manage_requests(events[i], epoll_fd, conf_c, servers);
   }
   close(epoll_fd);
   return SUCCESS;
