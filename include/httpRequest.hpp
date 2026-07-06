@@ -12,10 +12,13 @@
 # include <iostream>
 # include <fstream>
 # include <list>
+# include <string>
+# include <sstream>
+# include <map>
 
-#include <string>
-#include <sstream>
-#include <map>
+#define URI_MAX 2048
+#define	BODY_MAX 8192
+#define	HEADER_MAX 100
 
 enum RequestStatus {
     REQ_EMPTY,			// Nothing received yet
@@ -51,9 +54,11 @@ class httpRequest
 		int				_bodySize;
 		int				_chunkSize;
 
+		//copy constructors
 		httpRequest(const httpRequest& copy);
 		httpRequest	&operator=(const httpRequest& copy);
 	
+		//requestParser
 		bool	parseHexSize();
 		bool	parseChunkData();
 		bool	parseChunked();
@@ -70,6 +75,15 @@ class httpRequest
 		bool		checkPath();
 		bool		parseStartLine(std::string& startLine);
 
+		//getRequest
+		bool	getRequest();	//not implemented
+
+		//postRequest
+		bool	postRequest();	//not implemented
+
+		//deleteRequest
+		bool	deleteRequest();//not implemented
+
 	public:
 		httpRequest();
 		~httpRequest();
@@ -78,7 +92,9 @@ class httpRequest
 		void			setErrorCode(unsigned int code);
 		void			printRequest();
 
-		bool	parseRequest(std::string& str);
+		bool		parseRequest(std::string& str);
+		bool		processRequest();	//not implemented
+		std::string	generateResponse();	//not implemented
 
 };
 
