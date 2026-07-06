@@ -3,6 +3,7 @@
 
 # include "support.hpp"
 # include "conf/Conf.hpp"
+# include "httpRequest.hpp"
 
 # include <cerrno>
 # include <fcntl.h>
@@ -39,14 +40,15 @@ int   get_request(int client_fd, t_parse_data &client_infos);
 int   send_response(int client_fd, std::string &response);
 
 //socket support
-void  print_function_error(std::string function_name);
-void  print_success(std::string function_name, std::string output_name, int output);
-void  set_nonblocking(int fd);
+void    print_function_error(std::string function_name);
+void    print_success(std::string function_name, std::string output_name, int output);
+void    set_nonblocking(int fd);
 
 //epoll
-int   manage_events(std::map<int, Server> &servers, Conf &conf_c);
+int     manage_events(std::map<int, Server> &servers, Conf &conf_c);
 
 //conf
-void  parse_conf(char *argv);
+void    parse_conf(char *argv);
+Conf    *init_conf(char *path_conf);
 
 #endif
