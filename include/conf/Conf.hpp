@@ -1,14 +1,31 @@
 #ifndef CONF
 # define CONF
 
-//# include "webserv.hpp"
+# define CONF_SAFE "conf/safe.conf"
+# include <cstddef>
 # include <string>
+# include <vector>
+
+enum ErrorConf {
+    TOO_MUCH_BRACKET,
+    NO_END_BRACKET_HTTP,
+    NO_END_BRACKET_SERVER,
+    NO_END_BRACKET_LOCATION,
+    NO_END_BRACKET_EVENTS,
+    EMPTY_OR_MISSING,
+    FILE_NOT_EXIST,
+    HTTP_BEFORE_SERVER,
+    NO_SEMICOLON,
+    VALUE_NOT_EMPTY,
+};
+
+size_t  put_index_after_space(std::string line, size_t index);
+void    print_error_conf(ErrorConf error_numb);
+
+//# include "webserv.hpp"
 # include "conf/Server.hpp"
 # include "conf/Events.hpp"
 # include "conf/Location.hpp"
-# include <vector>
-
-size_t  put_index_after_space(std::string line, size_t index);
 
 class Conf {
     private:
@@ -26,15 +43,17 @@ class Conf {
         bool                        _gzip;
         bool                        _http;
         std::vector<Events>         _events;
-        std::vector<Server>         _server;
+        std::vector<Server>         _servers;
+        bool                        _end_http;
     public:
         Conf();
+        ~Conf() {};
         Set_variable            set;
-        void                    parse(char *argv);
+        bool                    parse(std::ifstream &fd_file);
 
         //GET
-        std::vector<Server>     get_server()    {return (this->_server);};
-        std::vector<Events>     get_events()    {return (this->_events);};
+        std::vector<Server>     get_servers() const {return (this->_servers);};
+        std::vector<Events>     get_events() const  {return (this->_events);};
     };
 
 #endif

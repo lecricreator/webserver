@@ -2,11 +2,11 @@
 #include "conf/Server.hpp"
 
 Server::Server() {
-
+    this->_listening_port = ERROR;
 }
 
 
-void    Server::parse_server(std::ifstream *fd_file) {
+bool    Server::parse_server(std::ifstream *fd_file) {
     std::string line;
     size_t      posi;
 
@@ -17,12 +17,22 @@ void    Server::parse_server(std::ifstream *fd_file) {
             return ;
         } else if ((posi = line.find("port ")) != std::string::npos) {
             this->set.add_in_var(line, posi + 5, &this->_port_listen);
+            if (this->get_port_listen() == ERROR || this->get_server_name().empty() || this->get_location().empty()) {
+                print_error_conf(EMPTY_OR_MISSING);
+                return (false);
+            } else {
+                return (true);
+            }
+        } else if ((posi = line.find("listen ")) != std::string::npos) {
+            this->set.add_in_var(line, posi + 7, &this->_listening_port);
         } else if ((posi = line.find("location ")) != std::string::npos) {
             size_t endposi;
             if ((endposi = line.find("{", posi + 9)) != std::string::npos) {
                 Location location = Location();
-                location.parse_location(fd_file, line, posi + 9);
-                this->_location.push_back(location);
+                if (!location.parse_location(fd_file, line, posi + 9)) {
+                    return (false);
+                }
+                this->_locations.push_back(location);
             }
         } else if ((posi = line.find("server_name ")) != std::string::npos) {
             this->set.add_in_var(line, posi + 12, &this->_server_name);
@@ -44,4 +54,6 @@ void    Server::parse_server(std::ifstream *fd_file) {
             this->set.add_in_var(line, posi + 11, &this->_error_page);
         }
     }
+    print_error_conf(NO_END_BRACKET_SERVER);
+    return (false);
 }

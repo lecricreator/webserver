@@ -32,7 +32,7 @@ int manage_events(const char *response, int server_fd)
     {
       int fd = events[i].data.fd;
       //uint32_t event = events[i].events;
-      
+
       if (fd == server_fd)
       {
         int client_fd = accept_client(server_fd);
