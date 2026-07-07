@@ -27,10 +27,18 @@ int main(int argc, char **argv) {
     print("Need 2 arguments.");
     return FAILURE;
   }
-  Conf  conf_c = Conf();
-  conf_c.parse(argv[1]);
-  std::map<int, Server> servers = create_server(conf_c);
-  if (manage_events(servers, conf_c) == ERROR)
+  print(argv[1]);
+  Conf *conf_c = init_conf(argv[1]);
+  if (conf_c == NULL) {
     return FAILURE;
+  }
+  delete conf_c;
+  /*
+  std::map<int, Server> servers = create_server(*conf_c);
+  int status = manage_events(servers, *conf_c);
+  delete conf_c;
+  if (status == ERROR)
+    return FAILURE;
+    */
   return SUCCESS;
 }

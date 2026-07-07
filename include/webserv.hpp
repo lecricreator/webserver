@@ -3,6 +3,7 @@
 
 # include "support.hpp"
 # include "conf/Conf.hpp"
+# include "httpRequest.hpp"
 
 # include <cerrno>
 # include <fcntl.h>
@@ -48,5 +49,6 @@ int   manage_events(std::map<int, Server> &servers, Conf &conf_c);
 
 //conf
 void  parse_conf(char *argv);
+Conf  *init_conf(char *path_conf);
 
 #endif

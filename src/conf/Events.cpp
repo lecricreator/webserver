@@ -6,7 +6,7 @@ Events::Events() {
 }
 
 
-void    Events::parse_events(std::ifstream *fd_file) {
+bool    Events::parse_events(std::ifstream *fd_file) {
     std::string line;
     size_t      posi;
 
@@ -14,7 +14,12 @@ void    Events::parse_events(std::ifstream *fd_file) {
         if ((posi = line.find("#")) != std::string::npos) {
             continue ;
         } else if ((posi = line.find("}")) != std::string::npos) {
-            break;
+            return (true);
+        } else if ((posi = line.find("http") != std::string::npos) || (posi = line.find("server")) != std::string::npos) {
+            print_error_conf(NO_END_BRACKET_EVENTS);
+            return (false);
         }
     }
+    print_error_conf(NO_END_BRACKET_EVENTS);
+    return (false);
 }

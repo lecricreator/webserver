@@ -7,7 +7,7 @@ class Events {
         std::string _use;
     public:
         Events();
-        void    parse_events(std::ifstream *fd_file);
+        bool    parse_events(std::ifstream *fd_file);
 };
 
 #endif
