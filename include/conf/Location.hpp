@@ -40,8 +40,9 @@ class Location {
         Set_variable    set;
 
         //GET
-        std::string                 get_root()  {return (this->_root);};
-        std::vector<std::string>    get_index() {return (this->_index);};
+        std::string                 get_root()          {return (this->_root);};
+        std::vector<std::string>    get_index()         {return (this->_index);};
+        std::string                 get_path_location() {return (this->_path_location);};
 
 };
 

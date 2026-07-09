@@ -16,7 +16,7 @@ int  set_epoll_event(struct epoll_event &event, int fd, int epoll_fd, int new_fl
   return SUCCESS;
 }
 
-t_parse_data create_parse_data(Conf conf_c, Server server)
+t_parse_data create_parse_data(Conf& conf_c, Server& server)
 {
   t_parse_data client_info;
   client_info.response = "";

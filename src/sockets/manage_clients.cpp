@@ -15,10 +15,17 @@ int accept_client(int server_fd)
   return client_fd;
 }
 
-int parse(char buf[4096]) {(void)buf; return SUCCESS;}
+int parse(char buf[4096]) {
+  (void)buf; return SUCCESS;
+}
 
 static int build_response(Conf &conf_c, std::string &response, Server &server)
 {
+  std::vector<Location>::iterator it;
+  for (it = server.get_location().begin(); it != server.get_location().end(); it++) {
+    print(it->get_path_location());
+  }
+
   (void)conf_c, (void)server;
   response =
       "HTTP/1.1 200 OK\r\n"
@@ -65,4 +72,3 @@ int send_response(int client_fd, std::string &response)
     response.erase(0, bytes_sent);
   return UNFINISHED;
 }
-
