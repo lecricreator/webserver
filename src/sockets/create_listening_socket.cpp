@@ -45,6 +45,7 @@ static int listen_address(int server_fd, int connexion_queue_size, int port)
 int create_listening_socket(int port)
 {
   int connexion_queue_size = 10;
+  print("");
   int server_fd = create_server_socket();
   if (server_fd == ERROR)
     return ERROR;
