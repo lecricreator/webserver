@@ -2,6 +2,7 @@
 
 bool    httpRequest::getRequest()
 {
+    print("loi");
     if (access(_path.c_str(), F_OK) == -1)
     {
         setErrorCode(404); //404 Not Found

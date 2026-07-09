@@ -19,4 +19,4 @@ We will use HTTP/1.1 and epoll as the single I/O function call.
 
 # Resources
 \[link webserv-mindmap.html and it's references]
-
+https://www.warp.dev/terminus/curl-post-request
