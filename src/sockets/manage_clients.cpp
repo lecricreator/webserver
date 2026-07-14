@@ -15,7 +15,13 @@ int accept_client(int server_fd)
   return client_fd;
 }
 
-int parse(char buf[4096]) {(void)buf; return SUCCESS;}
+int parse(char buf[4096]) {
+  httpRequest test;
+  std::string chunked_request(buf);
+  test.parseRequest(chunked_request);
+  std::string result = test.getRequest();
+  print(result);
+  return SUCCESS;}
 
 static int build_response(Conf &conf_c, std::string &response, Server &server)
 {

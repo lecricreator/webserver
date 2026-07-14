@@ -7,7 +7,7 @@ void    httpRequest::appendError()
 
 bool    httpRequest::addHeaders()
 {
-
+    return true;
 }
 
 std::string httpRequest::generateResponse()
@@ -24,12 +24,12 @@ std::string httpRequest::generateResponse()
 
 std::string httpRequest::processRequest()
 {
-    if (_method == "GET")
+    /*if (_method == "GET")
         getRequest();
     if (_method == "POST")
         postRequest();
     if (_method == "DELETE")
-        deleteRequest();
+        deleteRequest();*/
 
     std::string response = generateResponse();
     return response;

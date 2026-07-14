@@ -79,7 +79,7 @@ class httpRequest
 		bool		parseStartLine(std::string& startLine);
 
 		//getRequest
-		bool	getRequest();	//not implemented
+		//bool	getRequest();	//not implemented
 
 		//postRequest
 		bool	postRequest();	//not implemented
@@ -105,6 +105,7 @@ class httpRequest
 		//requestProcessing
 		std::string	generateResponse();	//not implemented
 		std::string	processRequest();	//not implemented
+		std::string	getRequest();	//not implemented
 
 };
 

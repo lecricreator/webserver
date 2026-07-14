@@ -1,6 +1,37 @@
 #include "webserv.hpp"
 
-bool    httpRequest::getRequest()
+std::string    httpRequest::getRequest()
+{
+    print("loi");
+    if (access(_path.c_str(), F_OK) == -1)
+    {
+        setErrorCode(404); //404 Not Found
+        return "";
+    }
+    if (access(_path.c_str(), R_OK) == -1)
+    {
+        setErrorCode(500); //500 Internal Server Error
+        return "";
+    }
+
+    std::ifstream   file(_path.c_str());
+    std::string     line;
+
+    if (!file.is_open())
+    {
+        setErrorCode(500);
+        return "";
+    }
+    while (std::getline(file, line))
+    {
+        _responseBody += line;
+        if (!file.eof())
+            _responseBody += '\n';
+    }
+    return _responseBody;
+}
+
+/*bool    httpRequest::getRequest()
 {
     print("loi");
     if (access(_path.c_str(), F_OK) == -1)
@@ -30,3 +61,4 @@ bool    httpRequest::getRequest()
     }
     return true;
 }
+*/
