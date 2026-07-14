@@ -31,6 +31,7 @@ typedef struct s_parse_data
   Server      *server;
   Conf        *conf;
   std::string response;
+  httpRequest request;
 } t_parse_data;
 
 //socket

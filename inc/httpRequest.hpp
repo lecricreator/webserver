@@ -43,7 +43,7 @@ class httpRequest
 		RequestStatus	_status;
 		ChunkBodyStatus	_chunkStatus;
 		std::string		_requestBuffer;
-		
+
 		std::string		_method;
 		std::string		_path;
 		std::string		_httpVersion;
@@ -57,21 +57,19 @@ class httpRequest
 		//response-related variables
 		std::string	_responseBody;
 
-		//copy constructors
-		httpRequest(const httpRequest& copy);
-		httpRequest	&operator=(const httpRequest& copy);
-	
+
+
 		//requestParser
 		bool	parseHexSize();
 		bool	parseChunkData();
 		bool	parseChunked();
 		bool	parseFixedLength();
 		bool	parseBody();
-		
+
 		bool	isValidHeaderValue(const std::string& value);
 		bool	isValidHeaderKey(const std::string& key);
 		bool	parseHeaders();
-		
+
 		std::string	decodePath();
 		bool		isValidPercentEncoding(const std::string& path);
 		bool		isValidUriString(const std::string& uri);
@@ -79,7 +77,7 @@ class httpRequest
 		bool		parseStartLine(std::string& startLine);
 
 		//getRequest
-		//bool	getRequest();	//not implemented
+		bool	getResponse(const Conf &conf, std::string &request, Server &server);	//not implemented
 
 		//postRequest
 		bool	postRequest();	//not implemented
@@ -93,6 +91,8 @@ class httpRequest
 
 	public:
 		httpRequest();
+		httpRequest(const httpRequest& copy);
+		httpRequest	&operator=(const httpRequest& copy);
 		~httpRequest();
 
 		unsigned int	getErrorCode() const;
@@ -101,11 +101,13 @@ class httpRequest
 
 		//requestParser
 		bool		parseRequest(std::string& str);
-		
+
 		//requestProcessing
-		std::string	generateResponse();	//not implemented
-		std::string	processRequest();	//not implemented
-		std::string	getRequest();	//not implemented
+		bool	generateResponse(const Conf &conf, std::string &request, Server &server);	//not implemented
+		//std::string	processRequest();	//not implemented
+
+		//GET
+		std::string get_path();
 
 };
 

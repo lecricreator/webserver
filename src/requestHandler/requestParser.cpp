@@ -262,8 +262,8 @@ bool	httpRequest::checkPath()
 		setErrorCode(400);
 		return false;
 	}
-	if (_path.find("/../") != std::string::npos 
-	|| _path.rfind("/..") == _path.length() - 3 
+	if (_path.find("/../") != std::string::npos
+	|| _path.rfind("/..") == _path.length() - 3
 	|| _path == "/.." || _path == "..")
 		return false;
 	if (!isValidUriString(_path))
@@ -295,7 +295,7 @@ bool	httpRequest::checkPath()
 		return false;
 	}
 	return true;
-} 
+}
 
 bool	httpRequest::parseStartLine(std::string &startLine)
 {
@@ -366,7 +366,7 @@ bool	httpRequest::parseStartLine(std::string &startLine)
 
 /**
  * The status of the request gets updated inside the functions parseRequest() calls.
- * 
+ *
  * In case of an error parseRequest() (or the functions it calls)
  * will set the appropriate error code and return false.
  * It is then up to the function that called parseRequest()

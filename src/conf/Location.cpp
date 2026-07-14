@@ -5,7 +5,9 @@
 bool    Location::parse_location(std::ifstream *fd_file, const std::string pline, size_t posi) {
     std::string line;
 
+    //print(pline);
     this->set.add_in_var(pline, posi, &this->_path_location);
+    //print(this->_path_location);
     while (std::getline(*fd_file, line)) {
         if ((posi = line.find("#")) != std::string::npos) {
             continue ;

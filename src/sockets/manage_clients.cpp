@@ -16,30 +16,13 @@ int accept_client(int server_fd)
 }
 
 int parse(char buf[4096]) {
-  httpRequest test;
-  std::string chunked_request(buf);
-  test.parseRequest(chunked_request);
-  std::string result = test.getRequest();
-  print(result);
+  (void)buf;
   return SUCCESS;}
 
-static int build_response(Conf &conf_c, std::string &response, Server &server)
+/*static int build_response(Conf &conf_c, std::string &response, Server &server)
 {
-  std::vector<Location>::iterator it;
-  for (it = server.get_location().begin(); it != server.get_location().end(); it++) {
-    print(it->get_path_location());
-  }
 
-  (void)conf_c, (void)server;
-  response =
-      "HTTP/1.1 200 OK\r\n"
-      "Content-Type: text/html\r\n"
-      "Content-Length: 21\r\n"
-      "Connection: close\r\n"
-      "\r\n"
-      "<h1>Hello World!</h1>";
-  return (SUCCESS);
-}
+}*/
 
 //connection closed by client, error and no data received is answered the same way for now
 //recv([...], MSG_PEEK) wouldn't consume the buffer
@@ -55,13 +38,13 @@ int get_request(int client_fd, t_parse_data &client_infos)
   print("--- HTTP REQUEST ---\n");
   print(buf);
 
-  //things from parse's return should be given to build_response.
-  int is_parsing_done = parse(buf);
-
-  if (is_parsing_done == ERROR)
+  std::string chunked_request(buf);
+  if (!client_infos.request.parseRequest(chunked_request))
     return ERROR;
-  if (build_response(*client_infos.conf, client_infos.response, *client_infos.server) == ERROR)
+  //std::string result = client_infos.request.getResponse();
+  if (!client_infos.request.generateResponse(*client_infos.conf, client_infos.response, *client_infos.server))
     return ERROR;
+  print(client_infos.response);
   return SUCCESS;
 }
 

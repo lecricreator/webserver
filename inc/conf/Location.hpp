@@ -5,9 +5,9 @@
 
 class Location {
     private:
-        std::string                 _path_location;
-        std::string                 _root;
-        std::vector<std::string>    _index;
+        //std::string                 _path_location;
+        //std::string                 _root;
+        //std::vector<std::string>    _index;
         std::string                 _fastcgi_pass;
         std::string                 _fastcgi_index;
         std::vector<std::string>    _fastcgi_param;
@@ -38,6 +38,10 @@ class Location {
         Location() {};
         bool            parse_location(std::ifstream *fd_file, const std::string pline, size_t posi);
         Set_variable    set;
+                std::string                 _path_location;
+        std::string                 _root;
+        std::vector<std::string>    _index;
+
 
         //GET
         std::string                 get_root()          {return (this->_root);};
