@@ -52,5 +52,6 @@ void  parse_conf(char *argv);
 Conf  *init_conf(char *path_conf);
 
 //cgi
-std::string execute_cgi(const char *filename, char **env, char *cgi_data);
+int   get_cgi_response(std::string &response, const std::string &full_path);
+
 #endif

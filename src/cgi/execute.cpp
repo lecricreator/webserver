@@ -1,5 +1,4 @@
-#include "webserv.hpp"
-#include "sys/wait.h"
+#include "cgi.hpp"
 
 static void  execute_child(const char *filename, int stdin_pipe[2], int stdout_pipe[2], char **env)
 {
