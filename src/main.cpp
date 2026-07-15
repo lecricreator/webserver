@@ -15,7 +15,7 @@ int main()
     print("");
   }
   print("/!\\ must implement response creation");
-  //must check if same header is present twice or if there's an invalid header
+  //must check if content_type is implemented
   return SUCCESS;
 }
 

@@ -5,6 +5,8 @@
 #include <sstream>
 #include <sys/wait.h>
 
+#define EMPTY_FIELD "None"
+
 typedef struct s_cgi_info
 {
   std::string content_type;
@@ -14,4 +16,4 @@ typedef struct s_cgi_info
 
 //cgi
 std::string execute_cgi(const char *filename, char **env, char *cgi_data);
-t_cgi_info  parse_cgi(const std::string &cgi_output);
+int  parse_cgi(const std::string &cgi_output, t_cgi_info &cgi_info);
