@@ -2,7 +2,19 @@
 
 std::string create_response(const t_cgi_info &cgi_info)
 {
-  return cgi_info.body;
+  std::string client_response;
+  if (cgi_info.status == EMPTY_FIELD)
+    client_response = "HTTP/1.1 200 OK";
+  else
+    client_response = "HTTP/1.1 " + cgi_info.status;
+  client_response.append("\n");
+  client_response.append("Content-Type: " + cgi_info.content_type);
+  client_response.append("\n");
+  client_response.append("Content-Length: " + to_str((int)cgi_info.body.size()));
+  client_response.append("\n");
+  client_response.append("\n");
+  client_response.append(cgi_info.body);
+  return client_response;
 }
 
 t_cgi_info init_cgi_info()
