@@ -7,9 +7,7 @@ bool    httpRequest::getResponse(const Conf &conf_c, std::string &response, Serv
     (void)conf_c,(void)server, (void) response;
     std::vector<Location>::iterator it_location;
     for (it_location = server.get_location().begin(); it_location != server.get_location().end(); it_location++) {
-        print(it_location->get_path_location());
         if (it_location->get_path_location() == this->_path) {
-            print("Find value in location conf");
             exact_path = it_location->get_root() + it_location->get_path_location() + "/index.html";//it_location->get_index();
             break ;
         }
@@ -25,7 +23,6 @@ bool    httpRequest::getResponse(const Conf &conf_c, std::string &response, Serv
         setErrorCode(500);
         return false;
     }
-    print("io");
     while (std::getline(file, line))
     {
         _responseBody += line;

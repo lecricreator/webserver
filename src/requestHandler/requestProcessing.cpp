@@ -12,24 +12,26 @@ bool    httpRequest::addHeaders()
 
 bool httpRequest::generateResponse(const Conf &conf_c, std::string &response, Server &server)
 {
+    std::string status = "HTTP/1.1 ";
+    std::string content_type = "Content-Type: text/html\r\n";
+    std::string content_lenght_start = "Content-Length: ";
+    std::string content_lenght_middle;
+    std::string content_lenght_end = "\r\n";
+    int size_http = -1;
     //if (this->_path == "")
     (void)conf_c,(void)server;
-    response = "HTTP/1.1 ";
     if (_errorCode != 0)
         appendError();
     else
-        response.append("200 OK\r\n");
-    addHeaders();
-    response.append(_responseBody);
-    response.append(
-        "Content-Type: text/html\r\n"
-        "Content-Length: 10000\r\n");
+        status.append("200 OK\r\n");
+    //addHeaders();
     if (!this->getResponse(conf_c, response, server)) {
         print("error in generate_response");
     }
-    response += _responseBody + "\r\n";
-    print("responnnnnnnnnccceee :");
-    print(response);
+    size_http = this->_responseBody.length();
+    content_lenght_middle = to_str(size_http) + "\r\n";
+    response = status + content_type + content_lenght_start + content_lenght_middle + content_lenght_end + this->_responseBody + "\r\n";
+    //print("Responce is " + response);
   return (true);
 }
 
