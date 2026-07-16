@@ -16,7 +16,23 @@ t_cgi_info init_cgi_info()
   return cgi_info;
 }
 
-//normally we might reuse the body of other codes than 202 but we can simplify
+int is_content_type_implemented(const std::string &content_type)
+{
+  //if (content_type.find("text") != std::string::npos)
+    //return SUCCESS;
+  if (content_type == "text/plain")
+    return SUCCESS;
+  return FAILURE;
+}
+
+int is_implemented(const t_cgi_info &cgi_info)
+{
+  if (is_content_type_implemented(cgi_info.content_type) == SUCCESS)
+    return SUCCESS;
+  return FAILURE;
+}
+
+//normally we might reuse the body of other codes than 200 but we can simplify
 int get_cgi_response(std::string &response, const std::string &full_path)
 {
   std::string cgi_output;
@@ -25,15 +41,18 @@ int get_cgi_response(std::string &response, const std::string &full_path)
       (char*)"QUERY_STRING=name=Alice",
       NULL
   };
+  t_cgi_info cgi_info = init_cgi_info();
+  std::string status = cgi_info.status;
+
   if ((cgi_output = execute_cgi(full_path.c_str(), env, NULL)) == "")
     return print(full_path + ": failure"), FAILURE;
-  t_cgi_info cgi_info = init_cgi_info();
   if (parse_cgi(cgi_output, cgi_info) == FAILURE)
-    print_error("CGI parsing failed");
-  std::string status = cgi_info.status;
-  if (status == EMPTY_FIELD || status == "200 OK")
+    response = "fetch 502 page";
+  else if (is_implemented(cgi_info) == FAILURE)
+    response = "fetch 501 page";
+  else if (status == EMPTY_FIELD || status == "200 OK")
     response = create_response(cgi_info);
   else
-    response = "status not 200 OK, fetch page"; //must get the correct status page
+    response = "fetch correspondent status page"; //must get the correct status page
   return SUCCESS;
 }

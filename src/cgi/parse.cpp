@@ -5,12 +5,12 @@ static bool is_prefix_present(const std::string& str, const std::string& prefix)
   return str.compare(0, prefix.size(), prefix) == 0;
 }
 
-static std::string get_content(const std::string &line, const std::string &prefix)
+static int get_content(const std::string &line, const std::string &prefix, std::string &content)
 {
   if (!is_prefix_present(line, prefix))
-    return std::string();
-  std::string content_type = line.substr(prefix.size());
-  return content_type;
+    return FAILURE;
+  content = line.substr(prefix.size());
+  return SUCCESS;
 }
 
 //we assume that if the pattern x/y is respected the content_type is respected
@@ -30,8 +30,8 @@ int is_valid_content_type(const std::string &content_type)
 static int parse_content_type(const std::string &line, t_cgi_info &cgi_info)
 {
   const std::string prefix = "Content-Type: ";
-  std::string content_type = get_content(line, prefix);
-  if (content_type.empty())
+  std::string content_type;
+  if (get_content(line, prefix, content_type) == FAILURE)
     return ERROR;
   else if (is_valid_content_type(content_type) == FAILURE || cgi_info.content_type != EMPTY_FIELD)
     return FAILURE;
@@ -40,8 +40,8 @@ static int parse_content_type(const std::string &line, t_cgi_info &cgi_info)
 }
 
 //no 3xx statuses as only document type cgi is implemented
-//5xx statuses are for server only
-//other code related to getting data were erased as well
+//5xx statuses are for server only so the cgi may not use it
+//other codes related to getting data were erased as well
 static bool is_valid_status_code(const std::string &status)
 {
   /*const char* valid_status_arr[] = {"200 OK", "201 Created", "202 Accepted", "204 No Content", "206 Partial Content",
@@ -57,8 +57,8 @@ static bool is_valid_status_code(const std::string &status)
 static int parse_status(const std::string &line, t_cgi_info &cgi_info)
 {
   const std::string prefix = "Status: ";
-  std::string status = get_content(line, prefix);
-  if (status.empty())
+  std::string status;
+  if (get_content(line, prefix, status) == FAILURE)
     return ERROR;
   else if (!is_valid_status_code(status) || cgi_info.status != EMPTY_FIELD)
     return FAILURE;
@@ -66,22 +66,19 @@ static int parse_status(const std::string &line, t_cgi_info &cgi_info)
   return SUCCESS;
 }
 
-static int parse_cgi_header_line(std::string &line, t_cgi_info &cgi_info)
-{
-  if (parse_content_type(line, cgi_info) == SUCCESS
-      || parse_status(line, cgi_info) == SUCCESS)
-    return SUCCESS;
-  print_error("header invalid");
-  return FAILURE;
-}
-
 static int parse_cgi_header(const std::string &cgi_output, t_cgi_info &cgi_info)
 {
   std::string         line;
   std::istringstream  stream(cgi_output);
   while (std::getline(stream, line))
-    if (parse_cgi_header_line(line, cgi_info) == FAILURE)
+  {
+    if (parse_content_type(line, cgi_info) == FAILURE)
       return FAILURE;
+    if (parse_status(line, cgi_info) == FAILURE)
+      return FAILURE;
+  }
+  if (cgi_info.content_type == EMPTY_FIELD)
+    return FAILURE;
   return SUCCESS;
 }
 
