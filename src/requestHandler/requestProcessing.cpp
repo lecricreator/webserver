@@ -2,12 +2,16 @@
 
 void    httpRequest::appendError()
 {
+    if (this->_errorCode == 301) {
+        this->_responseBody = "http/1.1 301 " + code_to_string(301) + "\r\n";
+        this->_responseBody += "Location: " + this->_path + "/\r\n\r\n";
 
+    }
 }
 
 bool    httpRequest::addHeaders()
 {
-    return true;
+    return (true);
 }
 
 bool httpRequest::generateResponse(const Conf &conf_c, std::string &response, Server &server)
@@ -20,13 +24,17 @@ bool httpRequest::generateResponse(const Conf &conf_c, std::string &response, Se
     int size_http = -1;
     //if (this->_path == "")
     (void)conf_c,(void)server;
-    if (_errorCode != 0)
+    if (_errorCode != 0) {
         appendError();
+        response = _responseBody;
+    }
     else
         status.append("200 OK\r\n");
     //addHeaders();
     if (!this->getResponse(conf_c, response, server)) {
-        print("error in generate_response");
+        appendError();
+        response = _responseBody;
+        return true;
     }
     size_http = this->_responseBody.length();
     content_lenght_middle = to_str(size_http) + "\r\n";

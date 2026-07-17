@@ -4,12 +4,14 @@ bool    httpRequest::getResponse(const Conf &conf_c, std::string &response, Serv
 {
     std::string     line;
     std::string     exact_path;
-    (void)conf_c,(void)server, (void) response;
     std::vector<Location>::iterator it_location;
     for (it_location = server.get_location().begin(); it_location != server.get_location().end(); it_location++) {
-        if (it_location->get_path_location() == this->_path) {
-            exact_path = it_location->get_root() + it_location->get_path_location() + "/index.html";//it_location->get_index();
-            break ;
+        if () {}
+        else if (it_location->get_path_location() == this->_path && this->_path[this->_path.length()] != '/') {
+            setErrorCode(301);
+            return false;
+        } else if (it_location->get_path_location() + "/" == this->_path) {
+            exact_path = it_location->get_root() + it_location->get_path_location() + it_location->get_index()[0];
         }
     }
     std::ifstream   file(exact_path.c_str());
