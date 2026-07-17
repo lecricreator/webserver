@@ -50,7 +50,6 @@ static void manage_requests(struct epoll_event event,
     struct epoll_event s_event;
     if (set_epoll_event(s_event, client_fd, epoll_fd, EPOLLIN, EPOLL_CTL_ADD) == ERROR)
       return ;
-    print(conf_c.get_servers()[0].get_location()[0].get_path_location());
     client_infos[client_fd] = create_parse_data(conf_c, servers[fd]);
     print(client_infos[client_fd].server->get_location()[0].get_path_location());
 

@@ -10,6 +10,9 @@ void    Set_variable::add_in_var(const std::string line, size_t posi, std::strin
     posi = put_index_after_space(line, posi);
     for (; posi < line.length(); posi++) {
         if (line[posi] == ';' || line[posi] == ' ' || line[posi] == '{') {
+            if (at_replace[0] == "/" && at_replace->length() == 1) {
+                *at_replace = "";
+            }
             return ;
         } else if (line[posi] >= 33 && line[posi] <= 126) {
             *at_replace += line[posi];
@@ -74,8 +77,9 @@ void    Set_variable::add_in_var(const std::string line, size_t posi, std::vecto
     posi = put_index_after_space(line, posi);
     for (; posi < line.length(); posi++) {
         if (line[posi] == ';' || line[posi] == '{') {
-            if (!line.empty())
+            if (!line.empty()) {
                 at_replace->push_back(tmp_val);
+            }
             return ;
         } else if (line[posi] == ' ') {
             at_replace->push_back(tmp_val);

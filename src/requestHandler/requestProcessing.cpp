@@ -17,10 +17,12 @@ bool    httpRequest::addHeaders()
 bool httpRequest::generateResponse(const Conf &conf_c, std::string &response, Server &server)
 {
     std::string status = "HTTP/1.1 ";
-    std::string content_type = "Content-Type: text/html\r\n";
+    std::string content_type = "Content-Type: ";
+    std::string content_type_end = "text/html";
     std::string content_lenght_start = "Content-Length: ";
     std::string content_lenght_middle;
-    std::string content_lenght_end = "\r\n";
+    std::string end_line = "\r\n";
+
     int size_http = -1;
     //if (this->_path == "")
     (void)conf_c,(void)server;
@@ -31,14 +33,14 @@ bool httpRequest::generateResponse(const Conf &conf_c, std::string &response, Se
     else
         status.append("200 OK\r\n");
     //addHeaders();
-    if (!this->getResponse(conf_c, response, server)) {
+    if (!this->getResponse(conf_c, response, server, content_type_end)) {
         appendError();
         response = _responseBody;
         return true;
     }
     size_http = this->_responseBody.length();
     content_lenght_middle = to_str(size_http) + "\r\n";
-    response = status + content_type + content_lenght_start + content_lenght_middle + content_lenght_end + this->_responseBody + "\r\n";
+    response = status + content_type + content_type_end + end_line + content_lenght_start + content_lenght_middle + end_line + this->_responseBody + "\r\n";
     //print("Responce is " + response);
   return (true);
 }
