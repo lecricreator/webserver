@@ -14,8 +14,5 @@ int main()
     print(response);
     print("");
   }
-  print("/!\\ must implement response creation");
-  //must check if content_type is implemented
   return SUCCESS;
 }
-

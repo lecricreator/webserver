@@ -19,6 +19,7 @@
 # include <algorithm>
 # include <vector>
 # include <map>
+# include <cstring>
 
 # define ERROR -1
 # define SUCCESS 0

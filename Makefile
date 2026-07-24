@@ -31,7 +31,7 @@ ROOT_FILES	:=	main.cpp support.cpp init_conf.cpp
 SOCKET_FILES:=	create_listening_socket.cpp manage_clients.cpp \
 								support.cpp epoll.cpp
 CONF_FILES	:=	Conf.cpp Server.cpp Events.cpp Location.cpp Set_variable.cpp
-CGI_FILES		:=	execute.cpp parse.cpp cgi.cpp
+CGI_FILES		:=	execute.cpp parse.cpp cgi.cpp set_cgi_env.cpp
 
 #connect folder and file of src
 SRC_FILES		:=	$(addprefix $(SOCKET_DIR)/, $(SOCKET_FILES)) \

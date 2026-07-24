@@ -13,7 +13,7 @@ static void  execute_child(const char *filename, int stdin_pipe[2], int stdout_p
 }
 
 //return SUCCESS even if cgi_data is empty
-static bool write_to_child(char *cgi_data, int stdin_pipe[2], int stdout_pipe[2])
+static int write_to_child(char *cgi_data, int stdin_pipe[2], int stdout_pipe[2])
 {
   if (cgi_data && cgi_data[0])
   {
@@ -22,10 +22,10 @@ static bool write_to_child(char *cgi_data, int stdin_pipe[2], int stdout_pipe[2]
     {
       close(stdin_pipe[1]);
       close(stdout_pipe[0]);
-      return false;
+      return ERROR;
     }
   }
-  return true;
+  return SUCCESS;
 }
 
 static std::string get_cgi_output(int pid, int output_fd)
@@ -51,7 +51,7 @@ std::string execute_parent(int stdin_pipe[2], int stdout_pipe[2], char *cgi_data
   close(stdin_pipe[0]);
   close(stdout_pipe[1]);
 
-  if (!write_to_child(cgi_data, stdin_pipe, stdout_pipe))
+  if (write_to_child(cgi_data, stdin_pipe, stdout_pipe) == ERROR)
     return "";
   close(stdin_pipe[1]);
 

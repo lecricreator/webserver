@@ -69,6 +69,7 @@ class httpRequest
 		bool		isValidUriString(const std::string& uri);
 		bool		checkPath();
 		bool		parseStartLine(std::string& startLine);
+    char	  **set_cgi_env();
 
 	public:
 		httpRequest();
@@ -79,6 +80,7 @@ class httpRequest
 		void			printRequest();
 
 		bool	parseRequest(std::string& str);
+    char	**set_cgi_env(const httpRequest &client_request);
 
 };
 
