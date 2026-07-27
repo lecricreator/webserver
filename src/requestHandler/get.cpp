@@ -16,12 +16,11 @@ std::string choice_content_type(std::string path) {
     return (content_type);
 }
 
-bool    httpRequest::getResponse(const Conf &conf_c, std::string &response, Server &server, std::string &content_type)
+bool    httpRequest::getResponse(Server &server, std::string &content_type)
 {
     std::string     line;
     std::string     exact_path;
     std::vector<Location>::const_iterator it_location;
-    (void)conf_c; (void)response;
     for (it_location = server.get_location().begin(); it_location != server.get_location().end(); it_location++) {
         if (it_location->get_path_location() == this->_path && this->_path[this->_path.length() - 1] != '/') {
             setErrorCode(301);

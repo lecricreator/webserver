@@ -42,7 +42,7 @@ int get_request(int client_fd, t_parse_data &client_infos)
   if (!client_infos.request.parseRequest(chunked_request))
     return ERROR;
   //std::string result = client_infos.request.getResponse();
-  if (!client_infos.request.generateResponse(*client_infos.conf, client_infos.response, *client_infos.server))
+  if (!client_infos.request.generateResponse(client_infos.response, *client_infos.server))
     return ERROR;
   print(client_infos.response);
   return SUCCESS;
