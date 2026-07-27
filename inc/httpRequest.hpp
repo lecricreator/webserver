@@ -77,7 +77,7 @@ class httpRequest
 		bool		parseStartLine(std::string& startLine);
 
 		//getRequest
-		bool	getResponse(const Conf &conf, std::string &request, Server &server);	//not implemented
+		bool	getResponse(const Conf &conf, std::string &request, Server &server, std::string &content_type);	//not implemented
 
 		//postRequest
 		bool	postRequest();	//not implemented

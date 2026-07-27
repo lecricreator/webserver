@@ -36,17 +36,17 @@ class Location {
         std::string                 _expires;
     public:
         Location() {};
-        bool            parse_location(std::ifstream *fd_file, const std::string pline, size_t posi);
-        Set_variable    set;
-                std::string                 _path_location;
+        bool                        parse_location(std::ifstream *fd_file, const std::string pline, size_t posi);
+        Set_variable                set;
+        std::string                 _path_location;
         std::string                 _root;
         std::vector<std::string>    _index;
 
 
         //GET
-        std::string                 get_root()          {return (this->_root);};
-        std::vector<std::string>    get_index()         {return (this->_index);};
-        std::string                 get_path_location() {return (this->_path_location);};
+        const std::string&              get_root() const {return (_root);};
+        const std::vector<std::string>& get_index() const {return (_index);};
+        const std::string&              get_path_location() const {return (_path_location);};
 
 };
 
