@@ -52,8 +52,8 @@ class Conf {
         bool                    parse(std::ifstream &fd_file);
 
         //GET
-        std::vector<Server>     get_servers() const {return (this->_servers);};
-        std::vector<Events>     get_events() const  {return (this->_events);};
+        const std::vector<Server>&     get_servers() const {return (this->_servers);};
+        const std::vector<Events>&     get_events() const {return (this->_events);};
     };
 
 #endif

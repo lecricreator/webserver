@@ -12,10 +12,13 @@
 # include <iostream>
 # include <fstream>
 # include <list>
+# include <string>
+# include <sstream>
+# include <map>
 
-#include <string>
-#include <sstream>
-#include <map>
+#define URI_MAX 2048
+#define	BODY_MAX 8192
+#define	HEADER_MAX 100
 
 enum RequestStatus {
     REQ_EMPTY,			// Nothing received yet
@@ -40,7 +43,7 @@ class httpRequest
 		RequestStatus	_status;
 		ChunkBodyStatus	_chunkStatus;
 		std::string		_requestBuffer;
-		
+
 		std::string		_method;
 		std::string		_path;
 		std::string		_httpVersion;
@@ -51,34 +54,60 @@ class httpRequest
 		int				_bodySize;
 		int				_chunkSize;
 
-		httpRequest(const httpRequest& copy);
-		httpRequest	&operator=(const httpRequest& copy);
-	
+		//response-related variables
+		std::string	_responseBody;
+
+
+
+		//requestParser
 		bool	parseHexSize();
 		bool	parseChunkData();
 		bool	parseChunked();
 		bool	parseFixedLength();
 		bool	parseBody();
-		
+
 		bool	isValidHeaderValue(const std::string& value);
 		bool	isValidHeaderKey(const std::string& key);
 		bool	parseHeaders();
-		
+
 		std::string	decodePath();
 		bool		isValidPercentEncoding(const std::string& path);
 		bool		isValidUriString(const std::string& uri);
 		bool		checkPath();
 		bool		parseStartLine(std::string& startLine);
 
+		//getRequest
+		bool	getResponse(Server &server, std::string &content_type);	//not implemented
+
+		//postRequest
+		bool	postRequest();	//not implemented
+
+		//deleteRequest
+		bool	deleteRequest();//not implemented
+
+		//requestProcessing
+		void	appendError();
+		bool	addHeaders();
+
 	public:
 		httpRequest();
+		httpRequest(const httpRequest& copy);
+		httpRequest	&operator=(const httpRequest& copy);
 		~httpRequest();
 
 		unsigned int	getErrorCode() const;
 		void			setErrorCode(unsigned int code);
 		void			printRequest();
 
-		bool	parseRequest(std::string& str);
+		//requestParser
+		bool		parseRequest(std::string& str);
+
+		//requestProcessing
+		bool	generateResponse(std::string &request, Server &server);	//not implemented
+		//std::string	processRequest();	//not implemented
+
+		//GET
+		std::string get_path();
 
 };
 

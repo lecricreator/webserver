@@ -22,9 +22,9 @@ class Server {
         Set_variable                set;
 
         //GET
-        int                         get_port_listen()   {return (this->_port_listen);};
-        std::vector<std::string>    get_server_name()   {return (this->_server_name);};
-        std::vector<Location>       get_location()      {return (this->_locations);};
+        int                         &get_port_listen()   {return (this->_port_listen);};
+        const std::vector<std::string>    &get_server_name() const {return (this->_server_name);};
+        const std::vector<Location>       &get_location() const {return (this->_locations);};
 };
 
 #endif

@@ -31,6 +31,7 @@ int main(int argc, char **argv) {
   if (conf_c == NULL) {
     return FAILURE;
   }
+  print("uiouioiouiv " + conf_c->get_servers()[0].get_location()[0].get_index()[0]);
   std::map<int, Server> servers = create_server(*conf_c);
   int status = manage_events(servers, *conf_c);
   delete conf_c;

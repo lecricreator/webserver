@@ -45,7 +45,7 @@ std::string execute_cgi(const char *filename, char **env)
   else if (pid == 0)
     execute_child(filename, stdin_pipe, stdout_pipe, env);
 
-  close(stdin_pipe);
+  //close(stdin_pipe);
 
   close(stdout_pipe[1]);
   std::string output = get_cgi_output(pid, stdout_pipe[0]);
