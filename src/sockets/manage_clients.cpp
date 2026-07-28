@@ -38,8 +38,8 @@ int get_request(int client_fd, t_parse_data &client_infos)
   print("--- HTTP REQUEST ---\n");
   print(buf);
 
-  std::string chunked_request(buf);
-  if (!client_infos.request.parseRequest(chunked_request))
+  std::string request_packet(buf);
+  if (!client_infos.request.parseRequest(request_packet))
     return ERROR;
   //std::string result = client_infos.request.getResponse();
   if (!client_infos.request.generateResponse(client_infos.response, *client_infos.server))
