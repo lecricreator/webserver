@@ -8,11 +8,13 @@
 # include <unistd.h>
 # include <sys/socket.h>
 # include <sys/epoll.h>
+# include <sys/stat.h>
 # include <arpa/inet.h>
 # include <iostream>
 # include <fstream>
 # include <list>
 # include <string>
+# include <cstring>
 # include <sstream>
 # include <map>
 
