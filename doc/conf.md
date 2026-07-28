@@ -114,6 +114,31 @@ server {
 The first name becomes the primary server name.
 Can be more complex, but it's sufisaly for webserver.
 
+# error_page
+```
+Syntax:	error_page code ... uri;
+Default:	—
+Context:	http, server, location, if in location
+```
+Defines the URI that will be shown for the specified errors. A uri value can contain variables.
+Example:
+```
+error_page 404              /404.html;
+error_page 400              /404.html;
+error_page 500              /50x.html;
+```
+
+# is_cgi_py
+```
+Syntax:     is_cgi_py bool;
+Default:	false
+Context:	server
+```
+Defines if the CGI in python can be use in this location.<br>
+Example:
+```
+is_cgi_py true;
+```
 ## root
 ```
 Syntax:	root path;

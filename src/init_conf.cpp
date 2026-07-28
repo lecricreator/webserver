@@ -20,6 +20,10 @@ void    print_error_conf(ErrorConf error_numb) {
         std::cout << "';' is missing" << std::endl;
     } else if (error_numb == VALUE_NOT_EMPTY) {
         std::cout << "The variable in not empty, has already been writen" << std::endl;
+    } else if (error_numb == VALUE_IS_NOT_CORRECT) {
+        std::cout << "The variable in not finish" << std::endl;
+    } else if (error_numb == VALUE_IS_NOT_INT) {
+        std::cout << "The variable in not int" << std::endl;
     }
 }
 
