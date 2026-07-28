@@ -21,7 +21,6 @@ std::map<int, Server> create_server(Conf conf_c)
   return servers_fds;
 }
 
-//handle_client receives a limited nbr of bytes
 int main(int argc, char **argv) {
   if (argc != 2) {
     print("Need 2 arguments.");
@@ -31,7 +30,6 @@ int main(int argc, char **argv) {
   if (conf_c == NULL) {
     return FAILURE;
   }
-  print("uiouioiouiv " + conf_c->get_servers()[0].get_location()[0].get_index()[0]);
   std::map<int, Server> servers = create_server(*conf_c);
   int status = manage_events(servers, *conf_c);
   delete conf_c;

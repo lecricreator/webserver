@@ -19,6 +19,7 @@
 # include <algorithm>
 # include <vector>
 # include <map>
+# include <cstring>
 
 # define ERROR -1
 # define SUCCESS 0
@@ -51,5 +52,14 @@ int   manage_events(std::map<int, Server> &servers, Conf &conf_c);
 //conf
 void  parse_conf(char *argv);
 Conf  *init_conf(char *path_conf);
+
+//cgi
+int   get_cgi_response(std::string &response, const std::string &full_path);
+
+
+std::string create_response(const std::string &status_value,
+                            const std::string &content_type_value,
+                            const std::string &body
+                            );
 
 #endif

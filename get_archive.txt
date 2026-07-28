@@ -28,24 +28,61 @@ bool	httpRequest::getResponse(Server &server, std::string &content_type)
     std::string location_root = it_location->get_root();
 
     bool is_target_path_a_dir = target_path[target_path.length() - 1] == '/';
+    if (is_target_path_a_dir)
+      current_path += "/";
 
-		if (current_path == target_path && !is_target_path_a_dir)
+    bool is_correct_location = current_path == target_path;
+
+    if (is_correct_location)
+    {
+      if (is_target_path_a_dir)
+      {
+        setErrorCode(301);
+        return false;
+      }
+      else
+      {
+        content_type = "text/html";
+        exact_path = location_root + target_path + it_location->get_index()[0];
+        break ;
+      }
+    }
+    else
+    {
+      content_type = choice_content_type(target_path);
+      exact_path = location_root + target_path;
+    }
+  }
+
+    /*
+		if (is_correct_location && !is_target_path_a_dir)
 		{
 			setErrorCode(301);
 			return false;
 		}
 		else if (current_path + "/" == target_path)
 		{
-      exact_path = location_root + target_path + it_location->get_index()[0];
-      content_type = "text/html";
-      break ;
+			if (target_path == "/") //equivalent to "current_path.empty()" which CANNOT happen
+			{
+				exact_path = location_root + "/" + current_path + it_location->get_index()[0];
+				content_type = "text/html";
+				break ;
+			}
+			else
+			{
+				exact_path = location_root + current_path + "/" + it_location->get_index()[0];
+				content_type = "text/html";
+				break ;
+			}
+			exact_path = location_root + current_path + it_location->get_index()[0];
+			content_type = "text/html";
 		}
 		else
 		{
 			content_type = choice_content_type(target_path);
 			exact_path = location_root + target_path;
 		}
-	}
+	}*/
 	std::ifstream	 file(exact_path.c_str());
 	if (access(exact_path.c_str(), F_OK) == -1)
 	{

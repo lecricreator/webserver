@@ -1,0 +1,66 @@
+[33mb6e8852[m[33m ([m[1;36mHEAD -> [m[1;32mdev[m[33m, [m[1;31morigin/feature/cgi[m[33m, [m[1;32mfeature/cgi[m[33m)[m HEAD@{0}: checkout: moving from feature/cgi to dev
+[33mb6e8852[m[33m ([m[1;36mHEAD -> [m[1;32mdev[m[33m, [m[1;31morigin/feature/cgi[m[33m, [m[1;32mfeature/cgi[m[33m)[m HEAD@{1}: checkout: moving from dev to feature/cgi
+[33mb6e8852[m[33m ([m[1;36mHEAD -> [m[1;32mdev[m[33m, [m[1;31morigin/feature/cgi[m[33m, [m[1;32mfeature/cgi[m[33m)[m HEAD@{2}: merge feature/cgi: Fast-forward
+[33ma3464d4[m HEAD@{3}: checkout: moving from feature/cgi to dev
+[33mb6e8852[m[33m ([m[1;36mHEAD -> [m[1;32mdev[m[33m, [m[1;31morigin/feature/cgi[m[33m, [m[1;32mfeature/cgi[m[33m)[m HEAD@{4}: commit: feat: added cgi env
+[33m831ee14[m HEAD@{5}: commit: feat: added wrapping for client response
+[33m9220c2d[m HEAD@{6}: commit: feat: checks if content_type is implemented
+[33ma18949b[m HEAD@{7}: commit: feat: double headers and wrong headers are filtered
+[33mac357ce[m HEAD@{8}: commit: build: divided cgi into more files and added a cgi header
+[33m2e32bfd[m HEAD@{9}: checkout: moving from httpMethods to feature/cgi
+[33mf519daa[m[33m ([m[1;32mhttpMethods[m[33m)[m HEAD@{10}: pull: Fast-forward
+[33m3ffb6b0[m HEAD@{11}: checkout: moving from feature/cgi to httpMethods
+[33m2e32bfd[m HEAD@{12}: commit: feat: added basic parsing of CGI script's output
+[33ma889443[m HEAD@{13}: merge origin/dev: Merge made by the 'ort' strategy.
+[33me7bf5d4[m HEAD@{14}: commit (merge): merge: merged with dev
+[33m6aa8e49[m HEAD@{15}: checkout: moving from dev to feature/cgi
+[33ma3464d4[m HEAD@{16}: commit: fix: github refuses to correctly merge so I'll do it myself
+[33m3ac12d9[m HEAD@{17}: checkout: moving from feature/epoll to dev
+[33m1f1ab7b[m[33m ([m[1;32mfeature/epoll[m[33m)[m HEAD@{18}: commit: fix: nvm code works mb
+[33mc2dcfa3[m HEAD@{19}: commit: build: merged manually with dev. the code doesnt compile anymore
+[33m5516330[m HEAD@{20}: reset: moving to 5516330
+[33m3ac12d9[m HEAD@{21}: merge dev: Fast-forward
+[33m5516330[m HEAD@{22}: checkout: moving from dev to feature/epoll
+[33m3ac12d9[m HEAD@{23}: checkout: moving from feature/epoll to dev
+[33m5516330[m HEAD@{24}: reset: moving to 5516330
+[33m3ac12d9[m HEAD@{25}: reset: moving to ORIG_HEAD
+[33m3ac12d9[m HEAD@{26}: rebase (finish): returning to refs/heads/feature/epoll
+[33m3ac12d9[m HEAD@{27}: rebase (start): checkout origin/dev
+[33m5516330[m HEAD@{28}: reset: moving to ORIG_HEAD
+[33m5516330[m HEAD@{29}: reset: moving to 5516330
+[33mf85a961[m HEAD@{30}: rebase (finish): returning to refs/heads/feature/epoll
+[33mf85a961[m HEAD@{31}: rebase (start): checkout origin/feature/epoll
+[33m5516330[m HEAD@{32}: reset: moving to HEAD
+[33m5516330[m HEAD@{33}: reset: moving to 5516330
+[33mf85a961[m HEAD@{34}: reset: moving to f85a961
+[33mf85a961[m HEAD@{35}: pull: Fast-forward
+[33m5516330[m HEAD@{36}: reset: moving to HEAD
+[33m5516330[m HEAD@{37}: checkout: moving from dev to feature/epoll
+[33m3ac12d9[m HEAD@{38}: pull: Fast-forward
+[33m5596a36[m HEAD@{39}: reset: moving to HEAD~1
+[33m4303c65[m HEAD@{40}: pull origin dev: Fast-forward
+[33m2113771[m HEAD@{41}: checkout: moving from feature/epoll to dev
+[33m5516330[m HEAD@{42}: reset: moving to HEAD~1
+[33m6597219[m HEAD@{43}: reset: moving to HEAD~1
+[33m7bba2be[m HEAD@{44}: revert: Revert "Merge branch 'dev' into feature/epoll"
+[33m6597219[m HEAD@{45}: reset: moving to HEAD
+[33m6597219[m HEAD@{46}: pull: Fast-forward
+[33m5516330[m HEAD@{47}: commit: fix: corrected false errors on responses sent
+[33m3f15c50[m HEAD@{48}: commit: refactor: made a struct for information needed by parsing
+[33mf0ee374[m HEAD@{49}: commit: fix: struct conf passed to build_response not parse
+[33m32cebab[m HEAD@{50}: commit: refactor: passes conf struct to parsing
+[33mdd0dfd7[m HEAD@{51}: commit: fix: negative port isn't valid anymore
+[33mae41879[m HEAD@{52}: commit: doc: deleted deprecated doc
+[33m7a3fe10[m HEAD@{53}: commit: fix: send doesnt write error on success
+[33md4b22fd[m HEAD@{54}: commit: feat: each client has its own response
+[33m04d3ea1[m HEAD@{55}: commit: feature: multiple servers may run
+[33m4923873[m HEAD@{56}: merge origin/dev: Merge made by the 'ort' strategy.
+[33m392f36d[m HEAD@{57}: merge origin/dev: Merge made by the 'ort' strategy.
+[33mb410ee7[m HEAD@{58}: commit: refactor: removed unused global
+[33mc9222c9[m HEAD@{59}: commit: build: resolved merge conflict file
+[33mafb14e0[m HEAD@{60}: commit (merge): Merge branch 'dev' into feature/epoll
+[33mb085f44[m HEAD@{61}: reset: moving to HEAD
+[33mb085f44[m HEAD@{62}: checkout: moving from dev to feature/epoll
+[33m2113771[m HEAD@{63}: reset: moving to HEAD
+[33m2113771[m HEAD@{64}: checkout: moving from main to dev
+[33m09d156c[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{65}: clone: from github.com:lecricreator/webserver.git

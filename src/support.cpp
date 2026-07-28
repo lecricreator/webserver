@@ -7,6 +7,13 @@ std::string to_str(int n)
     return ss.str();
 }
 
+std::string to_str(size_t n)
+{
+  std::ostringstream ss;
+  ss << n;
+  return ss.str();
+}
+
 std::string to_str(float n)
 {
     std::ostringstream ss;

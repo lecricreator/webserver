@@ -75,6 +75,7 @@ class httpRequest
 		bool		isValidUriString(const std::string& uri);
 		bool		checkPath();
 		bool		parseStartLine(std::string& startLine);
+    char	  **set_cgi_env();
 
 		//getRequest
 		bool	getResponse(Server &server, std::string &content_type);	//not implemented
@@ -99,16 +100,12 @@ class httpRequest
 		void			setErrorCode(unsigned int code);
 		void			printRequest();
 
-		//requestParser
-		bool		parseRequest(std::string& str);
+		bool	parseRequest(std::string& str);
+		bool	generateResponse(std::string &request, Server &server);
 
-		//requestProcessing
-		bool	generateResponse(std::string &request, Server &server);	//not implemented
-		//std::string	processRequest();	//not implemented
-
-		//GET
 		std::string get_path();
 
+    char	**set_cgi_env(const httpRequest &client_request);
 };
 
 std::string code_to_string(const unsigned int code);
