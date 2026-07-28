@@ -128,6 +128,7 @@ void    Set_variable::add_in_var(const std::string line, size_t posi, std::map<i
     int         tmp_val_i;
     int         step = 0;
     posi = put_index_after_space(line, posi);
+    print("tezrezrezrzerrze");
     for (; posi < line.length(); posi++) {
         if (step == 0) {
             if (line[posi] == ' ') {
@@ -138,13 +139,14 @@ void    Set_variable::add_in_var(const std::string line, size_t posi, std::map<i
                 continue ;
             } else if (line[posi] == ';') {
                 print_error_conf(VALUE_IS_NOT_CORRECT);
-            } else if (line[posi] >= '0' && line[posi] >= '9') {
+            } else if (line[posi] >= '0' && line[posi] <= '9') {
                 tmp_val_s += line[posi];
                 continue ;
             } else {
                 print_error_conf(VALUE_IS_NOT_INT);
                 at_replace->insert(std::make_pair(-1, "error"));
                 //at_replace[-1] = std::string("ERROR");
+                std::cout << "char is : " << line[posi] << " / line is : " << line;
                 return ;
             }
         } else if (step == 1) {

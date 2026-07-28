@@ -12,6 +12,8 @@ std::string choice_content_type(std::string path) {
         content_type = "text/html";
     } else if ((path.find(".jpg") != std::string::npos)) {
         content_type = "image/jpg";
+    } else if ((path.find(".ico") != std::string::npos)) {
+        content_type = "image/vnd.microsoft.icon";
     }
     return (content_type);
 }
@@ -41,6 +43,9 @@ bool    httpRequest::getResponse(Server &server, std::string &content_type)
             content_type = choice_content_type(this->_path);
             exact_path = it_location->get_root() + this->_path;
         }
+    }
+    if (content_type == "image/vnd.microsoft.icon") {
+        exact_path = "www/favicon.ico";
     }
     std::ifstream   file(exact_path.c_str());
     if (access(exact_path.c_str(), F_OK) == -1)
