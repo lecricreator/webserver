@@ -2,6 +2,11 @@
 #include "conf/Set_variable.hpp"
 #include "conf/Conf.hpp"
 
+
+Location::Location() {
+    this->_is_cgi_py = false;
+}
+
 bool    Location::parse_location(std::ifstream *fd_file, const std::string pline, size_t posi) {
     std::string line;
 
@@ -15,8 +20,12 @@ bool    Location::parse_location(std::ifstream *fd_file, const std::string pline
             this->set.add_in_var(line, posi + 5, &this->_root);
         } else if ((posi = line.find("index ")) != std::string::npos) {
             this->set.add_in_var(line, posi + 6, &this->_index);
-        } else if ((posi = line.find("error_page ")) != std::string::npos) {
-            this->set.add_in_var(line, posi + 11, &this->_index);
+        } else if ((posi = line.find("is_cgi_py ")) != std::string::npos) {
+            this->set.add_in_var(line, posi + 10, &this->_is_cgi_py);
+            if (this->_is_cgi_py)
+                print("trtrtrtrtrt");
+            else
+                print("trtrtrtrtri");
         } else if ((posi = line.find("}")) != std::string::npos) {
             return (true);
         }
