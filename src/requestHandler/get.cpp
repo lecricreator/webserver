@@ -47,12 +47,12 @@ bool get_file_location(std::string &file_location, std::string &content_type,
 
 bool	httpRequest::getResponse(Server &server, std::string &content_type)
 {
-  std::string file_location;
-  if (!get_file_location(file_location, content_type, this->_path, server))
-  {
-    setErrorCode(301);
-    return false;
-  }
+	std::string file_location;
+	if (!get_file_location(file_location, content_type, this->_path, server))
+	{
+	  setErrorCode(301);
+	  return false;
+	}
 
 	std::ifstream	 file(file_location.c_str());
 	if (access(file_location.c_str(), F_OK) == -1)
