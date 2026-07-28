@@ -16,43 +16,51 @@ std::string choice_content_type(std::string target_path) {
 	return (content_type);
 }
 
-bool	httpRequest::getResponse(Server &server, std::string &content_type)
+bool get_file_location(std::string &file_location, std::string &content_type,
+                      const std::string target_path, const Server &server)
 {
-	std::string	 exact_path;
 	std::vector<Location>::const_iterator it_location;
+  std::string location_root;
 
 	for (it_location = server.get_location().begin(); it_location != server.get_location().end(); it_location++)
 	{
-    std::string target_path = this->_path;
+    location_root = it_location->get_root();
     std::string current_path = it_location->get_path_location();
-    std::string location_root = it_location->get_root();
 
     bool is_target_path_a_dir = target_path[target_path.length() - 1] == '/';
 
 		if (current_path == target_path && !is_target_path_a_dir)
-		{
-			setErrorCode(301);
 			return false;
-		}
 		else if (current_path + "/" == target_path)
 		{
-      exact_path = location_root + target_path + it_location->get_index()[0];
+      file_location = location_root + target_path + it_location->get_index()[0];
       content_type = "text/html";
-      break ;
+      return true;
 		}
 		else
-		{
-			content_type = choice_content_type(target_path);
-			exact_path = location_root + target_path;
-		}
+      continue ;
 	}
-	std::ifstream	 file(exact_path.c_str());
-	if (access(exact_path.c_str(), F_OK) == -1)
+  content_type = choice_content_type(target_path);
+  file_location = location_root + target_path;
+  return true;
+}
+
+bool	httpRequest::getResponse(Server &server, std::string &content_type)
+{
+  std::string file_location;
+  if (!get_file_location(file_location, content_type, this->_path, server))
+  {
+    setErrorCode(301);
+    return false;
+  }
+
+	std::ifstream	 file(file_location.c_str());
+	if (access(file_location.c_str(), F_OK) == -1)
 	{
 		setErrorCode(404); //404 Not Found
 		return false;
 	}
-	if (access(exact_path.c_str(), R_OK) == -1 || !file.is_open())
+	if (access(file_location.c_str(), R_OK) == -1 || !file.is_open())
 	{
 		setErrorCode(500);
 		return false;
