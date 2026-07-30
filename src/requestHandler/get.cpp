@@ -1,32 +1,35 @@
 #include "webserv.hpp"
 
+//line.find("}")) != std::string::npos
 //insufficient check. test.png.html would be evaluated as png
-static std::string choice_content_type(const std::string &target_path) {
-	std::string content_type;
-	if ((target_path.find(".png") != std::string::npos)) {
-		content_type = "image/png";
-	} else if ((target_path.find(".css") != std::string::npos)) {
-		content_type = "text/css";
-	} else if ((target_path.find(".html") != std::string::npos)) {
-		content_type = "text/html";
-	} else if ((target_path.find(".jpg") != std::string::npos)) {
-		content_type = "image/jpg";
-	}
-	return (content_type);
+std::string choice_content_type(std::string target_path) {
+    std::string content_type;
+    if ((target_path.find(".png") != std::string::npos)) {
+        content_type = "image/png";
+    } else if ((target_path.find(".css") != std::string::npos)) {
+        content_type = "text/css";
+    } else if ((target_path.find(".html") != std::string::npos)) {
+        content_type = "text/html";
+    } else if ((target_path.find(".jpg") != std::string::npos)) {
+        content_type = "image/jpg";
+    } else if ((target_path.find(".ico") != std::string::npos)) {
+        content_type = "image/vnd.microsoft.icon";
+    }
+    return (content_type);
 }
 
 static bool  get_file_location(std::string &file_location,
                         const std::string &target_path, const Server &server)
 {
 	std::vector<Location>::const_iterator it_location;
-  std::string location_root;
+    std::string location_root;
 
 	for (it_location = server.get_location().begin(); it_location != server.get_location().end(); it_location++)
 	{
-    location_root = it_location->get_root();
-    std::string current_path = it_location->get_path_location();
+        location_root = it_location->get_root();
+        std::string current_path = it_location->get_path_location();
 
-    bool is_target_path_a_dir = target_path[target_path.length() - 1] == '/';
+        bool is_target_path_a_dir = target_path[target_path.length() - 1] == '/';
 
 		if (current_path == target_path && !is_target_path_a_dir)
 			return false;
@@ -36,7 +39,7 @@ static bool  get_file_location(std::string &file_location,
       return true;
 		}
 		else
-      continue ;
+        continue ;
 	}
   file_location = location_root + target_path;
   return true;
@@ -73,7 +76,7 @@ bool	httpRequest::getResponse(const Server &server, std::string &content_type, b
 {
   std::string   file_location;
 	std::ifstream file;
-  int status_code = validate_file(this->_path, server, file_location, file);
+  int status_code = validate_file(_path, server, file_location, file);
   if (status_code != 200)
   {
     setErrorCode(status_code);
@@ -81,7 +84,9 @@ bool	httpRequest::getResponse(const Server &server, std::string &content_type, b
   }
   if (!is_cgi_script)
   {
-    content_type = choice_content_type(file_location);
+    content_type = choice_content_type(_path);
+    if (content_type == "image/vnd.microsoft.icon")
+        file_location = "www/favicon.ico";
     _responseBody = copy_file_to_str(file);
   }
   return true;

@@ -5,7 +5,7 @@ void    httpRequest::appendError()
 {
   if (this->_errorCode == 301)
   {
-    this->_responseBody = "http/1.1 301 " + code_to_string(301) + "\r\n";
+    this->_responseBody = "HTTP/1.1 301 " + code_to_string(301) + "\r\n";
     this->_responseBody += "Location: " + this->_path + "/\r\n\r\n";
   }
 }
