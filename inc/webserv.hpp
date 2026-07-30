@@ -61,8 +61,4 @@ int   cgi(const std::string &path,
         std::string &body);
 
 
-std::string create_response(const std::string &status_value,
-                            const std::string &content_type_value,
-                            const std::string &body);
-
 #endif

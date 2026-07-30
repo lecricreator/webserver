@@ -25,7 +25,6 @@ static std::string create_response(const std::string &status_value,
 	return response;
 }
 
-
 void    httpRequest::appendError()
 {
   if (this->_errorCode == 301)
