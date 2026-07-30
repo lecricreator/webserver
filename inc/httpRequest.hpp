@@ -78,7 +78,7 @@ class httpRequest
     char	  **set_cgi_env();
 
 		//getRequest
-		bool	getResponse(Server &server, std::string &content_type);	//not implemented
+		bool	getResponse(Server &server, std::string &content_type, bool is_cgi);
 
 		//postRequest
 		bool	postRequest();	//not implemented

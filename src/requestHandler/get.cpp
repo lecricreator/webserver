@@ -1,8 +1,7 @@
 #include "webserv.hpp"
 
-//line.find("}")) != std::string::npos
-
-std::string choice_content_type(std::string target_path) {
+//insufficient check. test.png.html would be evaluated as png
+static std::string choice_content_type(std::string target_path) {
 	std::string content_type;
 	if ((target_path.find(".png") != std::string::npos)) {
 		content_type = "image/png";
@@ -16,8 +15,8 @@ std::string choice_content_type(std::string target_path) {
 	return (content_type);
 }
 
-bool get_file_location(std::string &file_location, std::string &content_type,
-                      const std::string target_path, const Server &server)
+static bool  get_file_location(std::string &file_location,
+                        const std::string target_path, const Server &server)
 {
 	std::vector<Location>::const_iterator it_location;
   std::string location_root;
@@ -34,21 +33,33 @@ bool get_file_location(std::string &file_location, std::string &content_type,
 		else if (current_path + "/" == target_path)
 		{
       file_location = location_root + target_path + it_location->get_index()[0];
-      content_type = "text/html";
       return true;
 		}
 		else
       continue ;
 	}
-  content_type = choice_content_type(target_path);
   file_location = location_root + target_path;
   return true;
 }
 
-bool	httpRequest::getResponse(Server &server, std::string &content_type)
+static std::string copy_file_to_str(std::ifstream &file)
+{
+  std::string   line;
+  std::string   copy;
+
+  while (std::getline(file, line))
+  {
+    copy += line;
+    if (!file.eof())
+      copy += '\n';
+  }
+  return copy;
+}
+
+bool	httpRequest::getResponse(Server &server, std::string &content_type, bool is_cgi_script)
 {
   std::string file_location;
-  if (!get_file_location(file_location, content_type, this->_path, server))
+  if (!get_file_location(file_location, this->_path, server))
   {
     setErrorCode(301);
     return false;
@@ -60,17 +71,15 @@ bool	httpRequest::getResponse(Server &server, std::string &content_type)
 		setErrorCode(404); //404 Not Found
 		return false;
 	}
-	if (access(file_location.c_str(), R_OK) == -1 || !file.is_open())
-	{
-		setErrorCode(500);
-		return false;
-	}
-	std::string	 line;
-	while (std::getline(file, line))
-	{
-		_responseBody += line;
-		if (!file.eof())
-			_responseBody += '\n';
-	}
+  if (access(file_location.c_str(), R_OK) == -1 || !file.is_open())
+  {
+    setErrorCode(500);
+    return false;
+  }
+  if (!is_cgi_script)
+  {
+    _responseBody = copy_file_to_str(file);
+    content_type = choice_content_type(file_location);
+  }
 	return true;
 }

@@ -32,7 +32,7 @@ ROOT_FILES	:=	main.cpp support.cpp init_conf.cpp
 SOCKET_FILES:=	create_listening_socket.cpp manage_clients.cpp \
 								support.cpp epoll.cpp
 CONF_FILES	:=	Conf.cpp Server.cpp Events.cpp Location.cpp Set_variable.cpp
-CGI_FILES		:=	execute.cpp parse.cpp cgi.cpp set_cgi_env.cpp
+CGI_FILES		:=	execute.cpp parse.cpp cgi.cpp set_cgi_env.cpp is_cgi.cpp
 HTTP_FILES	:=	delete.cpp get.cpp httpRequest.cpp post.cpp requestParser.cpp requestProcessing.cpp
 
 #connect folder and file of src
