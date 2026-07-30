@@ -1,9 +1,20 @@
 #include "cgi.hpp"
 
-static void  execute_child(const char *filename, int stdin_pipe[2], int stdout_pipe[2], char **env)
+//assume dir of path is correct
+static std::string  get_relative_path_to_executable(std::string path, std::string absolute_dir_for_cgi_exec)
+{
+  //remove www
+  (void)absolute_dir_for_cgi_exec;
+  return (path.substr(9));
+}
+
+static void  execute_child(std::string path, int stdin_pipe[2], int stdout_pipe[2], char **env)
 {
   char *executable = (char *)"/usr/bin/python3";
-  char *argv[] = {executable, const_cast<char*>(filename), NULL};
+  std::string relative_path = get_relative_path_to_executable(path, ROOT_DIR_FOR_CGI_EXEC);
+  char *argv[] = {executable, const_cast<char*>(relative_path.c_str()), NULL};
+  if (chdir(ROOT_DIR_FOR_CGI_EXEC) == ERROR)
+    exit(ERROR);
   close(stdin_pipe[1]);
   close(stdout_pipe[0]);
   dup2(stdin_pipe[0], STDIN_FILENO);
@@ -30,19 +41,19 @@ static int write_to_child(char *cgi_data, int stdin_pipe[2], int stdout_pipe[2])
 
 static std::string get_cgi_output(int pid, int output_fd)
 {
-  ssize_t     n;
+  ssize_t     bytes_read;
   char        buf[4096];
   std::string output;
 
-  while ((n = read(output_fd, buf, sizeof(buf))) > 0)
-    output.append(buf, n);
-  if (n == ERROR)
-    return "";
+  while ((bytes_read = read(output_fd, buf, sizeof(buf))) > 0)
+    output.append(buf, bytes_read);
+  if (bytes_read == ERROR)
+    return std::string();
   int status;
   if (waitpid(pid, &status, 0) == ERROR)
-    return "";
+    return std::string();
   if (WIFEXITED(status) == SUCCESS || WEXITSTATUS(status) != SUCCESS)
-    return "";
+    return std::string();
   return output;
 }
 
@@ -52,7 +63,7 @@ std::string execute_parent(int stdin_pipe[2], int stdout_pipe[2], char *cgi_data
   close(stdout_pipe[1]);
 
   if (write_to_child(cgi_data, stdin_pipe, stdout_pipe) == ERROR)
-    return "";
+    return std::string();
   close(stdin_pipe[1]);
 
   std::string output = get_cgi_output(pid, stdout_pipe[0]);
@@ -60,18 +71,18 @@ std::string execute_parent(int stdin_pipe[2], int stdout_pipe[2], char *cgi_data
   return output;
 }
 
-std::string execute_cgi(const char *filename, char **env, char *cgi_data)
+std::string execute_cgi(std::string path, char **env, char *cgi_data)
 {
   int   stdin_pipe[2];
   int   stdout_pipe[2];
 
   if (pipe(stdin_pipe) == ERROR || pipe(stdout_pipe) == ERROR)
-    return "";
+    return std::string();
 
   pid_t pid = fork();
   if (pid == -1)
-    return "";
+    return std::string();
   else if (pid == 0)
-    execute_child(filename, stdin_pipe, stdout_pipe, env);
+    execute_child(path, stdin_pipe, stdout_pipe, env);
   return execute_parent(stdin_pipe, stdout_pipe, cgi_data, pid);
 }

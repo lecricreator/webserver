@@ -1,7 +1,9 @@
 #include "webserv.hpp"
 
-static size_t	find_first_invalid_char(const std::string& str, size_t start,
-		    size_t increment, int (*is_valid_char)(int))
+static size_t	find_first_invalid_char(const std::string& str,
+              size_t start,
+              size_t increment,
+              int (*is_valid_char)(int))
 {
 	for (size_t i = start; i < str.length(); i += increment)
 		if (!is_valid_char(str[i]))

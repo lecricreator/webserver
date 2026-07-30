@@ -34,8 +34,9 @@ class Location {
         std::string                 _proxy_temp_path;
         std::string                 _charset;
         std::string                 _expires;
+        bool                        _is_cgi_py;
     public:
-        Location() {};
+        Location();
         bool                        parse_location(std::ifstream *fd_file, const std::string pline, size_t posi);
         Set_variable                set;
         std::string                 _path_location;

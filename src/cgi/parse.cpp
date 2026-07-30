@@ -72,9 +72,8 @@ static int parse_cgi_header(const std::string &cgi_output, t_cgi_info &cgi_info)
   std::istringstream  stream(cgi_output);
   while (std::getline(stream, line))
   {
-    if (parse_content_type(line, cgi_info) == FAILURE)
-      return FAILURE;
-    if (parse_status(line, cgi_info) == FAILURE)
+    if (parse_content_type(line, cgi_info) == FAILURE
+     || parse_status(line, cgi_info) == FAILURE)
       return FAILURE;
   }
   if (cgi_info.content_type == EMPTY_FIELD)

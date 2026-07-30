@@ -17,6 +17,8 @@ enum ErrorConf {
     HTTP_BEFORE_SERVER,
     NO_SEMICOLON,
     VALUE_NOT_EMPTY,
+    VALUE_IS_NOT_CORRECT,
+    VALUE_IS_NOT_INT,
 };
 
 size_t  put_index_after_space(std::string line, size_t index);

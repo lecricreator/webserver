@@ -20,6 +20,7 @@
 # include <vector>
 # include <map>
 # include <cstring>
+# include <utility>
 
 # define ERROR -1
 # define SUCCESS 0
@@ -54,12 +55,14 @@ void  parse_conf(char *argv);
 Conf  *init_conf(char *path_conf);
 
 //cgi
-int   get_cgi_response(std::string &response, const std::string &full_path);
+int   cgi(const std::string &path,
+        std::string &status,
+        std::string &content_type,
+        std::string &body);
 
 
 std::string create_response(const std::string &status_value,
                             const std::string &content_type_value,
-                            const std::string &body
-                            );
+                            const std::string &body);
 
 #endif

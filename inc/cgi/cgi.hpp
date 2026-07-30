@@ -6,6 +6,7 @@
 #include <sys/wait.h>
 
 #define EMPTY_FIELD "None"
+#define ROOT_DIR_FOR_CGI_EXEC "www/cgi-bin/"
 
 typedef struct s_cgi_info
 {
@@ -14,6 +15,6 @@ typedef struct s_cgi_info
   std::string status;
 } t_cgi_info;
 
-//cgi
-std::string execute_cgi(const char *filename, char **env, char *cgi_data);
-int  parse_cgi(const std::string &cgi_output, t_cgi_info &cgi_info);
+std::string execute_cgi(std::string filename, char **env, char *cgi_data);
+int         parse_cgi(const std::string &cgi_output, t_cgi_info &cgi_info);
+bool        is_cgi(const std::string &path, std::string &file);

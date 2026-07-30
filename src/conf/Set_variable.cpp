@@ -43,6 +43,7 @@ void    Set_variable::add_in_var(const std::string line, size_t posi, int *at_re
             tmp_val += line[posi];
         } else {
             *at_replace = -1;
+            return ;
         }
     }
     print_error_conf(NO_SEMICOLON);
@@ -115,6 +116,46 @@ void        Set_variable::add_in_var(const std::string line, size_t posi, std::v
             tmp_val += line[posi];
         } else {
             break ;
+        }
+    }
+    print_error_conf(NO_SEMICOLON);
+    print(line);
+    return ;
+}
+
+void    Set_variable::add_in_var(const std::string line, size_t posi, std::map<int, std::string> *at_replace) {
+    std::string tmp_val_s;
+    int         tmp_val_i;
+    int         step = 0;
+    posi = put_index_after_space(line, posi);
+    for (; posi < line.length(); posi++) {
+        if (step == 0) {
+            if (line[posi] == ' ') {
+                tmp_val_i = to_int(tmp_val_s);
+                tmp_val_s.empty();
+                posi = put_index_after_space(line, posi);
+                step = 1;
+                continue ;
+            } else if (line[posi] == ';') {
+                print_error_conf(VALUE_IS_NOT_CORRECT);
+            } else if (line[posi] >= '0' && line[posi] <= '9') {
+                tmp_val_s += line[posi];
+                continue ;
+            } else {
+                print_error_conf(VALUE_IS_NOT_INT);
+                at_replace->insert(std::make_pair(-1, "error"));
+                //at_replace[-1] = std::string("ERROR");
+                std::cout << "char is : " << " / line is : " << line;
+                return ;
+            }
+        } else if (step == 1) {
+            if (line[posi] == ';') {
+                at_replace->insert(std::make_pair(tmp_val_i, tmp_val_s));
+                //print("value is " + tmp_val_i + tmp_val_s);
+                return ;
+            } else {
+                tmp_val_s += line[posi];
+            }
         }
     }
     print_error_conf(NO_SEMICOLON);
