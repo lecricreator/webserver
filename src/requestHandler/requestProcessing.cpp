@@ -1,6 +1,31 @@
 #include "webserv.hpp"
 #include "cgi.hpp"
 
+static std::string create_response(const std::string &status_value,
+                            const std::string &content_type_value,
+                            const std::string &body
+                            )
+{
+  if (status_value.empty() || content_type_value.empty() || body.empty())
+    return std::string();
+  std::string status = "HTTP/1.1 ";
+  std::string content_type = "Content-Type: ";
+  std::string content_lenght = "Content-Length: ";
+
+  std::string content_lenght_value = to_str(body.size());
+
+  std::string end_line = "\r\n";
+
+  std::string response;
+  response  = status                + status_value          + end_line
+            + content_type          + content_type_value    + end_line
+            + content_lenght        + content_lenght_value  + end_line
+            + end_line
+            + body + end_line;
+	return response;
+}
+
+
 void    httpRequest::appendError()
 {
   if (this->_errorCode == 301)
@@ -21,8 +46,6 @@ bool httpRequest::generateResponse(std::string &response, Server &server)
   if (_errorCode == 0)
     _errorCode = 200;
 
-  if (is_cgi_script)
-    _errorCode = cgi(_path, status, content_type, body);
   if (!this->getResponse(server, content_type, is_cgi_script))
   {
     appendError();
@@ -35,6 +58,8 @@ bool httpRequest::generateResponse(std::string &response, Server &server)
     content_type = "text/html";
     body = _responseBody;
   }
+  else
+    _errorCode = cgi(_path, status, content_type, body);
   bool is_debug = true;
   if (is_debug)
   {
