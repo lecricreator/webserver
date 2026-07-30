@@ -35,9 +35,13 @@ bool httpRequest::generateResponse(std::string &response, Server &server)
     content_type = "text/html";
     body = _responseBody;
   }
-  //print(status);
-  //print(content_type);
-  //print(body);
+  bool is_debug = true;
+  if (is_debug)
+  {
+    print(status);
+    print(content_type);
+    print(body);
+  }
   response = create_response(status, content_type, body);
   if (response.empty())
     return false;
