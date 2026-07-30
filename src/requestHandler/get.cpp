@@ -72,7 +72,7 @@ static int validate_file(const std::string &path, const Server &server, std::str
   return 200;
 }
 
-bool	httpRequest::getResponse(const Server &server, std::string &content_type, bool is_cgi_script)
+bool	httpRequest::getRequest(const Server &server, std::string &content_type, bool is_cgi_script)
 {
   std::string   file_location;
 	std::ifstream file;

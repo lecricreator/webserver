@@ -22,6 +22,13 @@
 #define	BODY_MAX 8192
 #define	HEADER_MAX 100
 
+typedef struct s_response_data
+{
+  std::string status;
+  std::string content_type;
+  std::string body;
+} t_response_data;
+
 enum RequestStatus {
     REQ_EMPTY,			// Nothing received yet
     REQ_START_LINE,		// Parsing request line
@@ -77,20 +84,18 @@ class httpRequest
 		bool		isValidUriString(const std::string& uri);
 		bool		checkPath();
 		bool		parseStartLine(std::string& startLine);
-    char	  **set_cgi_env();
+    	char	  **set_cgi_env();
 
 		//getRequest
-    bool	getResponse(const Server &server, std::string &content_type, bool is_cgi_script);
+    	bool	getRequest(const Server &server, std::string &content_type, bool is_cgi_script);
 
 		//postRequest
-		bool	postRequest();	//not implemented
+		bool	postRequest();
 
 		//deleteRequest
 		bool	deleteRequest();//not implemented
 
 		//requestProcessing
-		void	appendError();
-		bool	addHeaders();
 
 	public:
 		httpRequest();
@@ -102,10 +107,10 @@ class httpRequest
 		void			setErrorCode(unsigned int code);
 		void			printRequest();
 
-		bool	parseRequest(std::string& str);
-		bool	generateResponse(std::string &request, Server &server);
+		bool				parseRequest(std::string& str);
+		t_response_data  	executeRequest(Server &server);
 
-		std::string get_path();
+		std::string getPath();
 
     char	**set_cgi_env(const httpRequest &client_request);
 };

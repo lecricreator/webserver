@@ -54,6 +54,6 @@ bool    httpRequest::postRequest()
         return false;
     }
 
-    int fd = open(_path.c_str(), O_CREAT | O_WRONLY | O_TRUNC, 0600);
-
+    //int fd = open(_path.c_str(), O_CREAT | O_WRONLY | O_TRUNC, 0600);
+    return true;
 }

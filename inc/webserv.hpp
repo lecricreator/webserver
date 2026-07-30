@@ -36,10 +36,11 @@ typedef struct s_parse_data
   httpRequest request;
 } t_parse_data;
 
+
 //socket
 int   create_listening_socket(int port);
 int   accept_client(int server_fd);
-int   get_request(int client_fd, t_parse_data &client_infos);
+int   handle_request(int client_fd, t_parse_data &client_infos);
 int   send_response(int client_fd, std::string &response);
 
 //socket support
@@ -59,10 +60,5 @@ int   cgi(const std::string &path,
         std::string &status,
         std::string &content_type,
         std::string &body);
-
-
-std::string create_response(const std::string &status_value,
-                            const std::string &content_type_value,
-                            const std::string &body);
 
 #endif

@@ -71,6 +71,8 @@ void	httpRequest::printRequest()
 	std::cout << _body << ";" << std::endl;
 }
 
+std::string httpRequest::getPath() { return _path; }
+
 /**********************************************************************************************/
 
 /**
