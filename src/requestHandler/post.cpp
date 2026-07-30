@@ -1,5 +1,10 @@
 #include "webserv.hpp"
 
+/*
+logique postRequest:
+logique separee en fonction de si le fichier doit etre write en chunk ou non, potentiellement 2 fonctions differentes
+*/
+
 /**
  * @brief Checks that a file path is a directory with write access to it.
 */
