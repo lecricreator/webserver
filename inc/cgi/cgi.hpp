@@ -6,7 +6,8 @@
 #include <sys/wait.h>
 
 #define EMPTY_FIELD "None"
-#define ROOT_DIR_FOR_CGI_EXEC "www/cgi-bin/"
+#define WWW_ROOT "www/"
+#define CGI_ROOT "cgi-bin/"
 
 typedef struct s_cgi_info
 {

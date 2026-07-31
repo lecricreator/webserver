@@ -1,19 +1,10 @@
 #include "cgi.hpp"
 
-//assume dir of path is correct
-static std::string  get_relative_path_to_executable(std::string path, std::string absolute_dir_for_cgi_exec)
-{
-  //remove www
-  (void)absolute_dir_for_cgi_exec;
-  return (path.substr(9));
-}
-
 static void  execute_child(std::string path, int stdin_pipe[2], int stdout_pipe[2], char **env)
 {
   char *executable = (char *)"/usr/bin/python3";
-  std::string relative_path = get_relative_path_to_executable(path, ROOT_DIR_FOR_CGI_EXEC);
-  char *argv[] = {executable, const_cast<char*>(relative_path.c_str()), NULL};
-  if (chdir(ROOT_DIR_FOR_CGI_EXEC) == ERROR)
+  char *argv[] = {executable, const_cast<char*>(path.c_str()), NULL};
+  if (chdir(WWW_ROOT CGI_ROOT) == ERROR)
     exit(ERROR);
   close(stdin_pipe[1]);
   close(stdout_pipe[0]);

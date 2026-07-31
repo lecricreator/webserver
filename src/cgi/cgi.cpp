@@ -27,6 +27,18 @@ int is_implemented(const t_cgi_info &cgi_info)
 }
 */
 
+static std::string  get_relative_path(std::string path, std::string cgi_root)
+{
+  size_t      cgi_root_size = cgi_root.size();
+
+  print(cgi_root);
+  print(path);
+  if (path.compare(1, cgi_root_size, cgi_root))
+    return std::string();
+  std::string relative_path = path.substr(cgi_root_size + 1);
+  return (relative_path);
+}
+
 //normally we might reuse the body of other codes than 200 but we can simplify
 int cgi(const std::string &path,
         std::string &status,
@@ -44,8 +56,10 @@ int cgi(const std::string &path,
 
   if (cgi_info.status == EMPTY_FIELD)
     cgi_info.status = "200 OK";
-
-	if ((cgi_output = execute_cgi(path, env, NULL)) == std::string())
+  std::string relative_path = get_relative_path(path, CGI_ROOT);
+  if (relative_path.empty())
+    return 401;
+	if ((cgi_output = execute_cgi(relative_path, env, NULL)) == std::string())
 		return 500;
 	if (parse_cgi(cgi_output, cgi_info) == FAILURE)
 		return 502;
