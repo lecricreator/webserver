@@ -49,9 +49,15 @@ httpRequest::~httpRequest() {}
 
 /**********************************************************************************************/
 
-void	httpRequest::setErrorCode(unsigned int code) { _errorCode = code; }
+std::string 	httpRequest::getPath() const { return _path; }
+
+RequestStatus	httpRequest::getStatus() const { return _status; }
+
+void			httpRequest::setStatus(RequestStatus newStatus) { _status = newStatus; }
 
 unsigned int	httpRequest::getErrorCode() const { return _errorCode; }
+
+void	httpRequest::setErrorCode(unsigned int code) { _errorCode = code; }
 
 void	httpRequest::printRequest()
 {
@@ -70,8 +76,6 @@ void	httpRequest::printRequest()
 	std::cout << "body:" << std::endl;
 	std::cout << _body << ";" << std::endl;
 }
-
-std::string httpRequest::getPath() { return _path; }
 
 /**********************************************************************************************/
 

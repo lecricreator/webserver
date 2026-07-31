@@ -3,6 +3,8 @@
 
 t_response_data  httpRequest::executeRequest(Server &server)
 {
+  std::cout << "executeRequest() call\n";
+
   t_response_data data;
   std::string     script_name;
   bool is_cgi_script = is_cgi(_path, script_name);
@@ -10,10 +12,33 @@ t_response_data  httpRequest::executeRequest(Server &server)
   if (_errorCode == 0)
     setErrorCode(200);
 
-  if (!this->getRequest(server, data.content_type, is_cgi_script))
+  if (_status == REQ_PARSED)
   {
-    data.status = to_str((int)_errorCode) + " " + code_to_string(_errorCode);
-    return data;
+    if (_method == "GET")
+    {
+      if (!getRequest(server, data.content_type, is_cgi_script))
+      {
+        data.status = to_str((int)_errorCode) + " " + code_to_string(_errorCode);
+        _status = REQ_EXECUTED; //ideally this should be REQ_ERROR but whatever
+        return data;
+      }
+      _status = REQ_EXECUTED;
+    }
+    if (_method == "POST")
+    {
+      postRequest();
+      _status = REQ_EXECUTED;
+    }
+    //if (_method == "DELETE")
+    //{
+    //  if (!deleteRequest())
+    //  {
+    //    data.status = to_str((int)_errorCode) + " " + code_to_string(_errorCode);
+    //    _status = REQ_EXECUTED; //ideally this should be REQ_ERROR but whatever
+    //    return data;
+    //  }
+    //  _status = REQ_EXECUTED;
+    //}
   }
 
   if (!is_cgi_script)

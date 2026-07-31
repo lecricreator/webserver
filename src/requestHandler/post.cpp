@@ -1,5 +1,5 @@
 #include "webserv.hpp"
-
+#define WRITE_MAX 8192
 /*
 logique postRequest:
 logique separee en fonction de si le fichier doit etre write en chunk ou non, potentiellement 2 fonctions differentes
@@ -10,17 +10,26 @@ logique separee en fonction de si le fichier doit etre write en chunk ou non, po
 */
 bool is_directory(const std::string& path) {
     //assert(path.empty() == false && "String contains an actual path");
-
+	std::cout << "path:" << path << ";\n";
     struct stat path_stat;
     std::memset(&path_stat, 0, sizeof(path_stat));
     if (stat(path.c_str(), &path_stat) != 0) 
+	{
+		std::cout << "errno: " << errno << "\n";
         return false;
+	}
 
     if (!S_ISDIR(path_stat.st_mode)) 
+	{
+		std::cout << "debug2\n";
         return false;
+	}
 
     if (access(path.c_str(), W_OK) != 0) 
+	{
+		std::cout << "debug3\n";
         return false;
+	}
 
     return true;
 }
@@ -50,15 +59,18 @@ bool    httpRequest::postRequest()
 {
     //use stat to check if the path is a file or a directory
     //use access to check if you can write in said directory
+	std::cout << "postRequest() call\n";
 
-    if (_body.empty())
-        return true; //maybe set error code to 200
-    if (!is_directory(_path))
-    {
-        setErrorCode(500);
-        return false;
-    }
+    //if (_body.empty())
+    //    return true; //maybe set error code to 200
+    //if (!is_directory(_path))
+    //{
+    //    setErrorCode(500);
+    //    return false;
+    //}
 
-    //int fd = open(_path.c_str(), O_CREAT | O_WRONLY | O_TRUNC, 0600);
+    int fd = open(_path.c_str(), O_CREAT | O_WRONLY | O_TRUNC, 0600);
+	std::cout << "fd: " << fd << "\n";
+	std::cout << "errno: " << errno << "\n";
     return true;
 }

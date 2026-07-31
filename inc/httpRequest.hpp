@@ -35,8 +35,10 @@ enum RequestStatus {
     REQ_HEADERS,		// Parsing headers
 	REQ_BODY,			// Parsing body
     REQ_PARSED,			// Ready to be processed
+	REQ_EXECUTED,		// Executed appropriate method, ready to create response
     REQ_PROCESSED,		// Fully processed, Response created
-    REQ_ERROR			// Error during parsing
+    REQ_ERROR,			// Error during parsing
+	POST_CHUNK
 };
 
 enum ChunkBodyStatus {
@@ -62,6 +64,11 @@ class httpRequest
 		unsigned int	_errorCode;
 		int				_bodySize;
 		int				_chunkSize;
+
+		//post request variables
+		bool	pathValidated;
+		bool	isChunkedPost;
+		size_t	bytesWritten;
 
 		//response-related variables
 		std::string	_responseBody;
@@ -103,14 +110,15 @@ class httpRequest
 		httpRequest	&operator=(const httpRequest& copy);
 		~httpRequest();
 
+		std::string 	getPath() const;
+		RequestStatus	getStatus() const;
+		void			setStatus(RequestStatus newStatus);
 		unsigned int	getErrorCode() const;
 		void			setErrorCode(unsigned int code);
 		void			printRequest();
 
 		bool				parseRequest(std::string& str);
 		t_response_data  	executeRequest(Server &server);
-
-		std::string getPath();
 
     char	**set_cgi_env(const httpRequest &client_request);
 };
