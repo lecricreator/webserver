@@ -85,7 +85,10 @@ int    httpRequest::postRequest()
         if (write(_fileFd, _body.c_str(), WRITE_MAX) != -1)
             _bytesWritten += WRITE_MAX;
         if (_bytesWritten >= _body.size())
+        {
             _status = REQ_EXECUTED;
+            return SUCCESS;
+        }
         return UNFINISHED;
     }
     //std::cout << "path: " << _path << "\n";
