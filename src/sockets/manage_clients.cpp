@@ -33,7 +33,7 @@ int get_request(int client_fd, t_parse_data &client_infos)
   //std::string result = client_infos.request.getResponse();
   if (!client_infos.request.generateResponse(client_infos.response, *client_infos.server))
     return ERROR;
-  print(client_infos.response);
+  //print(client_infos.response);
   return SUCCESS;
 }
 

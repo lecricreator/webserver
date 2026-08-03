@@ -54,7 +54,6 @@ bool httpRequest::generateResponse(std::string &response, Server &server)
   if (!is_cgi_script)
   {
     status = to_str((int)_errorCode) + " " + code_to_string(_errorCode);
-    content_type = "text/html";
     body = _responseBody;
   }
   else
@@ -64,7 +63,7 @@ bool httpRequest::generateResponse(std::string &response, Server &server)
   {
     print(status);
     print(content_type);
-    print(body);
+    //print(body);
   }
   response = create_response(status, content_type, body);
   if (response.empty())

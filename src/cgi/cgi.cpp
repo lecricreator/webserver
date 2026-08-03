@@ -31,8 +31,6 @@ static std::string  get_relative_path(std::string path, std::string cgi_root)
 {
   size_t      cgi_root_size = cgi_root.size();
 
-  print(cgi_root);
-  print(path);
   if (path.compare(1, cgi_root_size, cgi_root))
     return std::string();
   std::string relative_path = path.substr(cgi_root_size + 1);
