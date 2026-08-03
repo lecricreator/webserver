@@ -56,6 +56,7 @@ int handle_request(int client_fd, t_parse_data &client_infos)
   int             bytes_received = recv(client_fd, buf, sizeof(buf) - 1, 0);
   std::string     request_packet(buf);
   t_response_data data;
+  int             postStatus = SUCCESS;
 
   if (bytes_received <= 0)
     return ERROR;
@@ -65,7 +66,9 @@ int handle_request(int client_fd, t_parse_data &client_infos)
 
   if (!client_infos.request.parseRequest(request_packet))
     return ERROR;
-  data = client_infos.request.executeRequest(*client_infos.server);
+  data = client_infos.request.executeRequest(*client_infos.server, postStatus);
+  if (postStatus == UNFINISHED)
+    return UNFINISHED;
   if (client_infos.request.getStatus() == REQ_EXECUTED)
   {
 	  if (data.status == "301 Moved Permanently")
@@ -86,7 +89,7 @@ int send_response(int client_fd, std::string &response)
   if (bytes_sent == ERROR && errno != EAGAIN)
     return print_error("Failed to send response"), ERROR;
   if (bytes_sent == (ssize_t)response.size())
-    return DONE;
+    return SUCCESS;
   if (bytes_sent > 0)
     response.erase(0, bytes_sent);
   return UNFINISHED;

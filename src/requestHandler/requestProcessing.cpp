@@ -1,9 +1,11 @@
 #include "webserv.hpp"
 #include "cgi.hpp"
 
-t_response_data  httpRequest::executeRequest(Server &server)
+t_response_data  httpRequest::executeRequest(Server &server, int &postStatus)
 {
   std::cout << "executeRequest() call\n";
+  std::cout << "status: " << _status << "\n";
+  std::cout << "REQ_EXECUTED: " << REQ_EXECUTED << "\n";
 
   t_response_data data;
   std::string     script_name;
@@ -25,10 +27,7 @@ t_response_data  httpRequest::executeRequest(Server &server)
       _status = REQ_EXECUTED;
     }
     if (_method == "POST")
-    {
-      postRequest();
-      _status = REQ_EXECUTED;
-    }
+      postStatus = postRequest();
     //if (_method == "DELETE")
     //{
     //  if (!deleteRequest())
@@ -40,7 +39,8 @@ t_response_data  httpRequest::executeRequest(Server &server)
     //  _status = REQ_EXECUTED;
     //}
   }
-
+  if (_status == REQ_EXECUTED)
+    close(_fileFd);
   if (!is_cgi_script)
   {
     data.status = to_str((int)_errorCode) + " " + code_to_string(_errorCode);

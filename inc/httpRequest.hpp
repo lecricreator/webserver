@@ -66,9 +66,10 @@ class httpRequest
 		int				_chunkSize;
 
 		//post request variables
-		bool	pathValidated;
-		bool	isChunkedPost;
-		size_t	bytesWritten;
+		int		_fileFd;
+		bool	_pathValidated;
+		bool	_isChunkedPost;
+		size_t	_bytesWritten;
 
 		//response-related variables
 		std::string	_responseBody;
@@ -97,7 +98,7 @@ class httpRequest
     	bool	getRequest(const Server &server, std::string &content_type, bool is_cgi_script);
 
 		//postRequest
-		bool	postRequest();
+		int	postRequest();
 
 		//deleteRequest
 		bool	deleteRequest();//not implemented
@@ -118,7 +119,7 @@ class httpRequest
 		void			printRequest();
 
 		bool				parseRequest(std::string& str);
-		t_response_data  	executeRequest(Server &server);
+		t_response_data  	executeRequest(Server &server, int &postStatus);
 
     char	**set_cgi_env(const httpRequest &client_request);
 };

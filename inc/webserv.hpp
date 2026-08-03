@@ -25,8 +25,7 @@
 # define ERROR -1
 # define SUCCESS 0
 # define FAILURE 1
-# define DONE 0
-# define UNFINISHED 1
+# define UNFINISHED 2
 
 typedef struct s_parse_data
 {
