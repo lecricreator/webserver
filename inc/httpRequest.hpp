@@ -83,7 +83,7 @@ class httpRequest
 		bool		parseStartLine(std::string& startLine);
 
 		//getRequest
-    unsigned int    getResponse(const Server &server, std::string &content_type);
+    unsigned int    getResponse(const Server &server, t_response_data data);
     t_response_data generate_response_data(const Server &server, const bool &is_cgi_script);
 
 		//postRequest

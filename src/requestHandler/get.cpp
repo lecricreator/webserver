@@ -84,7 +84,7 @@ static int validate_file(const Server &server, std::string &path, std::ifstream 
   return 200;
 }
 
-unsigned int	httpRequest::getResponse(const Server &server, std::string &content_type)
+unsigned int	httpRequest::getResponse(const Server &server, t_response_data data)
 {
 	std::ifstream file;
 
@@ -94,8 +94,8 @@ unsigned int	httpRequest::getResponse(const Server &server, std::string &content
   int status_code = validate_file(server, path, file);
   if (status_code == 200)
   {
-    content_type = choice_content_type(path);
-    _responseBody = copy_file_to_str(file);
+    data.content_type = choice_content_type(path);
+    data.body = copy_file_to_str(file);
   }
   return status_code;
 }
