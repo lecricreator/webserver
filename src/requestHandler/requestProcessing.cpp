@@ -23,7 +23,7 @@ static void add_line_to_response(std::string &response, const std::string header
 static void add_body_to_response(std::string &response, const std::string body)
 {
   std::string end_line = "\r\n";
-  response += end_line + body + end_line;
+  response += end_line + body;
 }
 
 static std::string create_response(const t_response_data &data)
@@ -42,7 +42,7 @@ static std::string create_response(const t_response_data &data)
   if (!data.location.empty())
     add_line_to_response(response, location, data.location);
 
-  std::string content_lenght_value = to_str(data.body.size() + 2);
+  std::string content_lenght_value = to_str(data.body.size());
   add_line_to_response(response, content_lenght, content_lenght_value);
 
   add_body_to_response(response, data.body);
@@ -62,7 +62,7 @@ t_response_data httpRequest::generate_response_data(const Server &server, const 
   if (!is_response_data_valid(data))
     data.status = "500 Internal Server Error";
   if (data.status != "200 OK")
-    data.body = data.status;
+    data.body = data.status + "\n";
   return data;
 }
 
