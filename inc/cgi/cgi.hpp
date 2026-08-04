@@ -5,17 +5,9 @@
 #include <sstream>
 #include <sys/wait.h>
 
-#define EMPTY_FIELD "None"
 #define WWW_ROOT "www/"
 #define CGI_ROOT "cgi-bin/"
 
-typedef struct s_cgi_info
-{
-  std::string content_type;
-  std::string body;
-  std::string status;
-} t_cgi_info;
-
 std::string execute_cgi(std::string filename, char **env, char *cgi_data);
-int         parse_cgi(const std::string &cgi_output, t_cgi_info &cgi_info);
+int         parse_cgi(const std::string &cgi_output, t_response_data &data);
 bool        is_cgi(const std::string &path, std::string &file);
