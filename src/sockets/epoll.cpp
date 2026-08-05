@@ -51,16 +51,12 @@ static void manage_requests(struct epoll_event event,
     if (set_epoll_event(s_event, client_fd, epoll_fd, EPOLLIN, EPOLL_CTL_ADD) == ERROR)
       return ;
     client_infos[client_fd] = create_parse_data(conf_c, servers[fd]);
-    print(client_infos[client_fd].server->get_location()[0].get_path_location());
-
   }
   else if (event.events & (EPOLLERR | EPOLLHUP))
     end_connection(fd, epoll_fd, client_infos);
   else if (event.events & EPOLLIN)
   {
-    int request_status = handle_request(fd, client_infos[fd]);
-    if (request_status == SUCCESS)
-    {
+    if (handle_request(fd, client_infos[fd]) == SUCCESS)
       if (set_epoll_event(event, fd, epoll_fd, EPOLLOUT, EPOLL_CTL_MOD) == ERROR)
         return ;
     }

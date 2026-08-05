@@ -64,22 +64,14 @@ int handle_request(int client_fd, t_parse_data &client_infos)
   print("--- HTTP REQUEST ---\n");
   print(buf);
 
-  if (!client_infos.request.parseRequest(request_packet))
+  std::string chunked_request(buf);
+  if (!client_infos.request.parseRequest(chunked_request))
     return ERROR;
-  data = client_infos.request.executeRequest(*client_infos.server, postStatus);
-  if (postStatus == UNFINISHED)
-    return UNFINISHED;
-  if (client_infos.request.getStatus() == REQ_EXECUTED)
-  {
-	  if (data.status == "301 Moved Permanently")
-		  client_infos.response = createResponse301(client_infos.request.getPath());
-	  else
-		  client_infos.response = create_response(data.status, data.content_type, data.body);
-		if (client_infos.response.empty())
-		  return ERROR;
-    client_infos.request.setStatus(REQ_PROCESSED);
-  }
-  print(client_infos.response);
+  //std::string result = client_infos.request.getResponse();
+  client_infos.response = client_infos.request.executeRequest(*client_infos.server);
+  if (client_infos.response.empty())
+    return ERROR;
+  //print(client_infos.response);
   return SUCCESS;
 }
 

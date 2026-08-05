@@ -55,9 +55,6 @@ void  parse_conf(char *argv);
 Conf  *init_conf(char *path_conf);
 
 //cgi
-int   cgi(const std::string &path,
-        std::string &status,
-        std::string &content_type,
-        std::string &body);
+
 
 #endif
