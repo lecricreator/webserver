@@ -15,6 +15,13 @@ httpRequest::httpRequest() : _headers()
 	_bodySize = -1;
 	_chunkSize = -1;
 	_chunkStatus = CHUNK_SIZE;
+
+    _path = "";
+    _fileFd = -1;
+    _pathValidated = false;
+    _isChunkedPost = false;
+    _bytesWritten = 0;
+
 }
 
 httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)

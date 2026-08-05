@@ -19,8 +19,9 @@
 # include <map>
 
 #define URI_MAX 2048
-#define	BODY_MAX 8192
+#define	BODY_MAX 8192 //use conf file to set this value instead of define
 #define	HEADER_MAX 100
+
 
 enum RequestStatus {
     REQ_EMPTY,			// Nothing received yet
