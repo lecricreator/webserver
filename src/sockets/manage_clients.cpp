@@ -15,39 +15,6 @@ int accept_client(int server_fd)
   return client_fd;
 }
 
-static std::string create_response(const std::string &status_value,
-                            const std::string &content_type_value,
-                            const std::string &body
-                            )
-{
-  if (status_value.empty() || content_type_value.empty() || body.empty())
-    return std::string();
-  std::string status = "HTTP/1.1 ";
-  std::string content_type = "Content-Type: ";
-  std::string content_lenght = "Content-Length: ";
-
-  std::string content_lenght_value = to_str(body.size());
-
-  std::string end_line = "\r\n";
-
-  std::string response;
-  response  = status                + status_value          + end_line
-            + content_type          + content_type_value    + end_line
-            + content_lenght        + content_lenght_value  + end_line
-            + end_line
-            + body + end_line;
-	return response;
-}
-
-static std::string    createResponse301(const std::string &path)
-{
-  std::string response;
-
-  response = "HTTP/1.1 301 " + code_to_string(301) + "\r\n";
-  response += "Location: " + path + "/\r\n\r\n";
-  return response;
-}
-
 //connection closed by client, error and no data received is answered the same way for now
 //recv([...], MSG_PEEK) wouldn't consume the buffer
 int handle_request(int client_fd, t_parse_data &client_infos)
@@ -56,7 +23,6 @@ int handle_request(int client_fd, t_parse_data &client_infos)
   int             bytes_received = recv(client_fd, buf, sizeof(buf) - 1, 0);
   std::string     request_packet(buf);
   t_response_data data;
-  int             postStatus = SUCCESS;
 
   if (bytes_received <= 0)
     return ERROR;
@@ -67,11 +33,9 @@ int handle_request(int client_fd, t_parse_data &client_infos)
   std::string chunked_request(buf);
   if (!client_infos.request.parseRequest(chunked_request))
     return ERROR;
-  //std::string result = client_infos.request.getResponse();
   client_infos.response = client_infos.request.executeRequest(*client_infos.server);
   if (client_infos.response.empty())
     return ERROR;
-  //print(client_infos.response);
   return SUCCESS;
 }
 

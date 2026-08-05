@@ -22,13 +22,6 @@
 #define	BODY_MAX 8192
 #define	HEADER_MAX 100
 
-typedef struct s_response_data
-{
-  std::string status;
-  std::string content_type;
-  std::string body;
-} t_response_data;
-
 enum RequestStatus {
     REQ_EMPTY,			// Nothing received yet
     REQ_START_LINE,		// Parsing request line
