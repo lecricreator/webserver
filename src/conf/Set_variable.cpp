@@ -122,18 +122,18 @@ void        Set_variable::add_in_var(const std::string line, size_t posi, std::v
     print(line);
     return ;
 }
-
+// step 0 look the int / step 1 look the path html
 void    Set_variable::add_in_var(const std::string line, size_t posi, std::map<int, std::string> *at_replace) {
     std::string tmp_val_s;
-    int         tmp_val_i;
+    int         tmp_val_i = 0;
     int         step = 0;
     posi = put_index_after_space(line, posi);
     for (; posi < line.length(); posi++) {
         if (step == 0) {
             if (line[posi] == ' ') {
                 tmp_val_i = to_int(tmp_val_s);
-                tmp_val_s.empty();
-                posi = put_index_after_space(line, posi);
+                tmp_val_s.clear();
+                posi = put_index_after_space(line, posi) - 1;
                 step = 1;
                 continue ;
             } else if (line[posi] == ';') {
@@ -143,15 +143,12 @@ void    Set_variable::add_in_var(const std::string line, size_t posi, std::map<i
                 continue ;
             } else {
                 print_error_conf(VALUE_IS_NOT_INT);
-                at_replace->insert(std::make_pair(-1, "error"));
                 //at_replace[-1] = std::string("ERROR");
-                std::cout << "char is : " << " / line is : " << line;
                 return ;
             }
         } else if (step == 1) {
             if (line[posi] == ';') {
-                at_replace->insert(std::make_pair(tmp_val_i, tmp_val_s));
-                //print("value is " + tmp_val_i + tmp_val_s);
+                (*at_replace)[tmp_val_i] = tmp_val_s;
                 return ;
             } else {
                 tmp_val_s += line[posi];
