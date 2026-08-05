@@ -83,7 +83,7 @@ static int validate_file(const Server &server, std::string &path, std::ifstream 
   return 200;
 }
 
-unsigned int	httpRequest::getResponse(const Server &server, t_response_data &data)
+unsigned int	httpRequest::getRequest(const Server &server, t_response_data &data)
 {
 	std::ifstream file;
 

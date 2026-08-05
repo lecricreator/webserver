@@ -83,8 +83,8 @@ class httpRequest
 		bool		parseStartLine(std::string& startLine);
 
 		//getRequest
-    unsigned int    getResponse(const Server &server, t_response_data &data);
-    t_response_data generate_response_data(const Server &server, const bool &is_cgi_script);
+    unsigned int    getRequest(const Server &server, t_response_data &data);
+    t_response_data generateResponseData(const Server &server, const bool &is_cgi_script);
 
 		//postRequest
 		bool	postRequest();	//not implemented
@@ -107,7 +107,7 @@ class httpRequest
 		void			    printRequest();
 
 		bool	        parseRequest(std::string& str);
-    std::string	  generateResponse(const Server &server);
+    std::string	  executeRequest(const Server &server);
 
 		std::string   get_path();
 
