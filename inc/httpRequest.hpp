@@ -8,11 +8,13 @@
 # include <unistd.h>
 # include <sys/socket.h>
 # include <sys/epoll.h>
+# include <sys/stat.h>
 # include <arpa/inet.h>
 # include <iostream>
 # include <fstream>
 # include <list>
 # include <string>
+# include <cstring>
 # include <sstream>
 # include <map>
 
@@ -20,14 +22,23 @@
 #define	BODY_MAX 8192
 #define	HEADER_MAX 100
 
+typedef struct s_response_data
+{
+  std::string status;
+  std::string content_type;
+  std::string body;
+} t_response_data;
+
 enum RequestStatus {
     REQ_EMPTY,			// Nothing received yet
     REQ_START_LINE,		// Parsing request line
     REQ_HEADERS,		// Parsing headers
 	REQ_BODY,			// Parsing body
     REQ_PARSED,			// Ready to be processed
+	REQ_EXECUTED,		// Executed appropriate method, ready to create response
     REQ_PROCESSED,		// Fully processed, Response created
-    REQ_ERROR			// Error during parsing
+    REQ_ERROR,			// Error during parsing
+	POST_CHUNK
 };
 
 enum ChunkBodyStatus {
@@ -62,6 +73,12 @@ class httpRequest
 		int				_bodySize;
 		int				_chunkSize;
 
+		//post request variables
+		int		_fileFd;
+		bool	_pathValidated;
+		bool	_isChunkedPost;
+		size_t	_bytesWritten;
+
 		//response-related variables
 		std::string	_responseBody;
 
@@ -87,14 +104,12 @@ class httpRequest
     t_response_data generateResponseData(const Server &server, const bool &is_cgi_script);
 
 		//postRequest
-		bool	postRequest();	//not implemented
+		int	postRequest();
 
 		//deleteRequest
 		bool	deleteRequest();//not implemented
 
 		//requestProcessing
-		void	appendError();
-		bool	addHeaders();
 
 	public:
 		httpRequest();
@@ -102,6 +117,9 @@ class httpRequest
 		httpRequest	&operator=(const httpRequest& copy);
 		~httpRequest();
 
+		std::string 	getPath() const;
+		RequestStatus	getStatus() const;
+		void			setStatus(RequestStatus newStatus);
 		unsigned int	getErrorCode() const;
 		void			    setErrorCode(unsigned int code);
 		void			    printRequest();

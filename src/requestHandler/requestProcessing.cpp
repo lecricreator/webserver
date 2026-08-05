@@ -94,7 +94,7 @@ std::string httpRequest::executeRequest(const Server &server)
   //script name useful for env vars
  
   if (_errorCode == 0)
-    _errorCode = 200;
+    setErrorCode(200);
 
   if (_errorCode == 200)
     data = generateResponseData(server, is_cgi_script);
@@ -106,3 +106,4 @@ std::string httpRequest::executeRequest(const Server &server)
   response = create_response(data);
   return response;
 }
+

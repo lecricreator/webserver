@@ -59,6 +59,9 @@ static void manage_requests(struct epoll_event event,
     if (handle_request(fd, client_infos[fd]) == SUCCESS)
       if (set_epoll_event(event, fd, epoll_fd, EPOLLOUT, EPOLL_CTL_MOD) == ERROR)
         return ;
+    }
+    else if (request_status == UNFINISHED)
+      return ;
   }
   else
   {
@@ -96,6 +99,7 @@ int manage_events(std::map<int, Server> &servers, Conf &conf_c)
       perror("epoll_wait");
       return ERROR;
     }
+    print("JE SUIS UNE ITERATION DE EPOLL");
     for (int i = 0; i < nfds; i++)
       manage_requests(events[i], epoll_fd, conf_c, servers);
   }
