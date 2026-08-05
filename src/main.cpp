@@ -21,7 +21,6 @@ std::map<int, Server> create_server(Conf conf_c)
   return servers_fds;
 }
 
-//handle_client receives a limited nbr of bytes
 int main(int argc, char **argv) {
   if (argc != 2) {
     print("Need 2 arguments.");

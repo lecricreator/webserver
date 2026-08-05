@@ -15,19 +15,8 @@ int accept_client(int server_fd)
   return client_fd;
 }
 
-int parse(char buf[4096]) {
-  (void)buf;
-  return SUCCESS;}
-
-/*static int build_response(Conf &conf_c, std::string &response, Server &server)
-{
-
-}*/
-
 //connection closed by client, error and no data received is answered the same way for now
 //recv([...], MSG_PEEK) wouldn't consume the buffer
-//for send we should send as much as possible and if theres too much,
-//we mark the socket with EPOLLOUT
 int get_request(int client_fd, t_parse_data &client_infos)
 {
   char buf[4096];
@@ -44,7 +33,7 @@ int get_request(int client_fd, t_parse_data &client_infos)
   //std::string result = client_infos.request.getResponse();
   if (!client_infos.request.generateResponse(client_infos.response, *client_infos.server))
     return ERROR;
-  print(client_infos.response);
+  //print(client_infos.response);
   return SUCCESS;
 }
 

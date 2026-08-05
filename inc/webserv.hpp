@@ -19,6 +19,7 @@
 # include <algorithm>
 # include <vector>
 # include <map>
+# include <cstring>
 # include <utility>
 
 # define ERROR -1
@@ -52,5 +53,12 @@ int   manage_events(std::map<int, Server> &servers, Conf &conf_c);
 //conf
 void  parse_conf(char *argv);
 Conf  *init_conf(char *path_conf);
+
+//cgi
+int   cgi(const std::string &path,
+        std::string &status,
+        std::string &content_type,
+        std::string &body);
+
 
 #endif

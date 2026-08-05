@@ -9,10 +9,10 @@
 ###VARIABLES###
 
 # name of the executable
-NAME			:=	webserv
+NAME				:=	webserv
 
 # compiler with flags
-CC				:=	c++
+CC					:=	c++
 CFLAGS			:=	-Wall -Werror -Wextra -std=c++98 -g
 
 # main directories
@@ -21,19 +21,19 @@ OBJ_DIR			:=	obj
 INC_DIR			:=	inc
 
 # module directories
-SOCKET_DIR		:=	sockets
+SOCKET_DIR	:=	sockets
 CONF_DIR		:=	conf
 CGI_DIR			:=	cgi
 HTTP_DIR		:=	requestHandler
-MODULE_DIRS		:=	$(SOCKET_DIR) $(CONF_DIR) $(CGI_DIR) $(HTTP_DIR)
+MODULE_DIRS	:=	$(SOCKET_DIR) $(CONF_DIR) $(CGI_DIR) $(HTTP_DIR)
 
 # source files
-ROOT_FILES		:=	main.cpp support.cpp init_conf.cpp
-SOCKET_FILES	:=	create_listening_socket.cpp manage_clients.cpp \
+ROOT_FILES	:=	main.cpp support.cpp init_conf.cpp
+SOCKET_FILES:=	create_listening_socket.cpp manage_clients.cpp \
 								support.cpp epoll.cpp
-CONF_FILES		:=	Conf.cpp Server.cpp Events.cpp Location.cpp Set_variable.cpp
-CGI_FILES		:=	execute.cpp
-HTTP_FILES		:=	delete.cpp  get.cpp  httpRequest.cpp  post.cpp  requestParser.cpp  requestProcessing.cpp
+CONF_FILES	:=	Conf.cpp Server.cpp Events.cpp Location.cpp Set_variable.cpp
+CGI_FILES		:=	execute.cpp parse.cpp cgi.cpp set_cgi_env.cpp is_cgi.cpp
+HTTP_FILES	:=	delete.cpp get.cpp httpRequest.cpp post.cpp requestParser.cpp requestProcessing.cpp
 
 #connect folder and file of src
 SRC_FILES		:=	$(addprefix $(SOCKET_DIR)/, $(SOCKET_FILES)) \
@@ -41,8 +41,6 @@ SRC_FILES		:=	$(addprefix $(SOCKET_DIR)/, $(SOCKET_FILES)) \
 								$(addprefix $(CGI_DIR)/, $(CGI_FILES)) \
 								$(addprefix $(HTTP_DIR)/, $(HTTP_FILES)) \
 								$(ROOT_FILES)
-
-#connect folder and file of include
 
 SRC					:=	$(addprefix $(SRC_DIR)/, $(SRC_FILES))
 OBJ					:=	$(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
