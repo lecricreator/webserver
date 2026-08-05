@@ -80,7 +80,6 @@ t_response_data httpRequest::generateResponseData(const Server &server, const bo
   }
   if (data.status != "200 OK")
     data.body = data.status + "\n";
-  print_response_data(data);
   return data;
 }
 
@@ -99,7 +98,7 @@ std::string httpRequest::executeRequest(const Server &server)
   if (_errorCode == 200)
     data = generateResponseData(server, is_cgi_script);
 
-  bool debug = true;
+  bool debug = false;
   if (debug)
     print_response_data(data);
 

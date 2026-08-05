@@ -1,21 +1,5 @@
 #include "cgi.hpp"
 
-/*
-int is_content_type_implemented(const std::string &content_type)
-{
-	if (content_type.find("text") != std::string::npos)
-		return SUCCESS;
-	return FAILURE;
-}
-
-int is_implemented(const t_response_data &data)
-{
-	if (is_content_type_implemented(data.content_type) == SUCCESS)
-		return SUCCESS;
-	return FAILURE;
-}
-*/
-
 static std::string  get_relative_path(const std::string &path, const std::string &cgi_root)
 {
   size_t      cgi_root_size = cgi_root.size();

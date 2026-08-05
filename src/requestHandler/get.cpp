@@ -74,7 +74,6 @@ static int validate_file(const Server &server, std::string &path, std::ifstream 
   if (!get_file_location(file_location, path, server))
     return 301;
 
-  print(file_location);
 	file.open(file_location.c_str());
 	if (access(file_location.c_str(), F_OK) == -1)
 		return 404;
