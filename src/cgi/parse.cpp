@@ -5,12 +5,11 @@ static bool is_prefix_present(const std::string& str, const std::string& prefix)
   return str.compare(0, prefix.size(), prefix) == 0;
 }
 
-static int get_content(const std::string &line, const std::string &prefix, std::string &content)
+static std::string get_content(const std::string &line, const std::string &prefix)
 {
   if (!is_prefix_present(line, prefix))
-    return FAILURE;
-  content = line.substr(prefix.size());
-  return SUCCESS;
+    return std::string();
+  return line.substr(prefix.size());
 }
 
 //we assume that if the pattern x/y is respected the content_type is respected
@@ -27,15 +26,16 @@ int is_valid_content_type(const std::string &content_type)
   return SUCCESS;
 }
 
-static int parse_content_type(const std::string &line, t_cgi_info &cgi_info)
+static int parse_content_type(const std::string &line, t_response_data &data)
 {
   const std::string prefix = "Content-Type: ";
-  std::string content_type;
-  if (get_content(line, prefix, content_type) == FAILURE)
+  std::string content_type = get_content(line, prefix);
+
+  if (content_type == std::string())
     return ERROR;
-  else if (is_valid_content_type(content_type) == FAILURE || cgi_info.content_type != EMPTY_FIELD)
+  else if (is_valid_content_type(content_type) == FAILURE)
     return FAILURE;
-  cgi_info.content_type = content_type;
+  data.content_type = content_type;
   return SUCCESS;
 }
 
@@ -54,54 +54,52 @@ static bool is_valid_status_code(const std::string &status)
   return std::find(valid_status.begin(), valid_status.end(), status) != valid_status.end();
 }
 
-static int parse_status(const std::string &line, t_cgi_info &cgi_info)
+static int parse_status(const std::string &line, t_response_data &data)
 {
   const std::string prefix = "Status: ";
-  std::string status;
-  if (get_content(line, prefix, status) == FAILURE)
+  std::string status = get_content(line, prefix);
+  if (status == std::string())
     return ERROR;
-  else if (!is_valid_status_code(status) || cgi_info.status != EMPTY_FIELD)
+  else if (!is_valid_status_code(status))
     return FAILURE;
-  cgi_info.status = status;
+  data.status = status;
   return SUCCESS;
 }
 
-static int parse_cgi_header(const std::string &cgi_output, t_cgi_info &cgi_info)
+static int parse_cgi_header(const std::string &cgi_output, t_response_data &data)
 {
   std::string         line;
   std::istringstream  stream(cgi_output);
   while (std::getline(stream, line))
   {
-    if (parse_content_type(line, cgi_info) == FAILURE
-     || parse_status(line, cgi_info) == FAILURE)
+    if (parse_content_type(line, data) == FAILURE
+     || parse_status(line, data) == FAILURE)
       return FAILURE;
   }
-  if (cgi_info.content_type == EMPTY_FIELD)
+  if (data.content_type.empty())
     return FAILURE;
   return SUCCESS;
 }
 
-int parse_cgi(const std::string &cgi_output, t_cgi_info &cgi_info)
+int parse_cgi(const std::string &cgi_output, t_response_data &data)
 {
-    const char* delimiter = "\r\n\r\n";
-    size_t delim_len = 4;
-    size_t delimiter_pos = cgi_output.find(delimiter);
+  std::string delimiter = "\r\n\r\n";
+  size_t delimiter_pos = cgi_output.find(delimiter);
+  if (delimiter_pos == std::string::npos)
+  {
+    delimiter = "\n\n";
+    delimiter_pos = cgi_output.find(delimiter);
     if (delimiter_pos == std::string::npos)
-    {
-        delimiter = "\n\n";
-        delim_len = 2;
-        delimiter_pos = cgi_output.find(delimiter);
-    }
-    if (delimiter_pos == std::string::npos)
-        return FAILURE;
+      return FAILURE;
+  }
 
-    std::string header = cgi_output.substr(0, delimiter_pos);
-    std::string body   = cgi_output.substr(delimiter_pos + delim_len);
+  std::string header = cgi_output.substr(0, delimiter_pos);
+  std::string body   = cgi_output.substr(delimiter_pos + delimiter.size());
 
-    if (parse_cgi_header(header, cgi_info) == SUCCESS)
-    {
-        cgi_info.body = body;
-        return SUCCESS;
-    }
-    return FAILURE;
+  if (parse_cgi_header(header, data) == SUCCESS)
+  {
+    data.body = body;
+    return SUCCESS;
+  }
+  return FAILURE;
 }

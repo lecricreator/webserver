@@ -126,6 +126,7 @@ bool	httpRequest::parseFixedLength()
 		_body += _requestBuffer[i];
 		i++;
 	}
+	_status = REQ_PARSED;
 	return true;
 }
 

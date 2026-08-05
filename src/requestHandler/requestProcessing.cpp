@@ -1,72 +1,109 @@
 #include "webserv.hpp"
+#include "httpRequest.hpp"
 #include "cgi.hpp"
 
-static std::string create_response(const std::string &status_value,
-                            const std::string &content_type_value,
-                            const std::string &body
-                            )
+static bool is_response_data_valid(t_response_data &data)
 {
-  if (status_value.empty() || content_type_value.empty() || body.empty())
-    return std::string();
-  std::string status = "HTTP/1.1 ";
-  std::string content_type = "Content-Type: ";
-  std::string content_lenght = "Content-Length: ";
+  bool status = !data.status.empty();
+  bool content_type = !data.content_type.empty();
+  bool location = !data.location.empty();
+  bool body = !data.body.empty();
 
-  std::string content_lenght_value = to_str(body.size());
+  bool is_200 = data.status == "200 OK" && content_type && body && !location;
+  bool is_301 = data.status == "301 Moved Permanently" && location;
 
+  bool is_valid = status && (is_200 || (!content_type && !body && (is_301 || (!is_301 && !location))));
+  return is_valid;
+}
+
+static void add_line_to_response(std::string &response, const std::string header, const std::string value)
+{
   std::string end_line = "\r\n";
+  response += header + value + end_line;
+}
 
+static void add_body_to_response(std::string &response, const std::string body)
+{
+  std::string end_line = "\r\n";
+  response += end_line + body;
+}
+
+static std::string create_response(const t_response_data &data)
+{
   std::string response;
-  response  = status                + status_value          + end_line
-            + content_type          + content_type_value    + end_line
-            + content_lenght        + content_lenght_value  + end_line
-            + end_line
-            + body + end_line;
+  std::string status          = "HTTP/1.1 ";
+  std::string content_type    = "Content-Type: ";
+  std::string content_lenght  = "Content-Length: ";
+  std::string location        = "Location: ";
+
+
+  add_line_to_response(response, status, data.status);
+
+  if (!data.content_type.empty())
+    add_line_to_response(response, content_type, data.content_type);
+  if (!data.location.empty())
+    add_line_to_response(response, location, data.location);
+
+  std::string content_lenght_value = to_str(data.body.size());
+  add_line_to_response(response, content_lenght, content_lenght_value);
+
+  add_body_to_response(response, data.body);
 	return response;
 }
 
-void    httpRequest::appendError()
+static void print_response_data(const t_response_data &data)
 {
-  if (this->_errorCode == 301)
-  {
-    this->_responseBody = "HTTP/1.1 301 " + code_to_string(301) + "\r\n";
-    this->_responseBody += "Location: " + this->_path + "/\r\n\r\n";
-  }
+  print("-----------");
+  print("response data:");
+  print("status:        " + data.status);
+  print("content_type:  " + data.content_type);
+  print("location:      " + data.location);
+  print("body:");
+  print(data.body);
+  print("-----------");
 }
 
-bool httpRequest::generateResponse(std::string &response, Server &server)
+t_response_data httpRequest::generateResponseData(const Server &server, const bool &is_cgi_script)
 {
-  std::string status;
-  std::string content_type;
-  std::string body;
-  std::string script_name;
+  t_response_data data;
+  int             status_code;
+
+  status_code = is_cgi_script ? cgi(_path, data) : getRequest(server, data);
+  data.status = to_str((int)status_code) + " " + code_to_string(status_code);
+
+  if (data.status == "301 Moved Permanently")
+    data.location = _path + "/";
+  if (!is_response_data_valid(data))
+  {
+    data.status = "500 Internal Server Error";
+    data.content_type.erase(0);
+  }
+  if (data.status != "200 OK")
+    data.body = data.status + "\n";
+  print_response_data(data);
+  return data;
+}
+
+std::string httpRequest::executeRequest(const Server &server)
+{
+  std::string     response;
+  std::string     script_name;
+  t_response_data data;
+
   bool is_cgi_script = is_cgi(_path, script_name);
   //script name useful for env vars
+ 
   if (_errorCode == 0)
-    _errorCode = 200;
+    setErrorCode(200);
 
-  if (!this->getResponse(server, content_type, is_cgi_script))
-  {
-    appendError();
-    response = _responseBody;
-    return true;
-  }
-  if (!is_cgi_script)
-  {
-    status = to_str((int)_errorCode) + " " + code_to_string(_errorCode);
-    body = _responseBody;
-  }
-  else
-    _errorCode = cgi(_path, status, content_type, body);
-  bool is_debug = true;
-  if (is_debug)
-  {
-    print(status);
-    print(content_type);
-    //print(body);
-  }
-  response = create_response(status, content_type, body);
-  if (response.empty())
-    return false;
-  return true;
+  if (_errorCode == 200)
+    data = generateResponseData(server, is_cgi_script);
+
+  bool debug = true;
+  if (debug)
+    print_response_data(data);
+
+  response = create_response(data);
+  return response;
 }
+

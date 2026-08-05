@@ -17,10 +17,13 @@ int accept_client(int server_fd)
 
 //connection closed by client, error and no data received is answered the same way for now
 //recv([...], MSG_PEEK) wouldn't consume the buffer
-int get_request(int client_fd, t_parse_data &client_infos)
+int handle_request(int client_fd, t_parse_data &client_infos)
 {
-  char buf[4096];
-  int bytes_received = recv(client_fd, buf, sizeof(buf) - 1, 0);
+  char            buf[4096];
+  int             bytes_received = recv(client_fd, buf, sizeof(buf) - 1, 0);
+  std::string     request_packet(buf);
+  t_response_data data;
+
   if (bytes_received <= 0)
     return ERROR;
   buf[bytes_received] = '\0';
@@ -30,10 +33,9 @@ int get_request(int client_fd, t_parse_data &client_infos)
   std::string chunked_request(buf);
   if (!client_infos.request.parseRequest(chunked_request))
     return ERROR;
-  //std::string result = client_infos.request.getResponse();
-  if (!client_infos.request.generateResponse(client_infos.response, *client_infos.server))
+  client_infos.response = client_infos.request.executeRequest(*client_infos.server);
+  if (client_infos.response.empty())
     return ERROR;
-  //print(client_infos.response);
   return SUCCESS;
 }
 
@@ -43,8 +45,9 @@ int send_response(int client_fd, std::string &response)
   if (bytes_sent == ERROR && errno != EAGAIN)
     return print_error("Failed to send response"), ERROR;
   if (bytes_sent == (ssize_t)response.size())
-    return DONE;
+    return SUCCESS;
   if (bytes_sent > 0)
     response.erase(0, bytes_sent);
   return UNFINISHED;
 }
+

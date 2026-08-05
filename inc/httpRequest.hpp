@@ -8,11 +8,13 @@
 # include <unistd.h>
 # include <sys/socket.h>
 # include <sys/epoll.h>
+# include <sys/stat.h>
 # include <arpa/inet.h>
 # include <iostream>
 # include <fstream>
 # include <list>
 # include <string>
+# include <cstring>
 # include <sstream>
 # include <map>
 
@@ -26,14 +28,24 @@ enum RequestStatus {
     REQ_HEADERS,		// Parsing headers
 	REQ_BODY,			// Parsing body
     REQ_PARSED,			// Ready to be processed
+	REQ_EXECUTED,		// Executed appropriate method, ready to create response
     REQ_PROCESSED,		// Fully processed, Response created
-    REQ_ERROR			// Error during parsing
+    REQ_ERROR,			// Error during parsing
+	POST_CHUNK
 };
 
 enum ChunkBodyStatus {
 	CHUNK_SIZE,
 	CHUNK_DATA
 };
+
+typedef struct s_response_data
+{
+  std::string content_type;
+  std::string body;
+  std::string status;
+  std::string location;
+} t_response_data;
 
 typedef std::map<std::string, std::string> HeaderMap;
 
@@ -54,10 +66,14 @@ class httpRequest
 		int				_bodySize;
 		int				_chunkSize;
 
+		//post request variables
+		int		_fileFd;
+		bool	_pathValidated;
+		bool	_isChunkedPost;
+		size_t	_bytesWritten;
+
 		//response-related variables
 		std::string	_responseBody;
-
-
 
 		//requestParser
 		bool	parseHexSize();
@@ -75,20 +91,18 @@ class httpRequest
 		bool		isValidUriString(const std::string& uri);
 		bool		checkPath();
 		bool		parseStartLine(std::string& startLine);
-    char	  **set_cgi_env();
 
 		//getRequest
-    bool	getResponse(const Server &server, std::string &content_type, bool is_cgi_script);
+    unsigned int    getRequest(const Server &server, t_response_data &data);
+    t_response_data generateResponseData(const Server &server, const bool &is_cgi_script);
 
 		//postRequest
-		bool	postRequest();	//not implemented
+		int	postRequest();
 
 		//deleteRequest
 		bool	deleteRequest();//not implemented
 
 		//requestProcessing
-		void	appendError();
-		bool	addHeaders();
 
 	public:
 		httpRequest();
@@ -96,20 +110,24 @@ class httpRequest
 		httpRequest	&operator=(const httpRequest& copy);
 		~httpRequest();
 
+		std::string 	getPath() const;
+		RequestStatus	getStatus() const;
+		void			setStatus(RequestStatus newStatus);
 		unsigned int	getErrorCode() const;
-		void			setErrorCode(unsigned int code);
-		void			printRequest();
+		void			    setErrorCode(unsigned int code);
+		void			    printRequest();
 
-		bool	parseRequest(std::string& str);
-		bool	generateResponse(std::string &request, Server &server);
+		bool	        parseRequest(std::string& str);
+    std::string	  executeRequest(const Server &server);
 
-		std::string get_path();
+		std::string   get_path();
 
-    char	**set_cgi_env(const httpRequest &client_request);
+    char	        **set_cgi_env();
 };
 
 std::string code_to_string(const unsigned int code);
 int			ft_stoi(std::string n);
 int 		hexToInt(const std::string& hexStr);
+int     cgi(const std::string &path, t_response_data &data);
 
 #endif
