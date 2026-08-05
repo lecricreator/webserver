@@ -66,10 +66,13 @@ static void print_response_data(const t_response_data &data)
 t_response_data httpRequest::generateResponseData(const Server &server, const bool &is_cgi_script)
 {
   t_response_data data;
-  int             status_code;
+  int             status_code = _errorCode;
 
-  status_code = is_cgi_script ? cgi(_path, data) : getRequest(server, data);
-  data.status = to_str((int)status_code) + " " + code_to_string(status_code);
+  if (status_code == 200)
+  {
+    status_code = is_cgi_script ? cgi(_path, data) : getRequest(server, data);
+    data.status = to_str((int)status_code) + " " + code_to_string(status_code);
+  }
 
   if (data.status == "301 Moved Permanently")
     data.location = _path + "/";
@@ -95,8 +98,7 @@ std::string httpRequest::executeRequest(const Server &server)
   if (_errorCode == 0)
     setErrorCode(200);
 
-  if (_errorCode == 200)
-    data = generateResponseData(server, is_cgi_script);
+  data = generateResponseData(server, is_cgi_script);
 
   bool debug = false;
   if (debug)
