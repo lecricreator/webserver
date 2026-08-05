@@ -96,5 +96,11 @@ unsigned int	httpRequest::getRequest(const Server &server, t_response_data &data
     data.content_type = choice_content_type(path);
     data.body = copy_file_to_str(file);
   }
+  else if (is_favicon)
+  {
+    data.content_type = "text/plain";
+    data.status = "200 OK";
+    status_code = 200;
+  }
   return status_code;
 }
