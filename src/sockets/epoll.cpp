@@ -56,7 +56,7 @@ static void manage_requests(struct epoll_event event,
     end_connection(fd, epoll_fd, client_infos);
   else if (event.events & EPOLLIN)
   {
-    if (get_request(fd, client_infos[fd]) == SUCCESS)
+    if (handle_request(fd, client_infos[fd]) == SUCCESS)
       if (set_epoll_event(event, fd, epoll_fd, EPOLLOUT, EPOLL_CTL_MOD) == ERROR)
         return ;
   }

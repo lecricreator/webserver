@@ -17,7 +17,7 @@ int accept_client(int server_fd)
 
 //connection closed by client, error and no data received is answered the same way for now
 //recv([...], MSG_PEEK) wouldn't consume the buffer
-int get_request(int client_fd, t_parse_data &client_infos)
+int handle_request(int client_fd, t_parse_data &client_infos)
 {
   char buf[4096];
   int bytes_received = recv(client_fd, buf, sizeof(buf) - 1, 0);

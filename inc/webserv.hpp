@@ -39,7 +39,7 @@ typedef struct s_parse_data
 //socket
 int   create_listening_socket(int port);
 int   accept_client(int server_fd);
-int   get_request(int client_fd, t_parse_data &client_infos);
+int   handle_request(int client_fd, t_parse_data &client_infos);
 int   send_response(int client_fd, std::string &response);
 
 //socket support
