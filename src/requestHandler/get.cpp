@@ -13,7 +13,6 @@ static std::string get_extension(const std::string &path)
 static std::string  choice_content_type(std::string path) {
     std::string content_type;
     std::string extension = get_extension(path);
-    print(extension);
     if (extension == "png") {
         content_type = "image/png";
     } else if (extension == "css") {
@@ -84,7 +83,7 @@ static int validate_file(const Server &server, std::string &path, std::ifstream 
   return 200;
 }
 
-unsigned int	httpRequest::getResponse(const Server &server, t_response_data data)
+unsigned int	httpRequest::getResponse(const Server &server, t_response_data &data)
 {
 	std::ifstream file;
 

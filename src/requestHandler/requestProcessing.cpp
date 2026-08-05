@@ -12,7 +12,7 @@ static bool is_response_data_valid(t_response_data &data)
   bool is_200 = data.status == "200 OK" && content_type && body && !location;
   bool is_301 = data.status == "301 Moved Permanently" && location;
 
-  bool is_valid = !status && (is_200 || (!content_type && !body && (is_301 || (!is_301 && !location))));
+  bool is_valid = status && (is_200 || (!content_type && !body && (is_301 || (!is_301 && !location))));
   return is_valid;
 }
 
@@ -51,6 +51,18 @@ static std::string create_response(const t_response_data &data)
 	return response;
 }
 
+static void print_response_data(const t_response_data &data)
+{
+  print("-----------");
+  print("response data:");
+  print("status:        " + data.status);
+  print("content_type:  " + data.content_type);
+  print("location:      " + data.location);
+  print("body:");
+  print(data.body);
+  print("-----------");
+}
+
 t_response_data httpRequest::generate_response_data(const Server &server, const bool &is_cgi_script)
 {
   t_response_data data;
@@ -62,22 +74,14 @@ t_response_data httpRequest::generate_response_data(const Server &server, const 
   if (data.status == "301 Moved Permanently")
     data.location = _path + "/";
   if (!is_response_data_valid(data))
+  {
     data.status = "500 Internal Server Error";
+    data.content_type.erase(0);
+  }
   if (data.status != "200 OK")
     data.body = data.status + "\n";
+  print_response_data(data);
   return data;
-}
-
-static void print_response_data(const t_response_data &data)
-{
-  print("-----------");
-  print("response data:");
-  print("status:        " + data.status);
-  print("content_type:  " + data.content_type);
-  print("location:      " + data.location);
-  print("body:");
-  print(data.body);
-  print("-----------");
 }
 
 std::string httpRequest::generateResponse(const Server &server)
