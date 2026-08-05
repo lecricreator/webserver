@@ -4,13 +4,15 @@
 
 static bool is_response_data_valid(t_response_data &data)
 {
-  bool has_status_code = !data.status.empty();
+  bool status = !data.status.empty();
+  bool content_type = !data.content_type.empty();
+  bool location = !data.location.empty();
+  bool body = !data.body.empty();
 
-  bool is_200 = !(data.content_type.empty() || data.body.empty());
-  bool is_301 = !(data.location.empty());
-  bool is_error = data.content_type.empty() && data.body.empty();
+  bool is_200 = data.status == "200 OK" && content_type && body && !location;
+  bool is_301 = data.status == "301 Moved Permanently" && location;
 
-  bool is_valid = has_status_code && (is_200 || is_301 || is_error);
+  bool is_valid = !status && (is_200 || (!content_type && !body && (is_301 || (!is_301 && !location))));
   return is_valid;
 }
 
@@ -93,7 +95,7 @@ std::string httpRequest::generateResponse(const Server &server)
   if (_errorCode == 200)
     data = generate_response_data(server, is_cgi_script);
 
-  bool debug = false;
+  bool debug = true;
   if (debug)
     print_response_data(data);
 
