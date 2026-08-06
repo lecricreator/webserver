@@ -22,10 +22,6 @@ bool    Location::parse_location(std::ifstream *fd_file, const std::string pline
             this->set.add_in_var(line, posi + 6, &this->_index);
         } else if ((posi = line.find("is_cgi_py ")) != std::string::npos) {
             this->set.add_in_var(line, posi + 10, &this->_is_cgi_py);
-            if (this->_is_cgi_py)
-                print("trtrtrtrtrt");
-            else
-                print("trtrtrtrtri");
         } else if ((posi = line.find("}")) != std::string::npos) {
             return (true);
         }

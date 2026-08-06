@@ -2,6 +2,7 @@
 # define HTTPREQUEST_HPP
 
 # include <cerrno>
+# include <cstdio>
 # include <fcntl.h>
 # include <stdio.h>
 # include <string.h>
@@ -19,8 +20,9 @@
 # include <map>
 
 #define URI_MAX 2048
-#define	BODY_MAX 8192
+#define	BODY_MAX 8192 //use conf file to set this value instead of define
 #define	HEADER_MAX 100
+
 
 enum RequestStatus {
     REQ_EMPTY,			// Nothing received yet
@@ -111,16 +113,15 @@ class httpRequest
 		~httpRequest();
 
 		std::string 	getPath() const;
+		int				getFileFd() const;
 		RequestStatus	getStatus() const;
 		void			setStatus(RequestStatus newStatus);
 		unsigned int	getErrorCode() const;
-		void			    setErrorCode(unsigned int code);
-		void			    printRequest();
+		void			setErrorCode(unsigned int code);
+		void			printRequest();
 
 		bool	        parseRequest(std::string& str);
-    std::string	  executeRequest(const Server &server);
-
-		std::string   get_path();
+    	std::string	  	executeRequest(const Server &server);
 
     char	        **set_cgi_env();
 };

@@ -15,6 +15,12 @@ httpRequest::httpRequest() : _headers()
 	_bodySize = -1;
 	_chunkSize = -1;
 	_chunkStatus = CHUNK_SIZE;
+
+    _path = "";
+    _fileFd = -1;
+    _pathValidated = false;
+    _isChunkedPost = false;
+    _bytesWritten = 0;
 }
 
 httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
@@ -28,6 +34,12 @@ httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
 	_bodySize = copy._bodySize;
 	_chunkSize = copy._chunkSize;
 	_chunkStatus = copy._chunkStatus;
+
+    _path = copy._path;
+    _fileFd = copy._fileFd;
+    _pathValidated = copy._pathValidated;
+    _isChunkedPost = copy._isChunkedPost;
+    _bytesWritten = copy._bytesWritten;
 }
 
 httpRequest&	httpRequest::operator=(const httpRequest& copy)
@@ -42,6 +54,12 @@ httpRequest&	httpRequest::operator=(const httpRequest& copy)
 	_bodySize = copy._bodySize;
 	_chunkSize = copy._chunkSize;
 	_chunkStatus = copy._chunkStatus;
+
+    _path = copy._path;
+    _fileFd = copy._fileFd;
+    _pathValidated = copy._pathValidated;
+    _isChunkedPost = copy._isChunkedPost;
+    _bytesWritten = copy._bytesWritten;
 	return *this;
 }
 
@@ -50,6 +68,8 @@ httpRequest::~httpRequest() {}
 /**********************************************************************************************/
 
 std::string 	httpRequest::getPath() const { return _path; }
+
+int             httpRequest::getFileFd() const { return _fileFd; }
 
 RequestStatus	httpRequest::getStatus() const { return _status; }
 

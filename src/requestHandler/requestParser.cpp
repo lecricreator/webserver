@@ -45,12 +45,21 @@ bool	httpRequest::parseChunkData()
 		return false;
 	}
 	_body.append(_requestBuffer.substr(0, trueSize));
+	if (write(_fileFd, _requestBuffer.substr(0, trueSize).c_str(), trueSize) != -1)
+		_bytesWritten += trueSize;
+	else
+	{
+		std::cout << "parseChunkData() ERROR\n errno: " << errno << "\n";
+		setErrorCode(500);
+		return false;
+	}
 	_requestBuffer.erase(0, trueSize + 2);
 	return true;
 }
 
 bool	httpRequest::parseChunked()
 {
+	std::cout << "parseChunked() call\n";
 	if (_headers["Transfer-Encoding"] != "chunked")
 	{
 		setErrorCode(400);
@@ -58,7 +67,7 @@ bool	httpRequest::parseChunked()
 	}
 	while (_requestBuffer.find("\r\n") != std::string::npos)
 	{
-		if (_body.size() > BODY_MAX)
+		if (_bytesWritten > BODY_MAX)
 		{
 			setErrorCode(413); //413 Payload too large
 			return false;
@@ -73,6 +82,7 @@ bool	httpRequest::parseChunked()
 		if (_chunkSize == 0)
 		{
 			_status = REQ_PARSED;
+			std::cout << "calling close() with return code " << close(_fileFd) << "\n";
 			return true;
 		}
 		if (_chunkStatus == CHUNK_DATA)
@@ -93,6 +103,7 @@ bool	httpRequest::parseChunked()
  */
 bool	httpRequest::parseFixedLength()
 {
+	std::cout << "parseFixedLength() call\n";
 	if (_bodySize == -1)
 	{
 		_bodySize = ft_stoi(_headers.find("Content-Length")->second);
@@ -104,6 +115,7 @@ bool	httpRequest::parseFixedLength()
 		if (_bodySize == 0)
 		{
 			_status = REQ_PARSED;
+			std::cout << "calling close() with return code " << close(_fileFd) << "\n";
 			return true;
 		}
 		if (_bodySize > BODY_MAX)
@@ -117,16 +129,25 @@ bool	httpRequest::parseFixedLength()
 	size_t	bytesRead = _body.size();
 	while (_requestBuffer[i])
 	{
+		bytesRead++;
+		_body += _requestBuffer[i];
+		if (write(_fileFd, &_requestBuffer[i], 1) != -1)
+			_bytesWritten++;
+		else
+		{
+			std::cout << "parseFixedLength() ERROR\n errno: " << errno << "\n";
+			setErrorCode(500);
+			return false;
+		}
 		if (bytesRead == (size_t)_bodySize)
 		{
 			_status = REQ_PARSED;
+			std::cout << "calling close() with return code " << close(_fileFd) << "\n";
 			return true;
 		}
-		bytesRead++;
-		_body += _requestBuffer[i];
 		i++;
 	}
-	_status = REQ_PARSED;
+	//_status = REQ_PARSED;
 	return true;
 }
 
@@ -147,6 +168,7 @@ bool	httpRequest::parseBody()
 	else
 	{
 		_status = REQ_PARSED;
+		std::cout << "calling close() with return code " << close(_fileFd) << "\n";
 		return true;
 	}
 	return true;
@@ -396,10 +418,25 @@ bool	httpRequest::parseRequest(std::string& str)
 		if (!parseHeaders())
 			return false;
 	}
-	if (_status == REQ_BODY)
+	if (_status == REQ_BODY) //Now parses and writes to a file at the same time instead of storing everything in ram
 	{
+	    if (_fileFd == -1)
+    	{
+			_path.erase(0, 1);
+        	_fileFd = open(_path.c_str(), O_CREAT | O_RDWR | O_TRUNC | O_NONBLOCK, 0600);
+        	if (_fileFd < 0)
+        	{
+				std::cout << "parseRequest() ERROR\n errno: " << errno << "\n";
+				remove(_path.c_str());
+        	    setErrorCode(500);
+        	    return ERROR;
+        	}
+    	}
 		if (!parseBody())
+		{
+			remove(_path.c_str());
 			return false;
+		}
 	}
 	return true;
 }
