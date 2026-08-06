@@ -54,7 +54,4 @@ int   manage_events(std::map<int, Server> &servers, Conf &conf_c);
 void  parse_conf(char *argv);
 Conf  *init_conf(char *path_conf);
 
-//cgi
-
-
 #endif

@@ -94,7 +94,7 @@ class httpRequest
 
 		//getRequest
     unsigned int    getRequest(const Server &server, t_response_data &data);
-    t_response_data generateResponseData(const Server &server, const bool &is_cgi_script);
+    t_response_data generateResponseData(const Server &server);
 
 		//postRequest
 		int	postRequest();
@@ -122,12 +122,13 @@ class httpRequest
 
 		std::string   get_path();
 
-    char	        **set_cgi_env();
+    char	        **set_cgi_env(const std::string &script_name);
 };
 
 std::string code_to_string(const unsigned int code);
 int			ft_stoi(std::string n);
 int 		hexToInt(const std::string& hexStr);
-int     cgi(const std::string &path, t_response_data &data);
+int     cgi(const std::string &path, t_response_data &data, char *env[]);
+void    free_env(char** env);
 
 #endif

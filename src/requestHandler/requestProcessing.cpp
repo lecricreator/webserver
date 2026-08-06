@@ -63,14 +63,17 @@ static void print_response_data(const t_response_data &data)
   print("-----------");
 }
 
-t_response_data httpRequest::generateResponseData(const Server &server, const bool &is_cgi_script)
+t_response_data httpRequest::generateResponseData(const Server &server)
 {
   t_response_data data;
   int             status_code = _errorCode;
+  std::string     script_name;
+  bool            is_cgi_script = is_cgi(_path, script_name);
 
   if (status_code == 200)
   {
-    status_code = is_cgi_script ? cgi(_path, data) : getRequest(server, data);
+    char **env = set_cgi_env(script_name);
+    status_code = is_cgi_script ? cgi(_path, data, env) : getRequest(server, data);
     data.status = to_str((int)status_code) + " " + code_to_string(status_code);
   }
 
@@ -92,13 +95,10 @@ std::string httpRequest::executeRequest(const Server &server)
   std::string     script_name;
   t_response_data data;
 
-  bool is_cgi_script = is_cgi(_path, script_name);
-  //script name useful for env vars
- 
   if (_errorCode == 0)
     setErrorCode(200);
 
-  data = generateResponseData(server, is_cgi_script);
+  data = generateResponseData(server);
 
   bool debug = false;
   if (debug)
