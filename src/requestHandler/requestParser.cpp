@@ -59,6 +59,7 @@ bool	httpRequest::parseChunkData()
 
 bool	httpRequest::parseChunked()
 {
+	std::cout << "parseChunked() call\n";
 	if (_headers["Transfer-Encoding"] != "chunked")
 	{
 		setErrorCode(400);
@@ -102,6 +103,7 @@ bool	httpRequest::parseChunked()
  */
 bool	httpRequest::parseFixedLength()
 {
+	std::cout << "parseFixedLength() call\n";
 	if (_bodySize == -1)
 	{
 		_bodySize = ft_stoi(_headers.find("Content-Length")->second);
@@ -127,7 +129,6 @@ bool	httpRequest::parseFixedLength()
 	size_t	bytesRead = _body.size();
 	while (_requestBuffer[i])
 	{
-		//std::cout << "bytesRead = " << bytesRead << "	_body.size() = " << _body.size() << "	_bodySize = " << _bodySize << "		_requestBuffer.size() = " << _requestBuffer.size() << std::endl;
 		bytesRead++;
 		_body += _requestBuffer[i];
 		if (write(_fileFd, &_requestBuffer[i], 1) != -1)
@@ -140,7 +141,6 @@ bool	httpRequest::parseFixedLength()
 		}
 		if (bytesRead == (size_t)_bodySize)
 		{
-			std::cout << "HELLOOOOOOOOOOOOOOOOOOOOOOOOOO\n";
 			_status = REQ_PARSED;
 			std::cout << "calling close() with return code " << close(_fileFd) << "\n";
 			return true;
@@ -422,7 +422,7 @@ bool	httpRequest::parseRequest(std::string& str)
 	{
 	    if (_fileFd == -1)
     	{
-			std::cout << "DEBUG\n";
+			//std::cout << "DEBUG\n";
 			_path.erase(0, 1);
         	_fileFd = open(_path.c_str(), O_CREAT | O_RDWR | O_TRUNC | O_NONBLOCK, 0600);
         	if (_fileFd < 0)

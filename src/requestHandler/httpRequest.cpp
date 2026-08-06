@@ -21,8 +21,6 @@ httpRequest::httpRequest() : _headers()
     _pathValidated = false;
     _isChunkedPost = false;
     _bytesWritten = 0;
-    std::cout << "httpRequest constructor called\n";
-    std::cout << "initialized _fileFd to: " << _fileFd << "\n";
 }
 
 httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
@@ -36,6 +34,12 @@ httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
 	_bodySize = copy._bodySize;
 	_chunkSize = copy._chunkSize;
 	_chunkStatus = copy._chunkStatus;
+
+    _path = copy._path;
+    _fileFd = copy._fileFd;
+    _pathValidated = copy._pathValidated;
+    _isChunkedPost = copy._isChunkedPost;
+    _bytesWritten = copy._bytesWritten;
 }
 
 httpRequest&	httpRequest::operator=(const httpRequest& copy)
@@ -50,6 +54,12 @@ httpRequest&	httpRequest::operator=(const httpRequest& copy)
 	_bodySize = copy._bodySize;
 	_chunkSize = copy._chunkSize;
 	_chunkStatus = copy._chunkStatus;
+
+    _path = copy._path;
+    _fileFd = copy._fileFd;
+    _pathValidated = copy._pathValidated;
+    _isChunkedPost = copy._isChunkedPost;
+    _bytesWritten = copy._bytesWritten;
 	return *this;
 }
 
