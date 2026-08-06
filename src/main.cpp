@@ -12,7 +12,7 @@ std::map<int, Server> create_server(Conf conf_c)
     int server_fd = create_listening_socket(port);
     if (server_fd == ERROR)
     {
-      print_error("Server with port" + to_str(server_fd) + "couldn't start");
+      print_error("Server with port " + to_str(port) + " couldn't start");
       continue;
     }
     set_nonblocking(server_fd);
@@ -31,7 +31,9 @@ int main(int argc, char **argv) {
     return FAILURE;
   }
   std::map<int, Server> servers = create_server(*conf_c);
-  int status = manage_events(servers, *conf_c);
+  int status;
+  if (!servers.empty())
+    status = manage_events(servers, *conf_c);
   delete conf_c;
   if (status == ERROR)
     return FAILURE;
