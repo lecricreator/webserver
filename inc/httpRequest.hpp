@@ -2,6 +2,7 @@
 # define HTTPREQUEST_HPP
 
 # include <cerrno>
+# include <cstdio>
 # include <fcntl.h>
 # include <stdio.h>
 # include <string.h>
