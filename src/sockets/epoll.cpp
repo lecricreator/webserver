@@ -19,11 +19,9 @@ int  set_epoll_event(struct epoll_event &event, int fd, int epoll_fd, int new_fl
 t_parse_data create_parse_data(Conf& conf_c, Server &server)
 {
   t_parse_data client_info;
-  httpRequest request;
   client_info.response = "";
   client_info.conf = &conf_c;
   client_info.server = &server;
-  client_info.request = request;
   return client_info;
 }
 
@@ -50,7 +48,7 @@ static void manage_requests(struct epoll_event event,
     struct epoll_event s_event;
     if (set_epoll_event(s_event, client_fd, epoll_fd, EPOLLIN, EPOLL_CTL_ADD) == ERROR)
       return ;
-    client_infos[client_fd] = create_parse_data(conf_c, servers[fd]);
+    client_infos.insert(std::pair<int, t_parse_data>(client_fd, create_parse_data(conf_c, servers[fd])));
   }
   else if (event.events & (EPOLLERR | EPOLLHUP))
     end_connection(fd, epoll_fd, client_infos);
