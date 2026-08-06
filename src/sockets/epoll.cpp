@@ -48,12 +48,7 @@ static void manage_requests(struct epoll_event event,
     struct epoll_event s_event;
     if (set_epoll_event(s_event, client_fd, epoll_fd, EPOLLIN, EPOLL_CTL_ADD) == ERROR)
       return ;
-    //std::cout << "client_infos before: " << client_infos.size() << "\n";
-    //std::cout << "infoClient fileFd: " << infoClient.request.getFileFd() << "\n";
     client_infos.insert(std::pair<int, t_parse_data>(client_fd, create_parse_data(conf_c, servers[fd])));
-    //std::cout << "client_infos fileFd: " << client_infos.find(client_fd)->second.request.getFileFd() << "\n";
-    //std::cout << "debug3\n";
-    //std::cout << "client_infos after: " << client_infos.size() << "\n";
   }
   else if (event.events & (EPOLLERR | EPOLLHUP))
     end_connection(fd, epoll_fd, client_infos);

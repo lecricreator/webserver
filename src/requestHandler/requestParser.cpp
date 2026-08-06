@@ -422,7 +422,6 @@ bool	httpRequest::parseRequest(std::string& str)
 	{
 	    if (_fileFd == -1)
     	{
-			//std::cout << "DEBUG\n";
 			_path.erase(0, 1);
         	_fileFd = open(_path.c_str(), O_CREAT | O_RDWR | O_TRUNC | O_NONBLOCK, 0600);
         	if (_fileFd < 0)
