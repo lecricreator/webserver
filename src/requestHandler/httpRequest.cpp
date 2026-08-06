@@ -21,7 +21,8 @@ httpRequest::httpRequest() : _headers()
     _pathValidated = false;
     _isChunkedPost = false;
     _bytesWritten = 0;
-
+    std::cout << "httpRequest constructor called\n";
+    std::cout << "initialized _fileFd to: " << _fileFd << "\n";
 }
 
 httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
@@ -57,6 +58,8 @@ httpRequest::~httpRequest() {}
 /**********************************************************************************************/
 
 std::string 	httpRequest::getPath() const { return _path; }
+
+int             httpRequest::getFileFd() const { return _fileFd; }
 
 RequestStatus	httpRequest::getStatus() const { return _status; }
 

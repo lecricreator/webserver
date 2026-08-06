@@ -112,16 +112,15 @@ class httpRequest
 		~httpRequest();
 
 		std::string 	getPath() const;
+		int				getFileFd() const;
 		RequestStatus	getStatus() const;
 		void			setStatus(RequestStatus newStatus);
 		unsigned int	getErrorCode() const;
-		void			    setErrorCode(unsigned int code);
-		void			    printRequest();
+		void			setErrorCode(unsigned int code);
+		void			printRequest();
 
 		bool	        parseRequest(std::string& str);
-    std::string	  executeRequest(const Server &server);
-
-		std::string   get_path();
+    	std::string	  	executeRequest(const Server &server);
 
     char	        **set_cgi_env();
 };

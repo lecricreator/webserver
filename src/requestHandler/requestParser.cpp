@@ -420,7 +420,6 @@ bool	httpRequest::parseRequest(std::string& str)
 	}
 	if (_status == REQ_BODY) //Now parses and writes to a file at the same time instead of storing everything in ram
 	{
-		std::cout << "fileFd: " << _fileFd << "\n";
 	    if (_fileFd == -1)
     	{
 			std::cout << "DEBUG\n";
