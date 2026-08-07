@@ -9,7 +9,7 @@ static bool is_response_data_valid(t_response_data &data)
   bool location = !data.location.empty();
   bool body = !data.body.empty();
 
-  bool is_200 = data.status == "200 OK" && content_type && body && !location;
+  bool is_200 = data.status == "200 OK" && content_type && !location;
   bool is_301 = data.status == "301 Moved Permanently" && location;
 
   bool is_valid = status && (is_200 || (!content_type && !body && (is_301 || (!is_301 && !location))));
@@ -74,9 +74,9 @@ t_response_data httpRequest::generateResponseData(const Server &server)
   {
     char **env = set_cgi_env(script_name);
     status_code = is_cgi_script ? cgi(_path, data, env) : getRequest(server, data);
-    data.status = to_str((int)status_code) + " " + code_to_string(status_code);
   }
-
+  data.status = to_str((int)status_code) + " " + code_to_string(status_code);
+  print_response_data(data);
   if (data.status == "301 Moved Permanently")
     data.location = _path + "/";
   if (!is_response_data_valid(data))
@@ -84,8 +84,32 @@ t_response_data httpRequest::generateResponseData(const Server &server)
     data.status = "500 Internal Server Error";
     data.content_type.erase(0);
   }
-  if (data.status != "200 OK")
-    data.body = data.status + "\n";
+  if (data.status != "200 OK") {
+    if (server.get_error_page().find(status_code) != server.get_error_page().end()) {
+      std::ifstream file;
+      std::string path = "www/" + server.get_error_page().find(status_code)->second;
+      file.open(path.c_str());
+  	  if (access(path.c_str(), F_OK) == -1) {
+        data.status = "404" + code_to_string(404);
+        data.body = "<body style=\"background-color: green;\"><h1 style=\"position: absolute; left: 20%; top: 30%; text-align: center;color:red; transform: rotate(150deg);\">" + data.status + "</h1></body>" + "\n";
+      }
+      if (access(path.c_str(), R_OK) == -1 || !file.is_open()) {
+        data.status = "500" + code_to_string(500);
+        data.body = "<body style=\"background-color: green;\"><h1 style=\"position: absolute; left: 20%; top: 30%; text-align: center;color:red; transform: rotate(150deg);\">" + data.status + "</h1></body>" + "\n";
+      }
+    std::string   line;
+
+    while (std::getline(file, line))
+    {
+      data.body += line;
+      if (!file.eof())
+        data.body += '\n';
+    }
+    print(data.body);
+    } else {
+      data.body = "<body style=\"background-color: green;\"><h1 style=\"position: absolute; left: 20%; top: 30%; text-align: center;color:red; transform: rotate(150deg);\">" + data.status + "</h1></body>" + "\n";
+    }
+  }
   return data;
 }
 
@@ -107,4 +131,3 @@ std::string httpRequest::executeRequest(const Server &server)
   response = create_response(data);
   return response;
 }
-
