@@ -1,83 +1,140 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 
 <head>
-    <title>Webserv</title>
-    <link rel="shortcut icon" href="https://lucie-lebriquer.fr/webserv/favicon.png" />
-    <meta charset="utf-8" />
-    <link rel="stylesheet" href="https://lucie-lebriquer.fr/webserv/main.css" />
-    <script src="https://kit.fontawesome.com/58cd01063a.js" crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload Form with Snowfall</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(to bottom, #87CEFA, #f4f4f4);
+            /* Subtle gradient background */
+        }
+
+        .snowfall {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .snowflake {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #fff;
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: snowfall linear infinite;
+        }
+
+        .upload-form {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            transition: transform 0.3s ease-in-out;
+            z-index: 2;
+        }
+
+        .upload-form:hover {
+            transform: scale(1.05);
+        }
+
+        .upload-form h2 {
+            color: #333;
+        }
+
+        .file-input {
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .file-input label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .file-input input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .submit-btn {
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+
+        @keyframes snowfall {
+            0% {
+                transform: translateY(0);
+            }
+
+            100% {
+                transform: translateY(100vh);
+            }
+        }
+    </style>
 </head>
-<div class=whiteband></div>
-<header>
-    <div class="logo">
-        <img src="https://lucie-lebriquer.fr/webserv/logo.png">
-        <div class="titlename">Webserv</div>
-        <div class="title">euses</div>
-    </div>
-    <span class="buttonTab">
-        <a href="index.html"><i class="fas fa-home"></i><span class="tabname">Index</span></a>
-    </span>
-    <span class="buttonTab">
-        <a href="form.html"><i class="fas fa-file"></i><span class="tabname">Form</span></a>
-    </span>
-    <span class="buttonTab active">
-        <a href="upload.html"><i class="fas fa-upload"></i><span class="tabname">Upload</span></a>
-    </span>
-    <span class="buttonTab">
-        <a href="https://github.com/LucieLeBriquer/webserv.git"><i class="fab fa-github"></i><span
-                class="tabname">Source</span></a>
-    </span>
-</header>
 
-<body class="main">
-    <h2>Upload</h2>
-    <h3>Select file to upload :</h3>
-    <form action="./upload.php" class="upload" method="post" enctype="multipart/form-data">
-        <input type="file" name="fileToUpload" id="fileToUpload">
-        <input type="submit" value="Upload" name="submit">
-    </form>
-    <br><br>
+<body>
 
-    <h2>Download</h2>
-    <div class="columns">
-        <div>
-            <img src="./data/lama.jpg"><br>
-            <a href="./data/lama.jpg" download="lama.jpg"><span class="button"><i class="fas fa-download"></i>
-                    Download</span></a>
-        </div>
-        <div>
-            <img src="./data/lamaNB.jpg"><br>
-            <a href="./data/lamaNB.jpg" download="lamaNB.jpg"><span class="button"><i class="fas fa-download"></i>
-                    Download</span></a>
-        </div>
-        <div>
-            <img src="./data/lamaFat.jpg"><br>
-            <a href="./data/lamaFat.jpg" download="lamaFat.jpg"><span class="button"><i class="fas fa-download"></i>
-                    Download</span></a>
-        </div>
-
+    <div class="snowfall">
+        <!-- Snowflakes will be dynamically added here using JavaScript -->
     </div>
 
-    <div class="columns">
-        <div>
-            <img src="./data/icon_pdf.png" width="390"><br>
-            <a href="./data/subject.pdf" download="subject.pdf"><span class="button"><i class="fas fa-download"></i>
-                    Download</span></a>
-        </div>
+    <div class="upload-form">
+        <h2>File Upload Form</h2>
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <div class="file-input">
+                <label for="file">Choose a file:</label>
+                <input type="file" id="file" name="file" accept=".txt, .jpg, .png" required>
+            </div>
+            <button type="submit" class="submit-btn">Upload File</button>
+        </form>
     </div>
+
+    <script>
+        // JavaScript to dynamically create snowflakes
+        const snowfallContainer = document.querySelector('.snowfall');
+
+        for (let i = 0; i < 50; i++) {
+            const snowflake = document.createElement('div');
+            snowflake.className = 'snowflake';
+            snowflake.style.left = `${Math.random() * 100}vw`;
+            snowflake.style.animationDuration = `${Math.random() * 2 + 1}s`;
+            snowflake.style.animationDelay = `${Math.random()}s`;
+            snowfallContainer.appendChild(snowflake);
+        }
+    </script>
 
 </body>
-
-<footer>
-    <ul class="footer">
-        <li></li>
-        <li><a href="https://github.com/MassiliaB" target="_blank"><i class="fab fa-github"></i> masboula</a></li>
-        <li><a href="https://github.com/loupascreau" target="_blank"><i class="fab fa-github"></i> lpascrea</a></li>
-        <li><a href="https://github.com/LucieLeBriquer" target="_blank"><i class="fab fa-github"></i> lle-briq</a></li>
-        <li></li>
-    </ul>
-</footer>
 
 </html>
