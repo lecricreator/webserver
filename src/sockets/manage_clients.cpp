@@ -19,7 +19,7 @@ int accept_client(int server_fd)
 //recv([...], MSG_PEEK) wouldn't consume the buffer
 int handle_request(int client_fd, t_parse_data &client_infos)
 {
-  char            buf[4096];
+  char            buf[1024];
   int             bytes_received = recv(client_fd, buf, sizeof(buf) - 1, 0);
   std::string     request_packet(buf);
   t_response_data data;
