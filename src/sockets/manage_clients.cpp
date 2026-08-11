@@ -15,30 +15,39 @@ int accept_client(int server_fd)
   return client_fd;
 }
 
-static std::string get_sender_ip(int client_fd)
-{
-  struct sockaddr_in peer;
-  socklen_t len = sizeof(peer);
-  getpeername(client_fd, (struct sockaddr*)&peer, &len);
-  char ip[INET_ADDRSTRLEN];
-  inet_ntop(AF_INET, &peer.sin_addr, ip, sizeof(ip));
-  return ip;
-}
-
-//function should receive and send response
-//limited buf prevents DoS attacks
 //connection closed by client, error and no data received is answered the same way for now
 //recv([...], MSG_PEEK) wouldn't consume the buffer
-void handle_client(int client_fd, const char *response)
+int handle_request(int client_fd, t_parse_data &client_infos)
 {
-    char buf[4096];
-    int bytes_received = recv(client_fd, buf, sizeof(buf) - 1, 0);
-    if (bytes_received <= 0)
-      return (close(client_fd), void());
-    buf[bytes_received] = '\0';
-    print("--- HTTP REQUEST ---\n");
-    print(buf);
-    if (send(client_fd, response, strlen(response), 0) == ERROR)
-      print_error("Failed to send response to " + get_sender_ip(client_fd));
-    close(client_fd);
+  char            buf[1024];
+  int             bytes_received = recv(client_fd, buf, sizeof(buf) - 1, 0);
+  std::string     request_packet(buf);
+  t_response_data data;
+
+  if (bytes_received <= 0)
+    return ERROR;
+  buf[bytes_received] = '\0';
+  print("--- HTTP REQUEST ---\n");
+  print(buf);
+
+  std::string chunked_request(buf);
+  if (!client_infos.request.parseRequest(chunked_request))
+    return ERROR;
+  client_infos.response = client_infos.request.executeRequest(*client_infos.server);
+  if (client_infos.response.empty())
+    return ERROR;
+  return SUCCESS;
 }
+
+int send_response(int client_fd, std::string &response)
+{
+  ssize_t bytes_sent = send(client_fd, response.data(), response.size(), 0);
+  if (bytes_sent == ERROR && errno != EAGAIN)
+    return print_error("Failed to send response"), ERROR;
+  if (bytes_sent == (ssize_t)response.size())
+    return SUCCESS;
+  if (bytes_sent > 0)
+    response.erase(0, bytes_sent);
+  return UNFINISHED;
+}
+

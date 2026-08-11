@@ -10,6 +10,9 @@ void    Set_variable::add_in_var(const std::string line, size_t posi, std::strin
     posi = put_index_after_space(line, posi);
     for (; posi < line.length(); posi++) {
         if (line[posi] == ';' || line[posi] == ' ' || line[posi] == '{') {
+            if (at_replace[0] == "/" && at_replace->length() == 1) {
+                *at_replace = "";
+            }
             return ;
         } else if (line[posi] >= 33 && line[posi] <= 126) {
             *at_replace += line[posi];
@@ -40,6 +43,7 @@ void    Set_variable::add_in_var(const std::string line, size_t posi, int *at_re
             tmp_val += line[posi];
         } else {
             *at_replace = -1;
+            return ;
         }
     }
     print_error_conf(NO_SEMICOLON);
@@ -74,8 +78,9 @@ void    Set_variable::add_in_var(const std::string line, size_t posi, std::vecto
     posi = put_index_after_space(line, posi);
     for (; posi < line.length(); posi++) {
         if (line[posi] == ';' || line[posi] == '{') {
-            if (!line.empty())
+            if (!line.empty()) {
                 at_replace->push_back(tmp_val);
+            }
             return ;
         } else if (line[posi] == ' ') {
             at_replace->push_back(tmp_val);
@@ -111,6 +116,43 @@ void        Set_variable::add_in_var(const std::string line, size_t posi, std::v
             tmp_val += line[posi];
         } else {
             break ;
+        }
+    }
+    print_error_conf(NO_SEMICOLON);
+    print(line);
+    return ;
+}
+// step 0 look the int / step 1 look the path html
+void    Set_variable::add_in_var(const std::string line, size_t posi, std::map<int, std::string> *at_replace) {
+    std::string tmp_val_s;
+    int         tmp_val_i = 0;
+    int         step = 0;
+    posi = put_index_after_space(line, posi);
+    for (; posi < line.length(); posi++) {
+        if (step == 0) {
+            if (line[posi] == ' ') {
+                tmp_val_i = to_int(tmp_val_s);
+                tmp_val_s.clear();
+                posi = put_index_after_space(line, posi) - 1;
+                step = 1;
+                continue ;
+            } else if (line[posi] == ';') {
+                print_error_conf(VALUE_IS_NOT_CORRECT);
+            } else if (line[posi] >= '0' && line[posi] <= '9') {
+                tmp_val_s += line[posi];
+                continue ;
+            } else {
+                print_error_conf(VALUE_IS_NOT_INT);
+                //at_replace[-1] = std::string("ERROR");
+                return ;
+            }
+        } else if (step == 1) {
+            if (line[posi] == ';') {
+                (*at_replace)[tmp_val_i] = tmp_val_s;
+                return ;
+            } else {
+                tmp_val_s += line[posi];
+            }
         }
     }
     print_error_conf(NO_SEMICOLON);

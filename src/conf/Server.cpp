@@ -2,7 +2,7 @@
 #include "conf/Server.hpp"
 
 Server::Server() {
-    this->_listening_port = ERROR;
+    this->_port_listen = ERROR;
 }
 
 
@@ -14,7 +14,7 @@ bool    Server::parse_server(std::ifstream *fd_file) {
         if ((posi = line.find("#")) != std::string::npos) {
             continue ;
         } else if ((posi = line.find("}")) != std::string::npos) {
-            return ;
+            return (true);
         } else if ((posi = line.find("port ")) != std::string::npos) {
             this->set.add_in_var(line, posi + 5, &this->_port_listen);
             if (this->get_port_listen() == ERROR || this->get_server_name().empty() || this->get_location().empty()) {
@@ -24,7 +24,7 @@ bool    Server::parse_server(std::ifstream *fd_file) {
                 return (true);
             }
         } else if ((posi = line.find("listen ")) != std::string::npos) {
-            this->set.add_in_var(line, posi + 7, &this->_listening_port);
+            this->set.add_in_var(line, posi + 7, &this->_port_listen);
         } else if ((posi = line.find("location ")) != std::string::npos) {
             size_t endposi;
             if ((endposi = line.find("{", posi + 9)) != std::string::npos) {
