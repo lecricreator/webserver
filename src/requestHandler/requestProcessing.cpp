@@ -66,11 +66,22 @@ static void print_response_data(const t_response_data &data)
 t_response_data httpRequest::generateResponseData(const Server &server, const bool &is_cgi_script)
 {
   t_response_data data;
-  int             status_code;
+  int             status_code = 200;
 
-  status_code = is_cgi_script ? cgi(_path, data) : getRequest(server, data);
+  if (_method == "GET")
+  {
+	if (is_cgi_script)
+		status_code = cgi(_path, data);
+	else
+		status_code = getRequest(server, data);
+  }
+  //POST method is implemented/called in the parsing therefore not needed here
+  if (_method == "DELETE")
+  {
+	status_code = deleteRequest();
+  }
+
   data.status = to_str((int)status_code) + " " + code_to_string(status_code);
-  print_response_data(data);
   if (data.status == "301 Moved Permanently")
     data.location = _path + "/";
   if (!is_response_data_valid(data))

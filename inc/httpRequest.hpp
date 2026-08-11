@@ -99,10 +99,10 @@ class httpRequest
     t_response_data generateResponseData(const Server &server, const bool &is_cgi_script);
 
 		//postRequest
-		int	postRequest();
+		//int	postRequest();
 
 		//deleteRequest
-		bool	deleteRequest();//not implemented
+		unsigned int	deleteRequest();//not implemented
 
 		//requestProcessing
 
