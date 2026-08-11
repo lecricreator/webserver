@@ -35,6 +35,7 @@ class Location {
         std::string                 _charset;
         std::string                 _expires;
         bool                        _is_cgi_py;
+        bool                        _autoindex;
     public:
         Location();
         bool                        parse_location(std::ifstream *fd_file, const std::string pline, size_t posi);

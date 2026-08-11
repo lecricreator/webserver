@@ -5,6 +5,7 @@
 
 Location::Location() {
     this->_is_cgi_py = false;
+    this->_autoindex = false;
 }
 
 bool    Location::parse_location(std::ifstream *fd_file, const std::string pline, size_t posi) {
@@ -18,6 +19,8 @@ bool    Location::parse_location(std::ifstream *fd_file, const std::string pline
             continue ;
         } else if ((posi = line.find("root ")) != std::string::npos) {
             this->set.add_in_var(line, posi + 5, &this->_root);
+        } else if ((posi = line.find("autoindex ")) != std::string::npos) {
+            this->set.add_in_var(line, posi + 10, &this->_autoindex);
         } else if ((posi = line.find("index ")) != std::string::npos) {
             this->set.add_in_var(line, posi + 6, &this->_index);
         } else if ((posi = line.find("is_cgi_py ")) != std::string::npos) {

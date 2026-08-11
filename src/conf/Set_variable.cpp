@@ -5,6 +5,7 @@ void    Set_variable::add_in_var(const std::string line, size_t posi, std::strin
     if (!at_replace->empty()) {
         print_error_conf(VALUE_NOT_EMPTY);
         print(line);
+        print("old value is :" + *at_replace);
         return ;
     }
     posi = put_index_after_space(line, posi);
@@ -30,6 +31,7 @@ void    Set_variable::add_in_var(const std::string line, size_t posi, int *at_re
     if (*at_replace != -1) {
         print_error_conf(VALUE_NOT_EMPTY);
         print(line);
+        print("old value is :" + *at_replace);
         return ;
     }
 
@@ -57,7 +59,7 @@ void    Set_variable::add_in_var(const std::string line, size_t posi, bool *at_r
         print_error_conf(VALUE_NOT_EMPTY);
         print(line);
         return ;
-    } else if ((posi = line.find("on")) != std::string::npos) {
+    } else if ((posi = line.find("on")) != std::string::npos || (posi = line.find("true")) != std::string::npos) {
         *at_replace = true;
     }
     if ((posi = line.find(";")) != std::string::npos) {
@@ -72,6 +74,7 @@ void    Set_variable::add_in_var(const std::string line, size_t posi, std::vecto
     if (!at_replace->empty()) {
         print_error_conf(VALUE_NOT_EMPTY);
         print(line);
+        print("old value is :" + (*at_replace)[0]);
         return ;
     }
     std::string tmp_val;
