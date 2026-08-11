@@ -49,6 +49,7 @@ class Location {
         const std::string&              get_root() const {return (_root);};
         const std::vector<std::string>& get_index() const {return (_index);};
         const std::string&              get_path_location() const {return (_path_location);};
+        const bool&                     get_autoindex() const {return (_autoindex);};
 
 };
 
