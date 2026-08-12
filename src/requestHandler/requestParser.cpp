@@ -286,7 +286,7 @@ bool	httpRequest::checkPath()
 		return false;
 	}
 	if (_path.find("/../") != std::string::npos
-	|| _path.rfind("/..") == _path.length() - 3
+	|| (_path.length() >= 3 && _path.rfind("/..") == _path.length() - 3)
 	|| _path == "/.." || _path == "..")
 	{
 		setErrorCode(400);
