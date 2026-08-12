@@ -89,7 +89,7 @@ std::string httpRequest::executeRequest(const Server &server)
 
   data = generateResponseData(server);
 
-  bool debug = true;
+  bool debug = false;
   if (debug)
     print_response_data(data);
 
