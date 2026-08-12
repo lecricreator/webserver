@@ -33,7 +33,7 @@ SOCKET_FILES:=	create_listening_socket.cpp manage_clients.cpp \
 								support.cpp epoll.cpp
 CONF_FILES	:=	Conf.cpp Server.cpp Events.cpp Location.cpp Set_variable.cpp
 CGI_FILES		:=	execute.cpp parse.cpp cgi.cpp set_cgi_env.cpp is_cgi.cpp
-HTTP_FILES	:=	delete.cpp get.cpp httpRequest.cpp post.cpp requestParser.cpp requestProcessing.cpp
+HTTP_FILES	:=	delete.cpp get.cpp httpRequest.cpp post.cpp requestParser.cpp requestProcessing.cpp create_response.cpp
 
 #connect folder and file of src
 SRC_FILES		:=	$(addprefix $(SOCKET_DIR)/, $(SOCKET_FILES)) \
