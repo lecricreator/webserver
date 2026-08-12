@@ -54,7 +54,7 @@ static bool  get_file_location(std::string &file_location,
   return true;
 }
 
-static std::string copy_file_to_str(std::ifstream &file)
+std::string copy_file_to_str(std::ifstream &file)
 {
   std::string   line;
   std::string   copy;
