@@ -31,8 +31,10 @@ int handle_request(int client_fd, t_parse_data &client_infos)
   print(buf);
 
   std::string chunked_request(buf);
+  print("TEST");
   if (!client_infos.request.parseRequest(chunked_request))
-    return ERROR;
+    return print((int)client_infos.request.getErrorCode()), ERROR;
+  print("TEST");
   client_infos.response = client_infos.request.executeRequest(*client_infos.server);
   if (client_infos.response.empty())
     return ERROR;

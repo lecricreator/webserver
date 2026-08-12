@@ -1,21 +1,5 @@
 #include "cgi.hpp"
 
-/*
-int is_content_type_implemented(const std::string &content_type)
-{
-	if (content_type.find("text") != std::string::npos)
-		return SUCCESS;
-	return FAILURE;
-}
-
-int is_implemented(const t_response_data &data)
-{
-	if (is_content_type_implemented(data.content_type) == SUCCESS)
-		return SUCCESS;
-	return FAILURE;
-}
-*/
-
 static std::string  get_relative_path(const std::string &path, const std::string &cgi_root)
 {
   size_t      cgi_root_size = cgi_root.size();
@@ -23,18 +7,16 @@ static std::string  get_relative_path(const std::string &path, const std::string
   if (path.compare(1, cgi_root_size, cgi_root))
     return std::string();
   std::string relative_path = path.substr(cgi_root_size + 1);
+  size_t param_pos = relative_path.find("?");
+  if (param_pos != std::string::npos)
+    relative_path.erase(param_pos);
   return (relative_path);
 }
 
 //normally we might reuse the body of other codes than 200 but we can simplify
-int cgi(const std::string &path, t_response_data &data)
+int cgi(const std::string &path, t_response_data &data, char *env[])
 {
 	std::string cgi_output;
-	char *env[] = {
-			(char*)"REQUEST_METHOD=GET",
-			(char*)"QUERY_STRING=name=Alice",
-			NULL
-	};
 
   std::string relative_path = get_relative_path(path, CGI_ROOT);
   if (relative_path.empty())

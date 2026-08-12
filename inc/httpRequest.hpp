@@ -96,13 +96,13 @@ class httpRequest
 
 		//getRequest
     unsigned int    getRequest(const Server &server, t_response_data &data);
-    t_response_data generateResponseData(const Server &server, const bool &is_cgi_script);
+    t_response_data generateResponseData(const Server &server);
 
 		//postRequest
-		int	postRequest();
+		//int	postRequest();
 
 		//deleteRequest
-		bool	deleteRequest();//not implemented
+		unsigned int	deleteRequest();//not implemented
 
 		//requestProcessing
 
@@ -123,12 +123,15 @@ class httpRequest
 		bool	        parseRequest(std::string& str);
     	std::string	  	executeRequest(const Server &server);
 
-    char	        **set_cgi_env();
+    char	        **set_cgi_env(const std::string &script_name);
 };
 
 std::string code_to_string(const unsigned int code);
 int			ft_stoi(std::string n);
 int 		hexToInt(const std::string& hexStr);
-int     cgi(const std::string &path, t_response_data &data);
+int     cgi(const std::string &path, t_response_data &data, char *env[]);
+void    free_env(char** env);
+std::string copy_file_to_str(std::ifstream &file);
+std::string create_response(const t_response_data &data);
 
 #endif
