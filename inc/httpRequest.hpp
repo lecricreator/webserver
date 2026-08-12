@@ -132,5 +132,6 @@ int 		hexToInt(const std::string& hexStr);
 int     cgi(const std::string &path, t_response_data &data, char *env[]);
 void    free_env(char** env);
 std::string copy_file_to_str(std::ifstream &file);
+std::string create_response(const t_response_data &data);
 
 #endif
