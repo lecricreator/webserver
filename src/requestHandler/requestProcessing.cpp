@@ -75,6 +75,8 @@ t_response_data httpRequest::generateResponseData(const Server &server)
       std::string copy_file_to_str(std::ifstream &file);
     }
   }
+  if (data.status != "200 OK" && data.body.empty())
+    data.body = "<body style=\"background-color: green;\"><h1 style=\"position: absolute; left: 20%; top: 30%; text-align: center;color:red; transform: rotate(150deg);\">" + data.status + "</h1></body>\n";
   return data;
 }
 
@@ -93,8 +95,6 @@ std::string httpRequest::executeRequest(const Server &server)
   if (debug)
     print_response_data(data);
 
-  if (data.status != "200 OK" && data.body.empty())
-    data.body = "<body style=\"background-color: green;\"><h1 style=\"position: absolute; left: 20%; top: 30%; text-align: center;color:red; transform: rotate(150deg);\">" + data.status + "</h1></body>\n";
   response = create_response(data);
   return response;
 }
