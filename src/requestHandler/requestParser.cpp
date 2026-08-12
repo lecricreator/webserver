@@ -44,7 +44,7 @@ bool	httpRequest::parseChunkData()
 		setErrorCode(400);
 		return false;
 	}
-	_body.append(_requestBuffer.substr(0, trueSize));
+	//_body.append(_requestBuffer.substr(0, trueSize));
 	if (write(_fileFd, _requestBuffer.substr(0, trueSize).c_str(), trueSize) != -1)
 		_bytesWritten += trueSize;
 	else
@@ -130,7 +130,7 @@ bool	httpRequest::parseFixedLength()
 	while (_requestBuffer[i])
 	{
 		bytesRead++;
-		_body += _requestBuffer[i];
+		//_body += _requestBuffer[i];
 		if (write(_fileFd, &_requestBuffer[i], 1) != -1)
 			_bytesWritten++;
 		else
@@ -288,7 +288,10 @@ bool	httpRequest::checkPath()
 	if (_path.find("/../") != std::string::npos
 	|| _path.rfind("/..") == _path.length() - 3
 	|| _path == "/.." || _path == "..")
+	{
+		setErrorCode(400);
 		return false;
+	}
 	if (!isValidUriString(_path))
 	{
 		setErrorCode(400);

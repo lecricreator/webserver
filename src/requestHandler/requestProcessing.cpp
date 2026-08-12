@@ -70,13 +70,23 @@ t_response_data httpRequest::generateResponseData(const Server &server)
   std::string     script_name;
   bool            is_cgi_script = is_cgi(_path, script_name);
 
-  if (status_code == 200)
+  if (_method == "GET")
+  {
+	if (is_cgi_script)
   {
     char **env = set_cgi_env(script_name);
-    status_code = is_cgi_script ? cgi(_path, data, env) : getRequest(server, data);
+		status_code = cgi(_path, data);
   }
+	else
+		status_code = getRequest(server, data);
+  }
+  //POST method is implemented/called in the parsing therefore not needed here
+  if (_method == "DELETE")
+  {
+	status_code = deleteRequest();
+  }
+
   data.status = to_str((int)status_code) + " " + code_to_string(status_code);
-  print_response_data(data);
   if (data.status == "301 Moved Permanently")
     data.location = _path + "/";
   if (!is_response_data_valid(data))
