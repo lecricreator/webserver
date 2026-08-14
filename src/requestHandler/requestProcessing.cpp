@@ -21,7 +21,10 @@ static bool is_response_data_valid(t_response_data &data)
   bool location = !data.location.empty();
   bool body = !data.body.empty();
 
-  bool is_200 = data.status == "200 OK" && content_type && !location;
+  bool has_body = content_type && body;
+  bool has_no_body = !content_type && !body;
+
+  bool is_200 = data.status == "200 OK" && !location && (has_body || has_no_body);
   bool is_301 = data.status == "301 Moved Permanently" && location;
 
   bool is_valid = status && (is_200 || (!content_type && !body && (is_301 || (!is_301 && !location))));
