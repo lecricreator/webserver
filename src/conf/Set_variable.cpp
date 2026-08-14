@@ -10,9 +10,9 @@ void    Set_variable::add_in_var(const std::string line, size_t posi, std::strin
     posi = put_index_after_space(line, posi);
     for (; posi < line.length(); posi++) {
         if (line[posi] == ';' || line[posi] == ' ' || line[posi] == '{') {
-            if (at_replace[0] == "/" && at_replace->length() == 1) {
+            /*if (at_replace[0] == "/" && at_replace->length() == 1) {
                 *at_replace = "";
-            }
+            } this is inconsistent, if one wants to get / they're forced to make a special case */
             return ;
         } else if (line[posi] >= 33 && line[posi] <= 126) {
             *at_replace += line[posi];

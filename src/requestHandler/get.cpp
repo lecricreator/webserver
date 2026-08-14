@@ -49,7 +49,7 @@ static std::string  get_absolute_path(const Location &location, std::string &pat
   std::string location_root = location.get_root();
   std::string current_path = location.get_path_location();
 
-  if (current_path + "/" == path)
+  if (current_path + "/" == path || (current_path == "/" && path == current_path))
     path += location.get_index()[0];
   std::string absolute_path = location_root + path;
   return absolute_path;
@@ -69,9 +69,14 @@ std::string copy_file_to_str(std::ifstream &file)
   return copy;
 }
 
+static bool is_dir(const std::string &file)
+{
+  return file[file.size() - 1] == '/';
+}
+
 static bool should_redirect(const Location &location, const std::string &path)
 {
-  return location.get_path_location() == path;
+  return location.get_path_location() == path && !is_dir(path);
 }
 
 static int validate_file(const Server &server, std::string &path, std::ifstream &file)

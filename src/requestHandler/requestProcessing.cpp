@@ -31,7 +31,6 @@ static bool is_response_data_valid(t_response_data &data)
   return is_valid;
 }
 
-
 t_response_data httpRequest::generateResponseData(const Server &server)
 {
   t_response_data data;
