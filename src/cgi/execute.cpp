@@ -15,12 +15,19 @@ static void  execute_child(std::string path, int stdin_pipe[2], int stdout_pipe[
   exit(ERROR);
 }
 
+size_t ft_strlen(const char *s)
+{
+  const char *start = s;
+  while (*s) s++;
+  return s - start;
+}
+
 //return SUCCESS even if cgi_data is empty
 static int write_to_child(char *cgi_data, int stdin_pipe[2], int stdout_pipe[2])
 {
   if (cgi_data && cgi_data[0])
   {
-    ssize_t len = strlen(cgi_data);
+    ssize_t len = ft_strlen(cgi_data);
     if (write(stdin_pipe[1], cgi_data, len) != len)
     {
       close(stdin_pipe[1]);
