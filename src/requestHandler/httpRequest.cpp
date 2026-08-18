@@ -206,11 +206,16 @@ std::string code_to_string(const unsigned int code) {
     }
 }
 
+static int is_digit(char c)
+{
+  return (c >= '0' && c <= '9');
+}
+
 int	ft_stoi(std::string str)
 {
 	for (size_t i = 0; i < str.size(); i++)
 	{
-		if (!isdigit(str[i]))
+		if (!is_digit(str[i]))
 			return -1;
 	}
 	std::stringstream	ss;
