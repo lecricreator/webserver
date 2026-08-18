@@ -206,7 +206,7 @@ std::string code_to_string(const unsigned int code) {
     }
 }
 
-static int is_digit(char c)
+static bool is_digit(char c)
 {
   return (c >= '0' && c <= '9');
 }
