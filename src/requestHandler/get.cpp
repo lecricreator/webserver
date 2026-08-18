@@ -43,7 +43,7 @@ static bool  get_file_location(std::string &file_location,
 
 		if (current_path == target_path && !is_target_path_a_dir)
 			return false;
-		else if (current_path + "/" == target_path)
+		else if (current_path + "/" == target_path && !it_location->get_index().empty())
 		{
       target_path += it_location->get_index()[0];
       break ;
@@ -75,7 +75,7 @@ std::string listing_directory(const Server &server, std::string _path) {
   std::string path_directory = "www" + _path;
   folder = opendir(path_directory.c_str());
   struct dirent *entry;
-  std::string body = "<body style=\"background-color: purple;\"> <h1 style=\"text-align: center;color: white\">Mais bien le bonsoir venerable grand maistre !!!</h1></body>";
+  std::string body = "<body style=\"background-color: pink;\"> <h1 style=\"text-align: center;color: purple\">Mais bien le bonsoir venerable grand maistre !!!</h1></body>";
   body += "<h2>Voici vos fichier qui sont dans l'index de ";
   body += _path;
   body += ":</h2><hr><pre style=\"line-height: 20px;\"><ul>";
@@ -117,10 +117,10 @@ static int validate_file(const Server &server, std::string &path, std::ifstream 
         total_path = current_path + "/";
       }
     	if (total_path == path && !is_target_path_a_dir && it_location->get_autoindex()) {
-		  	return 1001;
+		  	return 0;
       }
 		  else if (total_path == path && it_location->get_autoindex()) {
-		  	return 1001;
+		  	return 0;
       }
     }
 		return 404;
@@ -141,7 +141,7 @@ unsigned int	httpRequest::getRequest(const Server &server, t_response_data &data
   if (status_code == 200) {
     data.content_type = choice_content_type(path);
     data.body = copy_file_to_str(file);
-  } else if (status_code == 1001) {
+  } else if (status_code == 0) {
     data.body = listing_directory(server, _path);
     data.content_type = "text/html";
     status_code = 200;
