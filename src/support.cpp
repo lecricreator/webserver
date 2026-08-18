@@ -55,3 +55,11 @@ void	      print_bool(bool value)
   else
     std::cout << "false" << std::endl;
 }
+
+void *ft_memset(void *s, int c, size_t n)
+{
+    unsigned char *p = (unsigned char *)s;
+    for (size_t i = 0; i < n; i++)
+        p[i] = (unsigned char)c;
+    return s;
+}

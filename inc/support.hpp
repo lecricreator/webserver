@@ -14,3 +14,4 @@ void    print(char c);
 void    print_bool(bool value);
 void		print_error(std::string str);
 int     to_int(std::string str);
+void    *ft_memset(void *s, int c, size_t n);
