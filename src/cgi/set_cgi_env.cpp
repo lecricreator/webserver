@@ -1,5 +1,17 @@
 #include "webserv.hpp"
 
+char *ft_strcpy(char *dst, const char *src)
+{
+  size_t i = 0;
+  while (src[i])
+  {
+    dst[i] = src[i];
+    i++;
+  }
+  dst[i] = '\0';
+  return dst;
+}
+
 static char** vector_to_env(const std::vector<std::string>& vec)
 {
   const std::size_t size = vec.size();
@@ -10,7 +22,7 @@ static char** vector_to_env(const std::vector<std::string>& vec)
     const std::string& s = vec[i];
     const std::size_t len = s.length();
     env[i] = new char[len + 1];
-    std::strcpy(env[i], s.c_str());
+    ft_strcpy(env[i], s.c_str());
   }
   env[size] = NULL;
   return env;
