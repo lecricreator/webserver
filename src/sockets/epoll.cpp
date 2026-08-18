@@ -91,7 +91,7 @@ int manage_events(std::map<int, Server> &servers, Conf &conf_c)
     if (nfds == ERROR)
     {
       if (errno == EINTR) continue;
-      perror("epoll_wait");
+      print_error("epoll_wait");
       return ERROR;
     }
     for (int i = 0; i < nfds; i++)
