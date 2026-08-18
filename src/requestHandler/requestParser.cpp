@@ -2,6 +2,11 @@
 
 /**********************************************************************************************/
 
+static bool is_hex_digit(char c)
+{
+  return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'Z');
+}
+
 bool	httpRequest::parseHexSize()
 {
 	size_t		crlf = _requestBuffer.find("\r\n");
@@ -14,7 +19,7 @@ bool	httpRequest::parseHexSize()
 	}
 	for (size_t i = 0; i < crlf; i++)
 	{
-		if (!isxdigit(_requestBuffer[i]))
+		if (!is_hex_digit(_requestBuffer[i]))
 		{
 			if (i > 0 && _requestBuffer[i] == ';')
 				break;
@@ -262,7 +267,7 @@ std::string httpRequest::decodePath()
 bool httpRequest::isValidPercentEncoding(const std::string& path) {
     for (size_t i = 0; i < path.length(); i++) {
         if (path[i] == '%') {
-            if (i + 2 >= path.length() || !isxdigit(path[i+1]) || !isxdigit(path[i+2]))
+            if (i + 2 >= path.length() || !is_hex_digit(path[i+1]) || !is_hex_digit(path[i+2]))
                 return false;
             i += 2;  // skip the two hex digits
         }
