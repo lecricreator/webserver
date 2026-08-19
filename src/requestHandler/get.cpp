@@ -141,6 +141,10 @@ static int validate_file(const Server &server, std::string &path, std::ifstream 
     return 301;
   std::string absolute_path = get_absolute_path(location_of_path, path);
 
+  size_t argument_pose = absolute_path.find('?');
+  if (argument_pose != std::string::npos)
+    absolute_path.erase(argument_pose);
+
 	file.open(absolute_path.c_str());
 	if (access(absolute_path.c_str(), F_OK) == -1)
 		return 404;
@@ -156,17 +160,15 @@ unsigned int	httpRequest::getRequest(const Server &server, t_response_data &data
   bool          is_favicon = get_extension(_path) == "ico";
   std::string   path = is_favicon ? "/favicon.ico" : _path;
 
-  std::string     script_name;
-  bool            is_cgi_script = is_cgi(_path, script_name);
 
   int status_code = validate_file(server, path, file);
   if (status_code == 200) {
-    if (is_cgi_script) {
+    std::string script_name;
+    if (is_cgi(_path, script_name)) {
       char **env = set_cgi_env(script_name);
       status_code = cgi(_path, data, env);
       free_env(env);
-    }
-    else {
+    } else {
       data.content_type = choice_content_type(path);
       data.body = copy_file_to_str(file);
     }
