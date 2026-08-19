@@ -120,7 +120,7 @@ class httpRequest
 		void			setErrorCode(unsigned int code);
 		void			printRequest();
 
-		bool	        parseRequest(std::string& str, int bodyMax);
+		int		        parseRequest(std::string& str, int bodyMax);
     	std::string	  	executeRequest(const Server &server);
 
     char	        **set_cgi_env(const std::string &script_name);
