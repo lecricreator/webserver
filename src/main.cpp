@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
     return FAILURE;
   }
   std::map<int, Server> servers = create_server(*conf_c);
-  int status;
+  int status = ERROR;
   if (!servers.empty())
     status = manage_events(servers, *conf_c);
   delete conf_c;

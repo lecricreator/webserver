@@ -5,7 +5,7 @@ void    Set_variable::add_in_var(const std::string line, size_t posi, std::strin
     if (!at_replace->empty()) {
         print_error_conf(VALUE_NOT_EMPTY);
         print(line);
-        print("old value is :" + *at_replace);
+        print("old value is :" + (*at_replace));
         return ;
     }
     posi = put_index_after_space(line, posi);
@@ -31,7 +31,7 @@ void    Set_variable::add_in_var(const std::string line, size_t posi, int *at_re
     if (*at_replace != -1 && *at_replace != 1024) {
         print_error_conf(VALUE_NOT_EMPTY);
         print(line);
-        print("old value is :" + *at_replace);
+        print(std::string("old value is :") + to_str((int)*at_replace));
         return ;
     }
 

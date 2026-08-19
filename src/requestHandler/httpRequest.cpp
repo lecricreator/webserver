@@ -28,7 +28,6 @@ httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
 	_requestBuffer = copy._requestBuffer;
 	_body = copy._body;
 	_method = copy._method;
-	_httpVersion = _httpVersion;
 	_status = copy._status;
 	_errorCode = copy._errorCode;
 	_bodySize = copy._bodySize;
@@ -48,7 +47,6 @@ httpRequest&	httpRequest::operator=(const httpRequest& copy)
 	_requestBuffer = copy._requestBuffer;
 	_body = copy._body;
 	_method = copy._method;
-	_httpVersion = _httpVersion;
 	_status = copy._status;
 	_errorCode = copy._errorCode;
 	_bodySize = copy._bodySize;
