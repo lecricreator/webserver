@@ -26,6 +26,7 @@ CONF_DIR		:=	conf
 CGI_DIR			:=	cgi
 HTTP_DIR		:=	requestHandler
 MODULE_DIRS	:=	$(SOCKET_DIR) $(CONF_DIR) $(CGI_DIR) $(HTTP_DIR)
+UPLOAD_DIR		:=	www/upload
 
 # source files
 ROOT_FILES	:=	main.cpp support.cpp init_conf.cpp
@@ -52,6 +53,7 @@ all: $(NAME)
 
 $(NAME): $(OBJ)
 	$(CC) $(OBJ) -o $@
+	mkdir -p $(UPLOAD_DIR)
 	$(MAKE) compilation_success
 
 # create .o file
@@ -71,6 +73,7 @@ clean:
 fclean: clean
 	rm -f $(NAME)
 	rm -rf $(OBJ_DIR)
+	rm -rf $(UPLOAD_DIR)
 
 re: fclean all
 
