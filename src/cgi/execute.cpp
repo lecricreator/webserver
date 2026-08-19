@@ -11,7 +11,6 @@ static void  execute_child(std::string path, int stdin_pipe[2], int stdout_pipe[
   dup2(stdin_pipe[0], STDIN_FILENO);
   dup2(stdout_pipe[1], STDOUT_FILENO);
   execve(executable, argv, env);
-  free_env(env);
   exit(ERROR);
 }
 

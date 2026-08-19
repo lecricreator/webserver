@@ -35,18 +35,10 @@ t_response_data httpRequest::generateResponseData(const Server &server)
 {
   t_response_data data;
   int             status_code = _errorCode;
-  std::string     script_name;
-  bool            is_cgi_script = is_cgi(_path, script_name);
 
   if (_method == "GET")
   {
-    if (is_cgi_script)
-    {
-      char **env = set_cgi_env(script_name);
-      status_code = cgi(_path, data, env);
-    }
-    else
-      status_code = getRequest(server, data);
+    status_code = getRequest(server, data);
   }
   //POST method is implemented/called in the parsing therefore not needed here
   if (_method == "DELETE")

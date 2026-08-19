@@ -1,4 +1,5 @@
 #include "webserv.hpp"
+#include "cgi.hpp"
 #include <dirent.h>
 
 //line.find("}")) != std::string::npos
@@ -107,6 +108,30 @@ std::string listing_directory(const Server &server, std::string _path) {
   return (body);
 }
 
+static bool exec_listing_dir(const Server &server, const std::string &path)
+{
+  std::vector<Location>::const_iterator it_location;
+  for (it_location = server.get_location().begin(); it_location != server.get_location().end(); it_location++)
+  {
+    std::string current_path = it_location->get_path_location();
+    bool is_target_path_a_dir = path[path.length() - 1] == '/';
+    std::string total_path;
+    std::cout << is_target_path_a_dir << std::endl;
+    if (!it_location->get_index().empty()) {
+      total_path = current_path + "/" + it_location->get_index()[0];
+    } else {
+      total_path = current_path + "/";
+    }
+    if (total_path == path && !is_target_path_a_dir && it_location->get_autoindex()) {
+      return true;
+    }
+    else if (total_path == path && it_location->get_autoindex()) {
+      return true;
+    }
+  }
+  return false;
+}
+
 static int validate_file(const Server &server, std::string &path, std::ifstream &file)
 {
   Location location_of_path = get_location_of_path(server, path);
@@ -118,28 +143,7 @@ static int validate_file(const Server &server, std::string &path, std::ifstream 
 
 	file.open(absolute_path.c_str());
 	if (access(absolute_path.c_str(), F_OK) == -1)
-  {
-    std::vector<Location>::const_iterator it_location;
-    for (it_location = server.get_location().begin(); it_location != server.get_location().end(); it_location++)
-	  {
-      std::string current_path = it_location->get_path_location();
-      bool is_target_path_a_dir = path[path.length() - 1] == '/';
-      std::string total_path;
-      std::cout << is_target_path_a_dir << std::endl;
-      if (!it_location->get_index().empty()) {
-        total_path = current_path + "/" + it_location->get_index()[0];
-      } else {
-        total_path = current_path + "/";
-      }
-    	if (total_path == path && !is_target_path_a_dir && it_location->get_autoindex()) {
-		  	return 0;
-      }
-		  else if (total_path == path && it_location->get_autoindex()) {
-		  	return 0;
-      }
-    }
 		return 404;
-  }
   if (is_dir(absolute_path) || access(absolute_path.c_str(), R_OK) == -1 || !file.is_open())
     return 403;
   return 200;
@@ -152,11 +156,21 @@ unsigned int	httpRequest::getRequest(const Server &server, t_response_data &data
   bool          is_favicon = get_extension(_path) == "ico";
   std::string   path = is_favicon ? "/favicon.ico" : _path;
 
+  std::string     script_name;
+  bool            is_cgi_script = is_cgi(_path, script_name);
+
   int status_code = validate_file(server, path, file);
   if (status_code == 200) {
-    data.content_type = choice_content_type(path);
-    data.body = copy_file_to_str(file);
-  } else if (status_code == 0) {
+    if (is_cgi_script) {
+      char **env = set_cgi_env(script_name);
+      status_code = cgi(_path, data, env);
+      free_env(env);
+    }
+    else {
+      data.content_type = choice_content_type(path);
+      data.body = copy_file_to_str(file);
+    }
+  } else if (status_code == 404 && exec_listing_dir(server, path)) {
     data.body = listing_directory(server, _path);
     data.content_type = "text/html";
     status_code = 200;
