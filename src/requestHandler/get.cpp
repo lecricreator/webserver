@@ -115,8 +115,6 @@ static int validate_file(const Server &server, std::string &path, std::ifstream 
   if (should_redirect(location_of_path, path))
     return 301;
   std::string absolute_path = get_absolute_path(location_of_path, path);
-  if (is_dir(absolute_path))
-    return 403;
 
 	file.open(absolute_path.c_str());
 	if (access(absolute_path.c_str(), F_OK) == -1)
@@ -142,7 +140,7 @@ static int validate_file(const Server &server, std::string &path, std::ifstream 
     }
 		return 404;
   }
-  if (access(absolute_path.c_str(), R_OK) == -1 || !file.is_open())
+  if (is_dir(absolute_path) || access(absolute_path.c_str(), R_OK) == -1 || !file.is_open())
     return 403;
   return 200;
 }
