@@ -21,13 +21,15 @@ static bool is_response_data_valid(t_response_data &data)
   bool location = !data.location.empty();
   bool body = !data.body.empty();
 
-  bool is_200 = data.status == "200 OK" && content_type && !location;
+  bool has_body = content_type && body;
+  bool has_no_body = !content_type && !body;
+
+  bool is_200 = data.status == "200 OK" && !location && (has_body || has_no_body);
   bool is_301 = data.status == "301 Moved Permanently" && location;
 
   bool is_valid = status && (is_200 || (!content_type && !body && (is_301 || (!is_301 && !location))));
   return is_valid;
 }
-
 
 t_response_data httpRequest::generateResponseData(const Server &server)
 {
@@ -75,6 +77,8 @@ t_response_data httpRequest::generateResponseData(const Server &server)
       std::string copy_file_to_str(std::ifstream &file);
     }
   }
+  if (data.status != "200 OK" && data.body.empty())
+    data.body = "<body style=\"background-color: green;\"><h1 style=\"position: absolute; left: 20%; top: 30%; text-align: center;color:red; transform: rotate(150deg);\">" + data.status + "</h1></body>\n";
   return data;
 }
 
@@ -89,12 +93,10 @@ std::string httpRequest::executeRequest(const Server &server)
 
   data = generateResponseData(server);
 
-  bool debug = true;
+  bool debug = false;
   if (debug)
     print_response_data(data);
 
-  if (data.status != "200 OK" && data.body.empty())
-    data.body = "<body style=\"background-color: green;\"><h1 style=\"position: absolute; left: 20%; top: 30%; text-align: center;color:red; transform: rotate(150deg);\">" + data.status + "</h1></body>\n";
   response = create_response(data);
   return response;
 }
