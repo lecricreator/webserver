@@ -1,9 +1,5 @@
 #include "webserv.hpp"
 
-#define URI_MAX 2048
-#define	BODY_MAX 8192
-#define	HEADER_MAX 100
-
 httpRequest::httpRequest() : _headers()
 {
 	_requestBuffer = "";
@@ -21,6 +17,7 @@ httpRequest::httpRequest() : _headers()
     _pathValidated = false;
     _isChunkedPost = false;
     _bytesWritten = 0;
+    _bodyMax = 0;
 }
 
 httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
@@ -28,7 +25,6 @@ httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
 	_requestBuffer = copy._requestBuffer;
 	_body = copy._body;
 	_method = copy._method;
-	_httpVersion = _httpVersion;
 	_status = copy._status;
 	_errorCode = copy._errorCode;
 	_bodySize = copy._bodySize;
@@ -40,6 +36,7 @@ httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
     _pathValidated = copy._pathValidated;
     _isChunkedPost = copy._isChunkedPost;
     _bytesWritten = copy._bytesWritten;
+    _bodyMax = copy._bodyMax;
 }
 
 httpRequest&	httpRequest::operator=(const httpRequest& copy)
@@ -48,7 +45,6 @@ httpRequest&	httpRequest::operator=(const httpRequest& copy)
 	_requestBuffer = copy._requestBuffer;
 	_body = copy._body;
 	_method = copy._method;
-	_httpVersion = _httpVersion;
 	_status = copy._status;
 	_errorCode = copy._errorCode;
 	_bodySize = copy._bodySize;
@@ -60,6 +56,7 @@ httpRequest&	httpRequest::operator=(const httpRequest& copy)
     _pathValidated = copy._pathValidated;
     _isChunkedPost = copy._isChunkedPost;
     _bytesWritten = copy._bytesWritten;
+    _bodyMax = copy._bodyMax;
 	return *this;
 }
 

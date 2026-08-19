@@ -182,6 +182,25 @@ location / {
 a “/” request will actually be processed in the second location as “/index.html”.
 
 
+## autoindex
+The ngx_http_autoindex_module module processes requests ending with the slash character (‘/’) and produces a directory listing. Usually a request is passed to the ngx_http_autoindex_module module when the ngx_http_index_module module cannot find an index file.
+```
+Syntax:	autoindex on | off;
+Default:	
+autoindex off;
+Context:	http, server, location
+```
+Enables or disables the directory listing output. <br>
+Obligatory to add root and the index need to not exist.<br>
+example :
+```
+location / {
+    root www;
+    index _;
+    autoindex on;
+}
+```
+
 ## keepalive_timeout
 ```
 Syntax:	keepalive_timeout timeout [header_timeout];
@@ -216,6 +235,15 @@ Usage example:
 include mime.types;
 include vhosts/*.conf;
 ```
+
+## client_max_body_size
+```SH
+Syntax:	client_max_body_size size;
+Default:	
+client_max_body_size 1m;
+Context:	http, server, location (on this project only in server)
+```
+Sets the maximum allowed size of the client request body. If the size in a request exceeds the configured value, the 413 (Request Entity Too Large) error is returned to the client. Please be aware that browsers cannot correctly display this error. Setting size to 0 disables checking of client request body size.
 
 ## access_log
 ```

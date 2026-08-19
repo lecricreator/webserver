@@ -67,7 +67,7 @@ bool	httpRequest::parseChunked()
 	}
 	while (_requestBuffer.find("\r\n") != std::string::npos)
 	{
-		if (_bytesWritten > BODY_MAX)
+		if (_bytesWritten > (size_t)_bodyMax)
 		{
 			setErrorCode(413); //413 Payload too large
 			return false;
@@ -118,7 +118,7 @@ bool	httpRequest::parseFixedLength()
 			std::cout << "calling close() with return code " << close(_fileFd) << "\n";
 			return true;
 		}
-		if (_bodySize > BODY_MAX)
+		if (_bodySize > _bodyMax)
 		{
 			setErrorCode(413); //413 Payload too large
 			return false;
@@ -398,8 +398,9 @@ bool	httpRequest::parseStartLine(std::string &startLine)
  * It is then up to the function that called parseRequest()
  * to check the error code and handle it appropriately.
   */
-bool	httpRequest::parseRequest(std::string& str)
+bool	httpRequest::parseRequest(std::string& str, int bodyMax)
 {
+	_bodyMax = bodyMax;
 	_requestBuffer.append(str);
 	if (_status == REQ_START_LINE)
 	{

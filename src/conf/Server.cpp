@@ -3,6 +3,7 @@
 
 Server::Server() {
     this->_port_listen = ERROR;
+    this->_client_max_body_size = 1024;
 }
 
 
@@ -52,6 +53,8 @@ bool    Server::parse_server(std::ifstream *fd_file) {
             this->set.add_in_var(line, posi + 11, &this->_access_log);
         } else if ((posi = line.find("error_page ")) != std::string::npos) {
             this->set.add_in_var(line, posi + 11, &this->_error_page);
+        } else if ((posi = line.find("client_max_body_size ")) != std::string::npos) {
+            this->set.add_in_var(line, posi + 21, &this->_client_max_body_size);
         }
     }
     print_error_conf(NO_END_BRACKET_SERVER);
