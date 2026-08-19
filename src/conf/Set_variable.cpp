@@ -28,7 +28,7 @@ void    Set_variable::add_in_var(const std::string line, size_t posi, std::strin
 }
 
 void    Set_variable::add_in_var(const std::string line, size_t posi, int *at_replace) {
-    if (*at_replace != -1) {
+    if (*at_replace != -1 && *at_replace != 1024) {
         print_error_conf(VALUE_NOT_EMPTY);
         print(line);
         print("old value is :" + *at_replace);
