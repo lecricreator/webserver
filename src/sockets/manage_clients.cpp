@@ -31,7 +31,7 @@ int handle_request(int client_fd, t_parse_data &client_infos)
   print(buf);
 
   std::string chunked_request(buf);
-  if (!client_infos.request.parseRequest(chunked_request))
+  if (!client_infos.request.parseRequest(chunked_request, client_infos.server->get_client_max_body_size()))
     return print((int)client_infos.request.getErrorCode()), ERROR;
   client_infos.response = client_infos.request.executeRequest(*client_infos.server);
   if (client_infos.response.empty())

@@ -20,7 +20,6 @@
 # include <map>
 
 #define URI_MAX 2048
-#define	BODY_MAX 8192 //use conf file to set this value instead of define
 #define	HEADER_MAX 100
 
 
@@ -67,6 +66,7 @@ class httpRequest
 		unsigned int	_errorCode;
 		int				_bodySize;
 		int				_chunkSize;
+		int				_bodyMax;
 
 		//post request variables
 		int		_fileFd;
@@ -120,7 +120,7 @@ class httpRequest
 		void			setErrorCode(unsigned int code);
 		void			printRequest();
 
-		bool	        parseRequest(std::string& str);
+		bool	        parseRequest(std::string& str, int bodyMax);
     	std::string	  	executeRequest(const Server &server);
 
     char	        **set_cgi_env(const std::string &script_name);
