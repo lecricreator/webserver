@@ -163,6 +163,8 @@ bool	httpRequest::parseBody()
 	{
 		if (!parseFixedLength())
 			return false;
+		std::cout << "status: " << _status << "\n";
+		std::cout << "REQ_PARSED: " << REQ_PARSED << "\n";
 		return true;
 	}
 	else
@@ -398,29 +400,32 @@ bool	httpRequest::parseStartLine(std::string &startLine)
  * It is then up to the function that called parseRequest()
  * to check the error code and handle it appropriately.
   */
-bool	httpRequest::parseRequest(std::string& str, int bodyMax)
+int	httpRequest::parseRequest(std::string& str, int bodyMax)
 {
 	_bodyMax = bodyMax;
+	if (!_requestBuffer.empty())
+		_requestBuffer.clear();
 	_requestBuffer.append(str);
+	//print(_requestBuffer);
 	if (_status == REQ_START_LINE)
 	{
 		if (_requestBuffer.size() > URI_MAX)
 		{
 			setErrorCode(414); //414 URI too long
-			return false;
+			return ERROR;
 		}
 		if (_requestBuffer.find("\r\n") != std::string::npos)
 		{
 			std::string	startLine = _requestBuffer.substr(0, _requestBuffer.find("\r\n"));
 			_requestBuffer.erase(0, _requestBuffer.find("\r\n") + 2);
 			if (!parseStartLine(startLine))
-				return false;
+				return ERROR;
 		}
 	}
 	if (_status == REQ_HEADERS)
 	{
 		if (!parseHeaders())
-			return false;
+			return ERROR;
 	}
 	if (_status == REQ_BODY) //Now parses and writes to a file at the same time instead of storing everything in ram
 	{
@@ -439,8 +444,10 @@ bool	httpRequest::parseRequest(std::string& str, int bodyMax)
 		if (!parseBody())
 		{
 			remove(_path.c_str());
-			return false;
+			return ERROR;
 		}
 	}
-	return true;
+	if (_status == REQ_PARSED)
+		return SUCCESS;
+	return UNFINISHED;
 }
