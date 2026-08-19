@@ -28,31 +28,32 @@ static std::string  choice_content_type(std::string path) {
     return (content_type);
 }
 
-static bool  get_file_location(std::string &file_location,
-                        std::string &target_path, const Server &server)
+Location get_location_of_path(const Server &server, const std::string &path)
 {
 	std::vector<Location>::const_iterator it_location;
-  std::string location_root;
+  std::string                           longest_subpath;
+  Location                              location_of_path;
 
 	for (it_location = server.get_location().begin(); it_location != server.get_location().end(); it_location++)
 	{
-    location_root = it_location->get_root();
-    std::string current_path = it_location->get_path_location();
+    std::string subpath = it_location->get_path_location();
+    if (subpath.size() < longest_subpath.size() || path.compare(0, subpath.size(), subpath))
+      continue ;
+    longest_subpath = subpath;
+    location_of_path = *it_location;
+  }
+  return location_of_path;
+}
 
-    bool is_target_path_a_dir = target_path[target_path.length() - 1] == '/';
+static std::string  get_absolute_path(const Location &location, std::string &path)
+{
+  std::string location_root = location.get_root();
+  std::string current_path = location.get_path_location();
 
-		if (current_path == target_path && !is_target_path_a_dir)
-			return false;
-		else if (current_path + "/" == target_path && !it_location->get_index().empty())
-		{
-      target_path += it_location->get_index()[0];
-      break ;
-		}
-		else
-        continue ;
-	}
-  file_location = location_root + target_path;
-  return true;
+  if (current_path + "/" == path || (current_path == "/" && path == current_path))
+    path += location.get_index()[0];
+  std::string absolute_path = location_root + path;
+  return absolute_path;
 }
 
 std::string copy_file_to_str(std::ifstream &file)
@@ -67,6 +68,16 @@ std::string copy_file_to_str(std::ifstream &file)
       copy += '\n';
   }
   return copy;
+}
+
+static bool is_dir(const std::string &file)
+{
+  return file[file.size() - 1] == '/';
+}
+
+static bool should_redirect(const Location &location, const std::string &path)
+{
+  return location.get_path_location() == path && !is_dir(path);
 }
 
 std::string listing_directory(const Server &server, std::string _path) {
@@ -98,12 +109,18 @@ std::string listing_directory(const Server &server, std::string _path) {
 
 static int validate_file(const Server &server, std::string &path, std::ifstream &file)
 {
-  std::string file_location;
-  if (!get_file_location(file_location, path, server))
+  Location location_of_path = get_location_of_path(server, path);
+  if (location_of_path.empty())
+    return 404;
+  if (should_redirect(location_of_path, path))
     return 301;
+  std::string absolute_path = get_absolute_path(location_of_path, path);
+  if (is_dir(absolute_path))
+    return 403;
 
-	file.open(file_location.c_str());
-	if (access(file_location.c_str(), F_OK) == -1) {
+	file.open(absolute_path.c_str());
+	if (access(absolute_path.c_str(), F_OK) == -1)
+  {
     std::vector<Location>::const_iterator it_location;
     for (it_location = server.get_location().begin(); it_location != server.get_location().end(); it_location++)
 	  {
@@ -125,8 +142,8 @@ static int validate_file(const Server &server, std::string &path, std::ifstream 
     }
 		return 404;
   }
-  if (access(file_location.c_str(), R_OK) == -1 || !file.is_open())
-    return 500;
+  if (access(absolute_path.c_str(), R_OK) == -1 || !file.is_open())
+    return 403;
   return 200;
 }
 
