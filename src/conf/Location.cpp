@@ -25,6 +25,9 @@ bool    Location::parse_location(std::ifstream *fd_file, const std::string pline
             this->set.add_in_var(line, posi + 6, &this->_index);
         } else if ((posi = line.find("is_cgi_py ")) != std::string::npos) {
             this->set.add_in_var(line, posi + 10, &this->_is_cgi_py);
+        } else if ((posi = line.find("limit_except ")) != std::string::npos) {
+            this->set.add_in_var(line, posi + 13, &this->_limit_except);
+            print(this->_limit_except[1]);
         } else if ((posi = line.find("}")) != std::string::npos) {
             return (true);
         }

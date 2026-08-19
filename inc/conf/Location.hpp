@@ -16,6 +16,7 @@ class Location {
         std::string                 _expires;
         bool                        _is_cgi_py;
         bool                        _autoindex;
+        std::vector<std::string>    _limit_except;
     public:
         Location();
         bool                        parse_location(std::ifstream *fd_file, const std::string pline, size_t posi);
@@ -31,6 +32,7 @@ class Location {
         const std::string&              get_path_location() const {return (_path_location);};
         bool                            empty() const {return (_path_location.empty());};
         const bool&                     get_autoindex() const {return (_autoindex);};
+        const std::vector<std::string>& get_limit_except() const {return (_limit_except);};
 
 };
 
