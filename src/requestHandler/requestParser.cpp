@@ -1,4 +1,5 @@
 #include "webserv.hpp"
+#include "cgi.hpp"
 
 /**********************************************************************************************/
 
@@ -44,14 +45,22 @@ bool	httpRequest::parseChunkData()
 		setErrorCode(400);
 		return false;
 	}
-	//_body.append(_requestBuffer.substr(0, trueSize));
-	if (write(_fileFd, _requestBuffer.substr(0, trueSize).c_str(), trueSize) != -1)
+	std::string script_name;
+	if (is_cgi(_path, script_name))
+	{
+		_body.append(_requestBuffer.substr(0, trueSize));
 		_bytesWritten += trueSize;
+	}
 	else
 	{
-		std::cout << "parseChunkData() ERROR\n errno: " << errno << "\n";
-		setErrorCode(500);
-		return false;
+		if (write(_fileFd, _requestBuffer.substr(0, trueSize).c_str(), trueSize) != -1)
+			_bytesWritten += trueSize;
+		else
+		{
+			std::cout << "parseChunkData() ERROR\n errno: " << errno << "\n";
+			setErrorCode(500);
+			return false;
+		}
 	}
 	_requestBuffer.erase(0, trueSize + 2);
 	return true;
@@ -130,14 +139,23 @@ bool	httpRequest::parseFixedLength()
 	while (_requestBuffer[i])
 	{
 		bytesRead++;
-		//_body += _requestBuffer[i];
-		if (write(_fileFd, &_requestBuffer[i], 1) != -1)
+
+		std::string script_name;
+		if (is_cgi(_path, script_name))
+		{
+			_body += _requestBuffer[i];
 			_bytesWritten++;
+		}
 		else
 		{
-			std::cout << "parseFixedLength() ERROR\n errno: " << errno << "\n";
-			setErrorCode(500);
-			return false;
+			if (write(_fileFd, &_requestBuffer[i], 1) != -1)
+				_bytesWritten++;
+			else
+			{
+				std::cout << "parseFixedLength() ERROR\n errno: " << errno << "\n";
+				setErrorCode(500);
+				return false;
+			}
 		}
 		if (bytesRead == (size_t)_bodySize)
 		{
