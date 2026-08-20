@@ -1,4 +1,5 @@
 #include "webserv.hpp"
+#include "cgi.hpp"
 
 /**********************************************************************************************/
 
@@ -44,14 +45,22 @@ bool	httpRequest::parseChunkData()
 		setErrorCode(400);
 		return false;
 	}
-	//_body.append(_requestBuffer.substr(0, trueSize));
-	if (write(_fileFd, _requestBuffer.substr(0, trueSize).c_str(), trueSize) != -1)
+	std::string script_name;
+	if (is_cgi(_path, script_name))
+	{
+		_body.append(_requestBuffer.substr(0, trueSize));
 		_bytesWritten += trueSize;
+	}
 	else
 	{
-		std::cout << "parseChunkData() ERROR\n errno: " << errno << "\n";
-		setErrorCode(500);
-		return false;
+		if (write(_fileFd, _requestBuffer.substr(0, trueSize).c_str(), trueSize) != -1)
+			_bytesWritten += trueSize;
+		else
+		{
+			std::cout << "parseChunkData() ERROR\n errno: " << errno << "\n";
+			setErrorCode(500);
+			return false;
+		}
 	}
 	_requestBuffer.erase(0, trueSize + 2);
 	return true;
@@ -130,14 +139,23 @@ bool	httpRequest::parseFixedLength()
 	while (_requestBuffer[i])
 	{
 		bytesRead++;
-		//_body += _requestBuffer[i];
-		if (write(_fileFd, &_requestBuffer[i], 1) != -1)
+
+		std::string script_name;
+		if (is_cgi(_path, script_name))
+		{
+			_body += _requestBuffer[i];
 			_bytesWritten++;
+		}
 		else
 		{
-			std::cout << "parseFixedLength() ERROR\n errno: " << errno << "\n";
-			setErrorCode(500);
-			return false;
+			if (write(_fileFd, &_requestBuffer[i], 1) != -1)
+				_bytesWritten++;
+			else
+			{
+				std::cout << "parseFixedLength() ERROR\n errno: " << errno << "\n";
+				setErrorCode(500);
+				return false;
+			}
 		}
 		if (bytesRead == (size_t)_bodySize)
 		{
@@ -429,7 +447,8 @@ int	httpRequest::parseRequest(std::string& str, int bodyMax)
 	}
 	if (_status == REQ_BODY) //Now parses and writes to a file at the same time instead of storing everything in ram
 	{
-	    if (_fileFd == -1)
+		std::string	script_name;
+	    if (_fileFd == -1 && !is_cgi(_path, script_name))
     	{
 			_path.erase(0, 1);
         	_fileFd = open(_path.c_str(), O_CREAT | O_RDWR | O_TRUNC | O_NONBLOCK, 0600);
@@ -443,7 +462,8 @@ int	httpRequest::parseRequest(std::string& str, int bodyMax)
     	}
 		if (!parseBody())
 		{
-			remove(_path.c_str());
+			if (!is_cgi(_path, script_name))
+				remove(_path.c_str());
 			return ERROR;
 		}
 	}

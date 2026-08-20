@@ -38,12 +38,11 @@ char	**httpRequest::set_cgi_env(const std::string &script_name)
 	}
 	else
 		path_info = _path;
+  int body_size = _bodySize >= 0 ? _bodySize : 0;
 	env.push_back("REQUEST_METHOD=" + _method);
 	env.push_back("QUERY_STRING=" + query);
-	env.push_back(std::string("CONTENT_LENGTH=") + to_str(_bodySize));
+	env.push_back(std::string("CONTENT_LENGTH=") + to_str(body_size));
   env.push_back("SCRIPT_NAME=" + script_name);
 	env.push_back("PATH_INFO=" + path_info);
-  for (long unsigned i = 0;i<env.size();i++)
-    print(env[i]);
   return (vector_to_env(env));
 }
