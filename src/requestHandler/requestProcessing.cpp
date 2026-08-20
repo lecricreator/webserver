@@ -44,8 +44,6 @@ t_response_data httpRequest::generateResponseData(const Server &server)
     status_code = deleteRequest();
   else if (_method == "POST" && is_cgi(_path, script_name))
   {
-    print(_path);
-    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     if (_path[0] != '/')
       _path = "/" + _path;
     char **env = set_cgi_env(script_name);
