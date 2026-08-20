@@ -48,6 +48,7 @@ bool	httpRequest::parseChunkData()
 	std::string script_name;
 	if (is_cgi(_path, script_name))
 	{
+		//std::cout << "CGI REQUEST1\n";
 		_body.append(_requestBuffer.substr(0, trueSize));
 		_bytesWritten += trueSize;
 	}
@@ -135,10 +136,8 @@ bool	httpRequest::parseFixedLength()
 	}
 
 	int	i = 0;
-	size_t	bytesRead = _body.size();
 	while (_requestBuffer[i])
 	{
-		bytesRead++;
 
 		std::string script_name;
 		if (is_cgi(_path, script_name))
@@ -157,7 +156,7 @@ bool	httpRequest::parseFixedLength()
 				return false;
 			}
 		}
-		if (bytesRead == (size_t)_bodySize)
+		if (_bytesWritten == (size_t)_bodySize)
 		{
 			_status = REQ_PARSED;
 			std::cout << "calling close() with return code " << close(_fileFd) << "\n";
@@ -165,7 +164,6 @@ bool	httpRequest::parseFixedLength()
 		}
 		i++;
 	}
-	//_status = REQ_PARSED;
 	return true;
 }
 
@@ -181,8 +179,8 @@ bool	httpRequest::parseBody()
 	{
 		if (!parseFixedLength())
 			return false;
-		std::cout << "status: " << _status << "\n";
-		std::cout << "REQ_PARSED: " << REQ_PARSED << "\n";
+		//std::cout << "status: " << _status << "\n";
+		//std::cout << "REQ_PARSED: " << REQ_PARSED << "\n";
 		return true;
 	}
 	else
