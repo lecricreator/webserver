@@ -67,7 +67,6 @@ std::string execute_cgi(std::string path, char **env, const char *cgi_data)
   int   stdin_pipe[2];
   int   stdout_pipe[2];
 
-  print(cgi_data);
   if (pipe(stdin_pipe) == ERROR || pipe(stdout_pipe) == ERROR)
     return std::string();
 
