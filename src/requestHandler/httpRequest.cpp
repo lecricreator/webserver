@@ -94,6 +94,27 @@ void	httpRequest::printRequest()
 	std::cout << _body << ";" << std::endl;
 }
 
+bool    httpRequest::can_requested(const Server &server, const std::string request) {
+    std::vector<Location>::const_iterator it_location;
+    for (it_location = server.get_location().begin(); it_location != server.get_location().end(); it_location++) {
+        std::vector<std::string>::const_iterator it_limit;
+        if (it_location->get_path_location() + "/" == _path || (_path == "/" && it_location->get_path_location() == "/")) {
+            if (it_location->get_limit_except().empty()) {
+                return (true);
+            } else {
+                for (it_limit = it_location->get_limit_except().begin(); it_limit != it_location->get_limit_except().end(); it_limit++) {
+                    if (*it_limit == request) {
+                        return (true);
+                    }
+                }
+                return (false);
+            }
+        }
+    }
+    return (false);
+}
+
+
 /**********************************************************************************************/
 
 /**

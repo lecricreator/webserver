@@ -50,7 +50,7 @@ static std::string  get_absolute_path(const Location &location, std::string &pat
   std::string location_root = location.get_root();
   std::string current_path = location.get_path_location();
 
-  if (current_path + "/" == path || (current_path == "/" && path == current_path))
+  if ((current_path + "/" == path || (current_path == "/" && path == current_path)) && !location.get_index().empty())
     path += location.get_index()[0];
   std::string absolute_path = location_root + path;
   return absolute_path;
@@ -153,6 +153,9 @@ unsigned int	httpRequest::getRequest(const Server &server, t_response_data &data
 
   bool          is_favicon = get_extension(_path) == "ico";
   std::string   path = is_favicon ? "/favicon.ico" : _path;
+  if (!can_requested(server, "GET")) {
+    return (405);
+  }
 
   int status_code = validate_file(server, path, file);
   if (status_code == 200) {
