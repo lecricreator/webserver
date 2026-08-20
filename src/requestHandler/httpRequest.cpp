@@ -111,6 +111,9 @@ int    httpRequest::can_requested(const Server &server, const std::string reques
     if (path.find(".") != std::string::npos) {
         path = remove_sup_after_slash(path);
     }
+    if (path[path.length() - 1] != '/') {
+        path += "/";
+    }
     std::vector<Location>::const_iterator it_location;
     for (it_location = server.get_location().begin(); it_location != server.get_location().end(); it_location++) {
         std::vector<std::string>::const_iterator it_limit;

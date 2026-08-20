@@ -162,16 +162,15 @@ unsigned int	httpRequest::getRequest(const Server &server, t_response_data &data
   int is_requested = -1;
   is_requested = can_requested(server, "GET");
   std::cout << "is_requested is " << is_requested << std::endl;
-  if (is_requested == -1) {
-    return (405);
-  } else if (is_requested == 0) {
-    print("lu");
-    return (200);
-  }
+  //if (is_requested == -1) {
+  //  return (405);
+  //} else if (is_requested == 0) {
+  //  return (200);
+  //}
 
   int status_code = validate_file(server, path, file);
   if (status_code == 200) {
-    std::string script_name;
+    std::string script_name = "";
     if (is_cgi(_path, script_name)) {
       char **env = set_cgi_env(script_name);
       status_code = cgi(_path, data, env, NULL);
