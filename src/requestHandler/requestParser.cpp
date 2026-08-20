@@ -447,7 +447,8 @@ int	httpRequest::parseRequest(std::string& str, int bodyMax)
 	}
 	if (_status == REQ_BODY) //Now parses and writes to a file at the same time instead of storing everything in ram
 	{
-	    if (_fileFd == -1)
+		std::string	script_name;
+	    if (_fileFd == -1 && !is_cgi(_path, script_name))
     	{
 			_path.erase(0, 1);
         	_fileFd = open(_path.c_str(), O_CREAT | O_RDWR | O_TRUNC | O_NONBLOCK, 0600);
@@ -461,7 +462,8 @@ int	httpRequest::parseRequest(std::string& str, int bodyMax)
     	}
 		if (!parseBody())
 		{
-			remove(_path.c_str());
+			if (!is_cgi(_path, script_name))
+				remove(_path.c_str());
 			return ERROR;
 		}
 	}
