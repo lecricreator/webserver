@@ -116,7 +116,6 @@ static bool exec_listing_dir(const Server &server, const std::string &path)
     std::string current_path = it_location->get_path_location();
     bool is_target_path_a_dir = path[path.length() - 1] == '/';
     std::string total_path;
-    std::cout << is_target_path_a_dir << std::endl;
     if (!it_location->get_index().empty()) {
       total_path = current_path + "/" + it_location->get_index()[0];
     } else {
@@ -161,12 +160,11 @@ unsigned int	httpRequest::getRequest(const Server &server, t_response_data &data
   std::string   path = is_favicon ? "/favicon.ico" : _path;
   int is_requested = -1;
   is_requested = can_requested(server, "GET");
-  std::cout << "is_requested is " << is_requested << std::endl;
-  //if (is_requested == -1) {
-  //  return (405);
-  //} else if (is_requested == 0) {
-  //  return (200);
-  //}
+  if (is_requested == -1) {
+    return (405);
+  } else if (is_requested == 0) {
+    return (200);
+  }
 
   int status_code = validate_file(server, path, file);
   if (status_code == 200) {

@@ -117,7 +117,6 @@ int    httpRequest::can_requested(const Server &server, const std::string reques
     std::vector<Location>::const_iterator it_location;
     for (it_location = server.get_location().begin(); it_location != server.get_location().end(); it_location++) {
         std::vector<std::string>::const_iterator it_limit;
-        print(it_location->get_path_location() + "/ | " + path);
         if (it_location->get_path_location() + "/" == path || (path == "/" && it_location->get_path_location() == "/")) {
             if (it_location->get_limit_except().empty()) {
                 return (1);
