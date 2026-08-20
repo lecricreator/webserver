@@ -135,10 +135,11 @@ bool	httpRequest::parseFixedLength()
 		}
 	}
 
-	int	i = 0;
-	while (_requestBuffer[i])
+	size_t	i = 0;
+	while (i < _requestBuffer.size())
 	{
-
+		//std::cout << "_bytesWritten: " << _bytesWritten << "\n";
+		//std::cout << "_bodySize: " << _bodySize << "\n";
 		std::string script_name;
 		if (is_cgi(_path, script_name))
 		{
@@ -453,6 +454,7 @@ int	httpRequest::parseRequest(std::string& str, int bodyMax)
         	if (_fileFd < 0)
         	{
 				std::cout << "parseRequest() ERROR\n errno: " << errno << "\n";
+				std::cout << "path: " << _path << "\n";
 				remove(_path.c_str());
         	    setErrorCode(500);
         	    return ERROR;
@@ -467,5 +469,6 @@ int	httpRequest::parseRequest(std::string& str, int bodyMax)
 	}
 	if (_status == REQ_PARSED)
 		return SUCCESS;
+	std::cout << "parseRequest() return\n";
 	return UNFINISHED;
 }
