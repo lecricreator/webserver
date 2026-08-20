@@ -28,8 +28,9 @@ int handle_request(int client_fd, t_parse_data &client_infos)
   if (bytes_received <= 0)
     return ERROR;
   buf[bytes_received] = '\0';
-  //print("--- HTTP REQUEST ---\n");
+  print("\n--- PACKET START ---\n");
   print(buf);
+  print("\n--- PACKET END ---\n");
 
   std::string chunked_request(buf);
   int status_parsing = client_infos.request.parseRequest(chunked_request, client_infos.server->get_client_max_body_size());
