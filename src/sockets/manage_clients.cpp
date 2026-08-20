@@ -21,7 +21,7 @@ int handle_request(int client_fd, t_parse_data &client_infos)
 {
   char            buf[1024];
   int             bytes_received = recv(client_fd, buf, sizeof(buf) - 1, 0);
-  std::string     request_packet(buf);
+  std::string     request_packet(buf, bytes_received);
   t_response_data data;
 
   if (bytes_received <= 0)
@@ -30,9 +30,7 @@ int handle_request(int client_fd, t_parse_data &client_infos)
   print("\n--- PACKET START ---\n");
   print(buf);
   print("\n--- PACKET END ---\n");
-
-  std::string chunked_request(buf);
-  int status_parsing = client_infos.request.parseRequest(chunked_request, client_infos.server->get_client_max_body_size());
+  int status_parsing = client_infos.request.parseRequest(request_packet, client_infos.server->get_client_max_body_size());
   if (status_parsing == UNFINISHED)
     return UNFINISHED;
   client_infos.response = client_infos.request.executeRequest(*client_infos.server);
