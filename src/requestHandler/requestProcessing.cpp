@@ -31,19 +31,25 @@ static bool is_response_data_valid(t_response_data &data)
   return is_valid;
 }
 
+//POST method is implemented/called in the parsing therefore not needed here
 t_response_data httpRequest::generateResponseData(const Server &server)
 {
   t_response_data data;
   int             status_code = _errorCode;
+  std::string     script_name;
 
   if (_method == "GET")
-  {
     status_code = getRequest(server, data);
-  }
-  //POST method is implemented/called in the parsing therefore not needed here
-  if (_method == "DELETE")
-  {
+  else if (_method == "DELETE")
     status_code = deleteRequest();
+  else if (_method == "POST" && is_cgi(_path, script_name))
+  {
+    print(_body);
+    if (_path[0] != '/')
+      _path = "/" + _path;
+    char **env = set_cgi_env(script_name);
+    status_code = cgi(_path, data, env, _body.c_str());
+    free_env(env);
   }
 
   data.status = to_str((int)status_code) + " " + code_to_string(status_code);
@@ -70,7 +76,10 @@ t_response_data httpRequest::generateResponseData(const Server &server)
     }
   }
   if (data.status != "200 OK" && data.body.empty())
+  {
+    data.content_type = "text/html";
     data.body = "<body style=\"background-color: green;\"><h1 style=\"position: absolute; left: 20%; top: 30%; text-align: center;color:red; transform: rotate(150deg);\">" + data.status + "</h1></body>\n";
+  }
   return data;
 }
 
@@ -85,7 +94,7 @@ std::string httpRequest::executeRequest(const Server &server)
 
   data = generateResponseData(server);
 
-  bool debug = false;
+  bool debug = true;
   if (debug)
     print_response_data(data);
 

@@ -160,13 +160,12 @@ unsigned int	httpRequest::getRequest(const Server &server, t_response_data &data
   bool          is_favicon = get_extension(_path) == "ico";
   std::string   path = is_favicon ? "/favicon.ico" : _path;
 
-
   int status_code = validate_file(server, path, file);
   if (status_code == 200) {
     std::string script_name;
     if (is_cgi(_path, script_name)) {
       char **env = set_cgi_env(script_name);
-      status_code = cgi(_path, data, env);
+      status_code = cgi(_path, data, env, NULL);
       free_env(env);
     } else {
       data.content_type = choice_content_type(path);

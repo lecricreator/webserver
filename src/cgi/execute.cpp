@@ -15,7 +15,7 @@ static void  execute_child(std::string path, int stdin_pipe[2], int stdout_pipe[
 }
 
 //return SUCCESS even if cgi_data is empty
-static int write_to_child(char *cgi_data, int stdin_pipe[2], int stdout_pipe[2])
+static int write_to_child(int stdin_pipe[2], int stdout_pipe[2], const char *cgi_data)
 {
   if (cgi_data && cgi_data[0])
   {
@@ -48,12 +48,12 @@ static std::string get_cgi_output(int pid, int output_fd)
   return output;
 }
 
-std::string execute_parent(int stdin_pipe[2], int stdout_pipe[2], char *cgi_data, pid_t pid)
+std::string execute_parent(int stdin_pipe[2], int stdout_pipe[2], const char *cgi_data, pid_t pid)
 {
   close(stdin_pipe[0]);
   close(stdout_pipe[1]);
 
-  if (write_to_child(cgi_data, stdin_pipe, stdout_pipe) == ERROR)
+  if (write_to_child(stdin_pipe, stdout_pipe, cgi_data) == ERROR)
     return std::string();
   close(stdin_pipe[1]);
 
@@ -62,11 +62,12 @@ std::string execute_parent(int stdin_pipe[2], int stdout_pipe[2], char *cgi_data
   return output;
 }
 
-std::string execute_cgi(std::string path, char **env, char *cgi_data)
+std::string execute_cgi(std::string path, char **env, const char *cgi_data)
 {
   int   stdin_pipe[2];
   int   stdout_pipe[2];
 
+  print(cgi_data);
   if (pipe(stdin_pipe) == ERROR || pipe(stdout_pipe) == ERROR)
     return std::string();
 
