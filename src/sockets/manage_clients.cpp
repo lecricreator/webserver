@@ -12,6 +12,7 @@ int accept_client(int server_fd)
     return print_function_error("fcntl"), ERROR;
   print_success("New client", "fd", client_fd);
   print_success("New client", "ip", (int)client_addr.sin_addr.s_addr);
+  print("\n");
   return client_fd;
 }
 
@@ -27,7 +28,7 @@ int handle_request(int client_fd, t_parse_data &client_infos)
   if (bytes_received <= 0)
     return ERROR;
   buf[bytes_received] = '\0';
-  print("--- HTTP REQUEST ---\n");
+  //print("--- HTTP REQUEST ---\n");
   print(buf);
 
   std::string chunked_request(buf);

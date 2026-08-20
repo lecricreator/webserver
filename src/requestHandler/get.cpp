@@ -153,8 +153,14 @@ unsigned int	httpRequest::getRequest(const Server &server, t_response_data &data
 
   bool          is_favicon = get_extension(_path) == "ico";
   std::string   path = is_favicon ? "/favicon.ico" : _path;
-  if (!can_requested(server, "GET")) {
+  int is_requested = -1;
+  is_requested = can_requested(server, "GET");
+  std::cout << "is_requested is " << is_requested << std::endl;
+  if (is_requested == -1) {
     return (405);
+  } else if (is_requested == 0) {
+    print("lu");
+    return (200);
   }
 
   int status_code = validate_file(server, path, file);

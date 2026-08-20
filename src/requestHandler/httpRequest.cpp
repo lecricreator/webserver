@@ -94,24 +94,41 @@ void	httpRequest::printRequest()
 	std::cout << _body << ";" << std::endl;
 }
 
-bool    httpRequest::can_requested(const Server &server, const std::string request) {
+std::string remove_sup_after_slash(std::string path) {
+    for (int i = path.length() - 1; i >= 0; i--) {
+        if (path[i] == '/') {
+            std::string test = path.substr(0, i + 1);
+            return (test);
+        }
+    }
+    return (path);
+}
+
+// return = 1 == Can Get / -1 block and error 405 / 0 can't get but can continue
+int    httpRequest::can_requested(const Server &server, const std::string request) {
+    std::string path = this->_path;
+    if (path == "/favicon.ico") {return true;}
+    if (path.find(".") != std::string::npos) {
+        path = remove_sup_after_slash(path);
+    }
     std::vector<Location>::const_iterator it_location;
     for (it_location = server.get_location().begin(); it_location != server.get_location().end(); it_location++) {
         std::vector<std::string>::const_iterator it_limit;
-        if (it_location->get_path_location() + "/" == _path || (_path == "/" && it_location->get_path_location() == "/")) {
+        print(it_location->get_path_location() + "/ | " + path);
+        if (it_location->get_path_location() + "/" == path || (path == "/" && it_location->get_path_location() == "/")) {
             if (it_location->get_limit_except().empty()) {
-                return (true);
+                return (1);
             } else {
                 for (it_limit = it_location->get_limit_except().begin(); it_limit != it_location->get_limit_except().end(); it_limit++) {
                     if (*it_limit == request) {
-                        return (true);
+                        return (1);
                     }
                 }
-                return (false);
+                return (-1);
             }
         }
     }
-    return (false);
+    return (0);
 }
 
 

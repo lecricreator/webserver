@@ -122,7 +122,7 @@ class httpRequest
 
 		int		        parseRequest(std::string& str, int bodyMax);
     	std::string	  	executeRequest(const Server &server);
-		bool			can_requested(const Server &server, const std::string request);
+		int				can_requested(const Server &server, const std::string request);
 
     	char	        **set_cgi_env(const std::string &script_name);
 };

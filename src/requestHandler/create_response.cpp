@@ -28,6 +28,7 @@ std::string create_response(const t_response_data &data)
     add_line_to_response(response, content_type, data.content_type);
   if (!data.location.empty())
     add_line_to_response(response, location, data.location);
+  response += "Server: Weebserver\r\n";
 
   std::string content_lenght_value = to_str(data.body.size());
   add_line_to_response(response, content_lenght, content_lenght_value);
