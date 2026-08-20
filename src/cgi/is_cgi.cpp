@@ -17,6 +17,10 @@ static std::string extract_string(const std::string &path, const size_t &start, 
 //dot_string is the string coming after the '.'
 bool is_cgi(const std::string &path, std::string &file)
 {
+  std::string upload_path = "www/upload/";
+  bool        start_slash = path[0] == '/';
+  if (path.compare(start_slash, upload_path.size(), upload_path) == 0)
+    return false;
   for (size_t dot_position = path.find(".");
       dot_position != std::string::npos;
       dot_position = path.find(".", dot_position + 1)

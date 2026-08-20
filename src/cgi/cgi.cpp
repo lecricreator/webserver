@@ -13,20 +13,17 @@ static std::string  get_relative_path(const std::string &path, const std::string
   return (relative_path);
 }
 
-//normally we might reuse the body of other codes than 200 but we can simplify
-int cgi(const std::string &path, t_response_data &data, char *env[])
+int cgi(const std::string &path, t_response_data &data, char *env[], const char *cgi_data)
 {
 	std::string cgi_output;
 
   std::string relative_path = get_relative_path(path, CGI_ROOT);
   if (relative_path.empty())
     return 401;
-	cgi_output = execute_cgi(relative_path, env, NULL);
+	cgi_output = execute_cgi(relative_path, env, cgi_data);
 	if (cgi_output == std::string())
 		return 500;
 	if (parse_cgi(cgi_output, data) == FAILURE)
 		return 502;
-	//else if (is_implemented(data) == FAILURE)
-		//return 501;
   return 200;
 }

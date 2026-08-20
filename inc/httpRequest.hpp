@@ -130,7 +130,7 @@ class httpRequest
 std::string code_to_string(const unsigned int code);
 int			ft_stoi(std::string n);
 int 		hexToInt(const std::string& hexStr);
-int     cgi(const std::string &path, t_response_data &data, char *env[]);
+int     cgi(const std::string &path, t_response_data &data, char *env[], const char *cgi_data);
 void    free_env(char** env);
 std::string copy_file_to_str(std::ifstream &file);
 std::string create_response(const t_response_data &data);
