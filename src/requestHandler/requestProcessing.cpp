@@ -2,17 +2,17 @@
 #include "httpRequest.hpp"
 #include "cgi.hpp"
 
-static void print_response_data(const t_response_data &data)
-{
-  print("-----------");
-  print("response data:");
-  print("status:        " + data.status);
-  print("content_type:  " + data.content_type);
-  print("location:      " + data.location);
-  print("body:");
-  print(data.body);
-  print("-----------");
-}
+//static void print_response_data(const t_response_data &data)
+//{
+//  print("-----------");
+//  print("response data:");
+//  print("status:        " + data.status);
+//  print("content_type:  " + data.content_type);
+//  print("location:      " + data.location);
+//  print("body:");
+//  print(data.body);
+//  print("-----------");
+//}
 
 static bool is_response_data_valid(t_response_data &data)
 {
@@ -93,9 +93,9 @@ std::string httpRequest::executeRequest(const Server &server)
 
   data = generateResponseData(server);
 
-  bool debug = true;
-  if (debug)
-    print_response_data(data);
+  //bool debug = false;
+  //if (debug)
+  //  print_response_data(data);
 
   response = create_response(data);
   return response;
