@@ -50,6 +50,7 @@ t_response_data httpRequest::generateResponseData(const Server &server)
     status_code = cgi(_path, data, env, _body.c_str());
     free_env(env);
   }
+  print("SSSSSSSSSSSTATUS: " + to_str(status_code));
 
   data.status = to_str((int)status_code) + " " + code_to_string(status_code);
   if (data.status == "301 Moved Permanently")

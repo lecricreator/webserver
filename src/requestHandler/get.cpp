@@ -159,6 +159,7 @@ unsigned int	httpRequest::getRequest(const Server &server, t_response_data &data
   bool          is_favicon = get_extension(_path) == "ico";
   std::string   path = is_favicon ? "/favicon.ico" : _path;
   int is_requested = -1;
+  //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaa
   is_requested = can_requested(server, "GET");
   if (is_requested == -1) {
     return (405);
