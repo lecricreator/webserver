@@ -6,6 +6,7 @@
 Location::Location() {
     this->_is_cgi_py = false;
     this->_autoindex = false;
+    _limit_except.push_back("UNINITIALIZED");
 }
 
 bool    Location::parse_location(std::ifstream *fd_file, const std::string pline, size_t posi) {
@@ -26,6 +27,7 @@ bool    Location::parse_location(std::ifstream *fd_file, const std::string pline
         } else if ((posi = line.find("is_cgi_py ")) != std::string::npos) {
             this->set.add_in_var(line, posi + 10, &this->_is_cgi_py);
         } else if ((posi = line.find("limit_except ")) != std::string::npos) {
+            _limit_except.clear();
             this->set.add_in_var(line, posi + 13, &this->_limit_except);
         } else if ((posi = line.find("}")) != std::string::npos) {
             return (true);
