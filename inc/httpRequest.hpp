@@ -120,7 +120,7 @@ class httpRequest
 		void			setErrorCode(unsigned int code);
 		void			printRequest();
 
-		int		        parseRequest(std::string& str, int bodyMax);
+		int		        parseRequest(std::string& str, int bodyMax, const Server &server);
     	std::string	  	executeRequest(const Server &server);
 		int				can_requested(const Server &server, const std::string request);
 

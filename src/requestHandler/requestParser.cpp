@@ -417,7 +417,7 @@ bool	httpRequest::parseStartLine(std::string &startLine)
  * It is then up to the function that called parseRequest()
  * to check the error code and handle it appropriately.
   */
-int	httpRequest::parseRequest(std::string& str, int bodyMax)
+int	httpRequest::parseRequest(std::string& str, int bodyMax, const Server &server)
 {
 	_bodyMax = bodyMax;
 	if (!_requestBuffer.empty())
@@ -446,6 +446,16 @@ int	httpRequest::parseRequest(std::string& str, int bodyMax)
 	}
 	if (_status == REQ_BODY) //Now parses and writes to a file at the same time instead of storing everything in ram
 	{
+		if (_errorCode == 200 || _errorCode == 0)
+		{
+			std::cout << "hello\n";
+			if (can_requested(server, _method) == -1)
+			{
+				std::cout << _method << "lol\n";
+				setErrorCode(405);
+				return ERROR;
+			}
+		}
 		std::string	script_name;
 	    if (_fileFd == -1 && !is_cgi(_path, script_name))
     	{

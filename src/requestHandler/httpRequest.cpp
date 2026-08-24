@@ -110,6 +110,7 @@ int    httpRequest::can_requested(const Server &server, const std::string reques
     if (path == "/favicon.ico") {return true;}
     if (path.find(".") != std::string::npos) {
         path = remove_sup_after_slash(path);
+        print(path);
     }
     if (path[path.length() - 1] != '/') {
         path += "/";
@@ -117,8 +118,11 @@ int    httpRequest::can_requested(const Server &server, const std::string reques
     std::vector<Location>::const_iterator it_location;
     for (it_location = server.get_location().begin(); it_location != server.get_location().end(); it_location++) {
         std::vector<std::string>::const_iterator it_limit;
+        std::cout << path << " / " << it_location->get_path_location() + "/" << "in location\n";
         if (it_location->get_path_location() + "/" == path || (path == "/" && it_location->get_path_location() == "/")) {
-            if (it_location->get_limit_except().empty()) {
+            
+            if (it_location->get_limit_except()[0] == "UNINITIALIZED") {
+                std::cout << "can_requested\n";
                 return (1);
             } else {
                 for (it_limit = it_location->get_limit_except().begin(); it_limit != it_location->get_limit_except().end(); it_limit++) {
@@ -130,6 +134,7 @@ int    httpRequest::can_requested(const Server &server, const std::string reques
             }
         }
     }
+    std::cout << _path << "//can_requested 0\n";
     return (0);
 }
 
