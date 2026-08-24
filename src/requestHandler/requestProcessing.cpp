@@ -63,15 +63,19 @@ t_response_data httpRequest::generateResponseData(const Server &server)
   if (data.status != "200 OK") {
     if (server.get_error_page().find(status_code) != server.get_error_page().end()) {
       std::ifstream file;
-      std::string path = "www/" + server.get_error_page().find(status_code)->second;
+      std::string path = "www" + server.get_error_page().find(status_code)->second;
+      print("JE SUIS LU : " + path);
       file.open(path.c_str());
   	  if (access(path.c_str(), F_OK) == -1) {
+        print("JE SUIS LU fhqeughfiqwjbuyyfuegvfhjqwbvfyweteuvy");
         data.status = "404" + code_to_string(404);
       }
-      if (access(path.c_str(), R_OK) == -1 || !file.is_open()) {
+      if (access(path.c_str(), R_OK) == -1) {
+        std::cout << "errno: " << errno << "\n";
         data.status = "500" + code_to_string(500);
       }
-
+      if (!file.is_open())
+        print("NOT OPEN");
       std::string copy_file_to_str(std::ifstream &file);
     }
   }
