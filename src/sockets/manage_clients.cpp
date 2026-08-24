@@ -43,7 +43,7 @@ int handle_request(int client_fd, t_parse_data &client_infos)
 int send_response(int client_fd, std::string &response)
 {
   ssize_t bytes_sent = send(client_fd, response.data(), response.size(), 0);
-  if (bytes_sent == ERROR && errno != EAGAIN)
+  if (bytes_sent == ERROR)
     return print_error("Failed to send response"), ERROR;
   if (bytes_sent == (ssize_t)response.size())
     return SUCCESS;
