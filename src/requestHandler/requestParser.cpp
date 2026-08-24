@@ -58,7 +58,7 @@ bool	httpRequest::parseChunkData()
 			_bytesWritten += trueSize;
 		else
 		{
-			std::cout << "parseChunkData() ERROR\n errno: " << errno << "\n";
+			//std::cout << "parseChunkData() ERROR\n errno: " << errno << "\n";
 			setErrorCode(500);
 			return false;
 		}
@@ -92,7 +92,7 @@ bool	httpRequest::parseChunked()
 		if (_chunkSize == 0)
 		{
 			_status = REQ_PARSED;
-			std::cout << "calling close() with return code " << close(_fileFd) << "\n";
+			//std::cout << "calling close() with return code " << close(_fileFd) << "\n";
 			return true;
 		}
 		if (_chunkStatus == CHUNK_DATA)
@@ -113,7 +113,7 @@ bool	httpRequest::parseChunked()
  */
 bool	httpRequest::parseFixedLength()
 {
-	std::cout << "parseFixedLength() call\n";
+	//std::cout << "parseFixedLength() call\n";
 	if (_bodySize == -1)
 	{
 		_bodySize = ft_stoi(_headers.find("Content-Length")->second);
@@ -125,7 +125,7 @@ bool	httpRequest::parseFixedLength()
 		if (_bodySize == 0)
 		{
 			_status = REQ_PARSED;
-			std::cout << "calling close() with return code " << close(_fileFd) << "\n";
+			//std::cout << "calling close() with return code " << close(_fileFd) << "\n";
 			return true;
 		}
 		if (_bodySize > _bodyMax)
@@ -152,7 +152,7 @@ bool	httpRequest::parseFixedLength()
 				_bytesWritten++;
 			else
 			{
-				std::cout << "parseFixedLength() ERROR\n errno: " << errno << "\n";
+				//std::cout << "parseFixedLength() ERROR\n errno: " << errno << "\n";
 				setErrorCode(500);
 				return false;
 			}
@@ -160,7 +160,7 @@ bool	httpRequest::parseFixedLength()
 		if (_bytesWritten == (size_t)_bodySize)
 		{
 			_status = REQ_PARSED;
-			std::cout << "calling close() with return code " << close(_fileFd) << "\n";
+			//std::cout << "calling close() with return code " << close(_fileFd) << "\n";
 			return true;
 		}
 		i++;
@@ -187,7 +187,7 @@ bool	httpRequest::parseBody()
 	else
 	{
 		_status = REQ_PARSED;
-		std::cout << "calling close() with return code " << close(_fileFd) << "\n";
+		//std::cout << "calling close() with return code " << close(_fileFd) << "\n";
 		return true;
 	}
 	return true;
@@ -453,8 +453,8 @@ int	httpRequest::parseRequest(std::string& str, int bodyMax)
         	_fileFd = open(_path.c_str(), O_CREAT | O_RDWR | O_TRUNC | O_NONBLOCK, 0600);
         	if (_fileFd < 0)
         	{
-				std::cout << "parseRequest() ERROR\n errno: " << errno << "\n";
-				std::cout << "path: " << _path << "\n";
+				//std::cout << "parseRequest() ERROR\n errno: " << errno << "\n";
+				//std::cout << "path: " << _path << "\n";
 				remove(_path.c_str());
         	    setErrorCode(500);
         	    return ERROR;
@@ -469,6 +469,6 @@ int	httpRequest::parseRequest(std::string& str, int bodyMax)
 	}
 	if (_status == REQ_PARSED)
 		return SUCCESS;
-	std::cout << "parseRequest() return\n";
+	//std::cout << "parseRequest() return\n";
 	return UNFINISHED;
 }

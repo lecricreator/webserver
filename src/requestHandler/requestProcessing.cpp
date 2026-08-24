@@ -2,17 +2,17 @@
 #include "httpRequest.hpp"
 #include "cgi.hpp"
 
-static void print_response_data(const t_response_data &data)
-{
-  print("-----------");
-  print("response data:");
-  print("status:        " + data.status);
-  print("content_type:  " + data.content_type);
-  print("location:      " + data.location);
-  print("body:");
-  print(data.body);
-  print("-----------");
-}
+//static void print_response_data(const t_response_data &data)
+//{
+//  print("-----------");
+//  print("response data:");
+//  print("status:        " + data.status);
+//  print("content_type:  " + data.content_type);
+//  print("location:      " + data.location);
+//  print("body:");
+//  print(data.body);
+//  print("-----------");
+//}
 
 static bool is_response_data_valid(t_response_data &data)
 {
@@ -50,6 +50,7 @@ t_response_data httpRequest::generateResponseData(const Server &server)
     status_code = cgi(_path, data, env, _body.c_str());
     free_env(env);
   }
+  print("SSSSSSSSSSSTATUS: " + to_str(status_code));
 
   data.status = to_str((int)status_code) + " " + code_to_string(status_code);
   if (data.status == "301 Moved Permanently")
@@ -93,9 +94,9 @@ std::string httpRequest::executeRequest(const Server &server)
 
   data = generateResponseData(server);
 
-  bool debug = true;
-  if (debug)
-    print_response_data(data);
+  //bool debug = false;
+  //if (debug)
+  //  print_response_data(data);
 
   response = create_response(data);
   return response;

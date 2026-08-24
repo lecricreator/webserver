@@ -301,14 +301,8 @@
 <body>
     <main>
         <header>
-            <h1>Catastrophic level of yapping</h1>
+            <h1>Webserv</h1>
             <p class="subtitle">GET · POST · DELETE · CGI</p>
-
-            <div class="logo-scene">
-                <a href="https://classic.minecraft.net/">
-                    <img src="resources/images/error/50x.png" class="logo-miku" alt="miku"></a>
-                <a href="https://fauux.neocities.org/login">
-                    <img src="resources/images/error/404.png" class="logo-teto" alt="teto"></a>
             </div>
         </header>
 
@@ -336,7 +330,7 @@
                         </div>
 
                         <label for="uploadBasePath">Upload location</label>
-                        <input id="uploadBasePath" value="/upload" />
+                        <input id="uploadBasePath" value="/www/upload" />
 
                         <label for="uploadFile">File</label>
                         <input id="uploadFile" type="file" onchange="showSelectedFile()" />
@@ -355,7 +349,7 @@
                         </div>
 
                         <label for="customUploadPath">Full destination path</label>
-                        <input id="customUploadPath" value="/upload/custom-name.txt" />
+                        <input id="customUploadPath" value="/www/upload/custom-name.txt" />
 
                         <label for="customUploadFile">File</label>
                         <input id="customUploadFile" type="file" />
@@ -370,7 +364,7 @@
                         </div>
 
                         <label for="deletePath">Path</label>
-                        <input id="deletePath" value="/upload/custom-name.txt" />
+                        <input id="deletePath" value="/www/upload/custom-name.txt" />
 
                         <button onclick="sendDelete()">Send DELETE</button>
                     </div>
