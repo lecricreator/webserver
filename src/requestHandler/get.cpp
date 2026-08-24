@@ -158,17 +158,17 @@ unsigned int	httpRequest::getRequest(const Server &server, t_response_data &data
 
   bool          is_favicon = get_extension(_path) == "ico";
   std::string   path = is_favicon ? "/favicon.ico" : _path;
-  int is_requested = -1;
-  is_requested = can_requested(server, "GET");
-  if (is_requested == -1) {
-    return (405);
-  } else if (is_requested == 0) {
-    return (200);
-  }
 
   int status_code = validate_file(server, path, file);
   if (status_code == 200) {
     std::string script_name = "";
+    int is_requested = can_requested(server, "GET");
+    if (is_requested == -1) {
+      return (405);
+    } else if (is_requested == 0) {
+      return (200);
+    }
+
     if (is_cgi(_path, script_name)) {
       char **env = set_cgi_env(script_name);
       status_code = cgi(_path, data, env, NULL);

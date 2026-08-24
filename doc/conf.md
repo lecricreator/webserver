@@ -181,6 +181,20 @@ location / {
 ```
 a “/” request will actually be processed in the second location as “/index.html”.
 
+## limit_except
+```
+Syntax:	limit_except method ... { ... }
+Default:	—
+Context:	location
+```
+Limits allowed HTTP methods inside a location. The method parameter can be one of the following: GET, HEAD, POST, PUT, DELETE, MKCOL, COPY, MOVE, OPTIONS, PROPFIND, PROPPATCH, LOCK, UNLOCK, or PATCH. Allowing the GET method makes the HEAD method also allowed. Access to other methods can be limited using the ngx_http_access_module, ngx_http_auth_basic_module, and ngx_http_auth_jwt_module (1.13.10) modules directives:
+```
+limit_except GET {
+    allow 192.168.1.0/32;
+    deny  all;
+}
+```
+Not exactly in our webserv, if not appears in conf every request is excepted, but if their's limit_except, only the request on the var is excepted.
 
 ## autoindex
 The ngx_http_autoindex_module module processes requests ending with the slash character (‘/’) and produces a directory listing. Usually a request is passed to the ngx_http_autoindex_module module when the ngx_http_index_module module cannot find an index file.
