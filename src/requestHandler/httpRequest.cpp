@@ -18,6 +18,7 @@ httpRequest::httpRequest() : _headers()
     _isChunkedPost = false;
     _bytesWritten = 0;
     _bodyMax = 0;
+    _requestTimer = time(NULL);
 }
 
 httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
@@ -37,6 +38,7 @@ httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
     _isChunkedPost = copy._isChunkedPost;
     _bytesWritten = copy._bytesWritten;
     _bodyMax = copy._bodyMax;
+    _requestTimer = copy._requestTimer;
 }
 
 httpRequest&	httpRequest::operator=(const httpRequest& copy)
@@ -57,6 +59,7 @@ httpRequest&	httpRequest::operator=(const httpRequest& copy)
     _isChunkedPost = copy._isChunkedPost;
     _bytesWritten = copy._bytesWritten;
     _bodyMax = copy._bodyMax;
+    _requestTimer = copy._requestTimer;
 	return *this;
 }
 
@@ -137,6 +140,18 @@ int    httpRequest::can_requested(const Server &server, const std::string reques
         }
     }
     return (0);
+}
+
+bool    httpRequest::isTimedOut(int fd)
+{
+    time_t  currentTime = time(NULL);
+    std::cout << currentTime - _requestTimer << "isTimedOut() call for fd " << fd << "\n";
+    if (currentTime - _requestTimer > 10)
+    {
+        std::cout << " connection timed out\n";
+        return true;
+    }
+    return false;
 }
 
 
