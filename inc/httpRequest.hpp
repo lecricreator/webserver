@@ -104,7 +104,7 @@ class httpRequest
 		//int	postRequest();
 
 		//deleteRequest
-		unsigned int	deleteRequest();//not implemented
+		unsigned int	deleteRequest(const Server &server);
 
 		//requestProcessing
 
