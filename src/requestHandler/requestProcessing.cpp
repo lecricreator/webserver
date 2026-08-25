@@ -41,7 +41,10 @@ t_response_data httpRequest::generateResponseData(const Server &server)
   if (_method == "GET")
     status_code = getRequest(server, data);
   else if (_method == "DELETE")
-    status_code = deleteRequest();
+  {
+    status_code = deleteRequest(server);
+    print("STATUS: " + to_str(status_code));
+  }
   else if (_method == "POST" && is_cgi(_path, script_name))
   {
     if (_path[0] != '/')
@@ -50,7 +53,7 @@ t_response_data httpRequest::generateResponseData(const Server &server)
     status_code = cgi(_path, data, env, _body.c_str());
     free_env(env);
   }
-  print("STATUS: " + to_str(status_code));
+ 
 
   data.status = to_str((int)status_code) + " " + code_to_string(status_code);
   if (data.status == "301 Moved Permanently")

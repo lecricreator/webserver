@@ -18,6 +18,7 @@
 # include <cstring>
 # include <sstream>
 # include <map>
+# include <ctime>
 
 #define URI_MAX 2048
 #define	HEADER_MAX 100
@@ -67,6 +68,7 @@ class httpRequest
 		int				_bodySize;
 		int				_chunkSize;
 		int				_bodyMax;
+		time_t			_requestTimer;
 
 		//post request variables
 		int		_fileFd;
@@ -102,7 +104,7 @@ class httpRequest
 		//int	postRequest();
 
 		//deleteRequest
-		unsigned int	deleteRequest();//not implemented
+		unsigned int	deleteRequest(const Server &server);
 
 		//requestProcessing
 
@@ -119,6 +121,7 @@ class httpRequest
 		unsigned int	getErrorCode() const;
 		void			setErrorCode(unsigned int code);
 		void			printRequest();
+		bool			isTimedOut(int fd);
 
 		int		        parseRequest(std::string& str, int bodyMax, const Server &server);
     	std::string	  	executeRequest(const Server &server);
