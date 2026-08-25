@@ -4,10 +4,56 @@
 
 
 Location::Location() {
+	_fastcgi_pass = "";
+	_fastcgi_index = "";
+	_include = "";
+	_charset = "";
+	_expires = "";
+
     this->_is_cgi_py = false;
     this->_autoindex = false;
     _limit_except.push_back("UNINITIALIZED");
+
+	_path_location = "";
+	_root = "";
 }
+
+Location::Location(const Location& copy)
+{
+	_fastcgi_pass = copy._fastcgi_pass;
+	_fastcgi_index = copy._fastcgi_index;
+	_fastcgi_param = copy._fastcgi_param;
+	_include = copy._include;
+	_charset = copy._charset;
+	_expires = copy._expires;
+	_is_cgi_py = copy._is_cgi_py;
+	_autoindex = copy._autoindex;
+	_limit_except = copy._limit_except;
+
+	_path_location = copy._path_location;
+	_root = copy._root;
+	_index = copy._index;
+}
+
+Location	&Location::operator=(const Location& copy)
+{
+	_fastcgi_pass = copy._fastcgi_pass;
+	_fastcgi_index = copy._fastcgi_index;
+	_fastcgi_param = copy._fastcgi_param;
+	_include = copy._include;
+	_charset = copy._charset;
+	_expires = copy._expires;
+	_is_cgi_py = copy._is_cgi_py;
+	_autoindex = copy._autoindex;
+	_limit_except = copy._limit_except;
+
+	_path_location = copy._path_location;
+	_root = copy._root;
+	_index = copy._index;
+	return *this;	
+}
+
+Location::~Location() {}
 
 bool    Location::parse_location(std::ifstream *fd_file, const std::string pline, size_t posi) {
     std::string line;
