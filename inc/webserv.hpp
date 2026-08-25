@@ -1,4 +1,4 @@
-# ifndef WEBSERV
+#ifndef WEBSERV
 # define WEBSERV
 
 # include "support.hpp"
@@ -27,6 +27,8 @@
 # define FAILURE 1
 # define UNFINISHED 2
 
+extern volatile int gSignalStatus;
+
 typedef struct s_parse_data
 {
   Server      *server;
@@ -37,7 +39,7 @@ typedef struct s_parse_data
 
 
 //socket
-int   create_listening_socket(int port);
+int   create_listening_socket(int port, std::string server_name);
 int   accept_client(int server_fd);
 int   handle_request(int client_fd, t_parse_data &client_infos);
 int   send_response(int client_fd, std::string &response);

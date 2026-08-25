@@ -1,4 +1,12 @@
 #include "webserv.hpp"
+#include <csignal>
+
+volatile int gSignalStatus = 0;
+
+void signal_handler(int signal)
+{
+  gSignalStatus = signal;
+}
 
 std::map<int, Server> create_server(Conf conf_c)
 {
@@ -9,7 +17,8 @@ std::map<int, Server> create_server(Conf conf_c)
   {
     Server server = servers[server_index];
     int port = server.get_port_listen();
-    int server_fd = create_listening_socket(port);
+    std::string server_name = server.get_server_name();
+    int server_fd = create_listening_socket(port, server_name);
     if (server_fd == ERROR)
     {
       print_error("Server with port " + to_str(port) + " couldn't start");
@@ -32,6 +41,7 @@ int main(int argc, char **argv) {
   }
   std::map<int, Server> servers = create_server(*conf_c);
   int status = ERROR;
+  std::signal(SIGINT, signal_handler);
   if (!servers.empty())
     status = manage_events(servers, *conf_c);
   delete conf_c;

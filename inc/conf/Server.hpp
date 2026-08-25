@@ -6,7 +6,7 @@
 class Server {
     private:
         int                                 _port_listen;
-        std::vector<std::string>            _server_name;
+        std::string                         _server_name;
         std::string                         _include;
         std::string                         _default_type;
         std::string                         _log_format;
@@ -24,7 +24,7 @@ class Server {
 
         //GET
         int                                 &get_port_listen()   {return (this->_port_listen);};
-        const std::vector<std::string>      &get_server_name() const {return (this->_server_name);};
+        const std::string                   &get_server_name() const {return (this->_server_name);};
         const std::vector<Location>         &get_location() const {return (this->_locations);};
         const std::map<int, std::string>    &get_error_page() const {return (this->_error_page);};
         const int                           &get_client_max_body_size() const {return (this->_client_max_body_size);};

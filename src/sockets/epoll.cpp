@@ -42,8 +42,10 @@ static void manage_requests(struct epoll_event event,
   if (servers.find(fd) != servers.end())
   {
     int client_fd = accept_client(fd);
-    if (client_fd == ERROR)
-      return ;
+    if (client_fd == ERROR) {
+      close(client_fd);
+      return;
+    }
     set_nonblocking(client_fd);
     struct epoll_event s_event;
     if (set_epoll_event(s_event, client_fd, epoll_fd, EPOLLIN, EPOLL_CTL_ADD) == ERROR)
@@ -85,7 +87,7 @@ int manage_events(std::map<int, Server> &servers, Conf &conf_c)
   }
 
   struct epoll_event events[MAX_EVENTS];
-  while (true)
+  while (gSignalStatus != 2)
   {
     int nfds = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
     if (nfds == ERROR)
@@ -96,6 +98,9 @@ int manage_events(std::map<int, Server> &servers, Conf &conf_c)
     }
     for (int i = 0; i < nfds; i++)
       manage_requests(events[i], epoll_fd, conf_c, servers);
+  }
+  for (std::map<int, Server>::iterator it = servers.begin(); it != servers.end(); ++it) {
+    close(it->first);
   }
   close(epoll_fd);
   return SUCCESS;

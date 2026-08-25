@@ -73,6 +73,7 @@ t_response_data httpRequest::generateResponseData(const Server &server)
         data.status = "500" + code_to_string(500);
       }
       data.body = copy_file_to_str(file);
+      file.close();
     }
   }
   if (data.status != "200 OK" && data.body.empty())
