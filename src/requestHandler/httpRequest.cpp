@@ -150,6 +150,8 @@ bool    httpRequest::isTimedOut(int fd)
 {
     time_t  currentTime = time(NULL);
     std::cout << currentTime - _requestTimer << "isTimedOut() call for fd " << fd << "\n";
+    std::cout << "path of fd " << fd << _path << "\n";
+    std::cout << "method of fd " << fd << _method << "\n\n";
     if (currentTime - _requestTimer > 10)
     {
         std::cout << " connection timed out\n";

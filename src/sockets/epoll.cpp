@@ -97,6 +97,9 @@ int manage_events(std::map<int, Server> &servers, Conf &conf_c)
       perror("epoll_wait");
       return ERROR;
     }
+    for (int i = 0; i < nfds; i++)
+      manage_requests(events[i], epoll_fd, conf_c, servers, client_infos);
+
     std::map<int, t_parse_data>::iterator it = client_infos.begin();
     while (it != client_infos.end())
     {
@@ -109,8 +112,6 @@ int manage_events(std::map<int, Server> &servers, Conf &conf_c)
         else
           ++it;
     }
-    for (int i = 0; i < nfds; i++)
-      manage_requests(events[i], epoll_fd, conf_c, servers, client_infos);
   }
 
   for (std::map<int, Server>::iterator it = servers.begin(); it != servers.end(); ++it) {
