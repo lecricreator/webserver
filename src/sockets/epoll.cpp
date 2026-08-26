@@ -84,26 +84,24 @@ static void manage_requests(struct epoll_event event,
     if (set_epoll_event(event, client_fd, epoll_fd, EPOLLIN, EPOLL_CTL_ADD) == ERROR)
       return ;
     client_infos.insert(std::pair<int, t_parse_data>(client_fd, create_parse_data(conf_c, servers[fd])));
-  } else if (cgi_response_fds.find(fd) != cgi_response_fds.end()) {
+  }
+  else if (cgi_response_fds.find(fd) != cgi_response_fds.end()) {
     int status_cgi = cgi_event(fd, client_infos[fd].cgi_pid, client_infos[client_infos[fd].client_fd].response);
-    if (status_cgi == 200) {
-      //print("no errors with cgi answer, proceeding");
-      if (set_epoll_event(event, client_infos[fd].client_fd, epoll_fd, EPOLLOUT, EPOLL_CTL_MOD) == ERROR)
-        return ;
-      end_connection(fd, epoll_fd, client_infos);
-    } else {
-      //must change ||||||||||
-      client_infos[client_infos[fd].client_fd].request.setErrorCode(status_cgi);
-      if (set_epoll_event(event, client_infos[fd].client_fd, epoll_fd, EPOLLIN, EPOLL_CTL_MOD) == ERROR)
-        return ;
+    if (status_cgi != 200) {
+      client_infos[client_infos[fd].client_fd].response = create_response(set_error_response(*client_infos[fd].server, status_cgi, std::string()));
     }
-  } else if (event.events & EPOLLIN) {
+    if (set_epoll_event(event, client_infos[fd].client_fd, epoll_fd, EPOLLOUT, EPOLL_CTL_MOD) == ERROR)
+      return ;
+    end_connection(fd, epoll_fd, client_infos);
+  }
+  else if (event.events & EPOLLIN) {
     client_infos[fd].cgi_fd = INIT_CGI_FD;
     int request_status = handle_request(fd, client_infos[fd], response_data);
     if (request_status == SUCCESS) {
       if (set_epoll_event(event, fd, epoll_fd, EPOLLOUT, EPOLL_CTL_MOD) == ERROR)
         return ;
-    } else if (request_status == UNFINISHED && client_infos[fd].cgi_fd != INIT_CGI_FD) {
+    }
+    else if (request_status == UNFINISHED && client_infos[fd].cgi_fd != INIT_CGI_FD) {
       set_nonblocking(client_infos[fd].cgi_fd);
       //print(client_infos[fd].cgi_fd);
       if (set_epoll_event(event, client_infos[fd].cgi_fd, epoll_fd, EPOLLIN, EPOLL_CTL_ADD) == ERROR)
@@ -112,11 +110,12 @@ static void manage_requests(struct epoll_event event,
       client_infos.insert(std::pair<int, t_parse_data>(client_infos[fd].cgi_fd, client_infos[fd]));
       //print("cgi was registered in epoll");
     }
-  } else if (event.events & (EPOLLERR | EPOLLHUP)) {
+  }
+  else if (event.events & (EPOLLERR | EPOLLHUP)) {
     end_connection(fd, epoll_fd, client_infos);
-  } else {
-    if (send_response(fd, client_infos[fd].response) == UNFINISHED)
-    {
+  }
+  else {
+    if (send_response(fd, client_infos[fd].response) == UNFINISHED) {
       if (set_epoll_event(event, fd, epoll_fd, EPOLLOUT, EPOLL_CTL_MOD) == ERROR)
         return ;
     }

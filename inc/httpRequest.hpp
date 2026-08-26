@@ -134,7 +134,8 @@ int			ft_stoi(std::string n);
 int 		hexToInt(const std::string& hexStr);
 int     cgi(const std::string &path, t_parse_data &parse_data, char *env[], const char *cgi_input_data);
 void    free_env(char** env);
-std::string copy_file_to_str(std::ifstream &file);
-std::string create_response(const t_response_data &data);
+std::string     copy_file_to_str(std::ifstream &file);
+t_response_data set_error_response(const Server &server, int &status_code, const std::string &path);
+std::string     create_response(const t_response_data &data);
 
 #endif
