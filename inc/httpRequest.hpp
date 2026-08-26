@@ -78,6 +78,7 @@ class httpRequest
 
 		//response-related variables
 		std::string	_responseBody;
+		bool		_timeout;
 
 		//requestParser
 		bool	parseHexSize();
@@ -122,6 +123,8 @@ class httpRequest
 		void			setErrorCode(unsigned int code);
 		void			printRequest();
 		bool			isTimedOut(int fd);
+		bool			getTimeout(int fd);
+		void			setTimeout();
 
 		int		        parseRequest(std::string& str, int bodyMax, const Server &server);
     	std::string	  	executeRequest(const Server &server);

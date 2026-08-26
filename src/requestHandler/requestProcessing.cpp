@@ -28,6 +28,7 @@ static bool is_response_data_valid(t_response_data &data)
   bool is_301 = data.status == "301 Moved Permanently" && location;
 
   bool is_valid = status && (is_200 || (!content_type && !body && (is_301 || (!is_301 && !location))));
+
   return is_valid;
 }
 
@@ -38,20 +39,23 @@ t_response_data httpRequest::generateResponseData(const Server &server)
   int             status_code = _errorCode;
   std::string     script_name;
 
-  if (_method == "GET")
-    status_code = getRequest(server, data);
-  else if (_method == "DELETE")
+  if (status_code == 200)
   {
-    status_code = deleteRequest(server);
-    print("STATUS: " + to_str(status_code));
-  }
-  else if (_method == "POST" && is_cgi(_path, script_name))
-  {
-    if (_path[0] != '/')
-      _path = "/" + _path;
-    char **env = set_cgi_env(script_name);
-    status_code = cgi(_path, data, env, _body.c_str());
-    free_env(env);
+    if (_method == "GET")
+      status_code = getRequest(server, data);
+    else if (_method == "DELETE")
+    {
+      status_code = deleteRequest(server);
+      print("STATUS: " + to_str(status_code));
+    }
+    else if (_method == "POST" && is_cgi(_path, script_name))
+    {
+      if (_path[0] != '/')
+        _path = "/" + _path;
+      char **env = set_cgi_env(script_name);
+      status_code = cgi(_path, data, env, _body.c_str());
+      free_env(env);
+    }
   }
  
 
@@ -60,6 +64,7 @@ t_response_data httpRequest::generateResponseData(const Server &server)
     data.location = _path + "/";
   if (!is_response_data_valid(data))
   {
+    std::cout << "is_response_data_valid returned false\n";
     data.status = "500 Internal Server Error";
     data.content_type.erase(0);
   }

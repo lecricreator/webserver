@@ -19,6 +19,7 @@ httpRequest::httpRequest() : _headers()
     _bytesWritten = 0;
     _bodyMax = 0;
     _requestTimer = time(NULL);
+    _timeout = false;
 }
 
 httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
@@ -39,6 +40,7 @@ httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
     _bytesWritten = copy._bytesWritten;
     _bodyMax = copy._bodyMax;
     _requestTimer = copy._requestTimer;
+    _timeout = copy._timeout;
 }
 
 httpRequest&	httpRequest::operator=(const httpRequest& copy)
@@ -60,6 +62,7 @@ httpRequest&	httpRequest::operator=(const httpRequest& copy)
     _bytesWritten = copy._bytesWritten;
     _bodyMax = copy._bodyMax;
     _requestTimer = copy._requestTimer;
+    _timeout = copy._timeout;
 	return *this;
 }
 
@@ -82,6 +85,16 @@ void			httpRequest::setStatus(RequestStatus newStatus) { _status = newStatus; }
 unsigned int	httpRequest::getErrorCode() const { return _errorCode; }
 
 void	httpRequest::setErrorCode(unsigned int code) { _errorCode = code; }
+
+bool    httpRequest::getTimeout(int fd) 
+{
+    std::cout << "getTimeout call for fd " << fd << ": " << _errorCode << "\n";
+    if (_errorCode == 408)
+        return true;
+    return false;
+}
+
+void    httpRequest::setTimeout() { _timeout = true; }
 
 void	httpRequest::printRequest()
 {
@@ -150,11 +163,10 @@ bool    httpRequest::isTimedOut(int fd)
 {
     time_t  currentTime = time(NULL);
     std::cout << currentTime - _requestTimer << "isTimedOut() call for fd " << fd << "\n";
-    std::cout << "path of fd " << fd << _path << "\n";
-    std::cout << "method of fd " << fd << _method << "\n\n";
     if (currentTime - _requestTimer > 10)
     {
-        std::cout << " connection timed out\n";
+        std::cout << " connection timed out, setting error code to 408\n";
+        _errorCode = 408;
         return true;
     }
     return false;
