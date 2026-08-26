@@ -28,9 +28,9 @@ int handle_request(int client_fd, t_parse_data &client_infos)
   if (bytes_received <= 0)
     return ERROR;
   buf[bytes_received] = '\0';
-  //print("\n--- PACKET START ---\n");
-  //print(buf);
-  //print("\n--- PACKET END ---\n");
+  std::cout << "\n--- PACKET START " << client_fd << " ---\n";
+  print(buf);
+  print("\n--- PACKET END ---\n");
   int status_parsing = client_infos.request.parseRequest(request_packet, client_infos.server->get_client_max_body_size(), *client_infos.server);
   if (status_parsing == UNFINISHED)
     return UNFINISHED;

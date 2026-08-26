@@ -124,42 +124,34 @@ int    httpRequest::can_requested(const Server &server, const std::string reques
     if (path[path.length() - 1] != '/') {
         path += "/";
     }
-    std::cout << path <<" 2\n";
 
     std::vector<Location>::const_iterator it_location;
     for (it_location = server.get_location().begin(); it_location != server.get_location().end(); it_location++) {
         if (it_location->get_path_location() + "/" == path || (path == "/" && it_location->get_path_location() == "/")) {
-            std::cout << path <<" 3\n";
             if (it_location->get_limit_except().empty())
-            {
-                std::cout << "debug1\n";
                 return (-1);
-            }
             if (it_location->get_limit_except()[0] == "UNINITIALIZED") {
-                //std::cout << "can_requested\n";
-                std::cout << "debug5\n";
                 return (1);
             } else {
                 std::vector<std::string>::const_iterator it_limit;
                 for (it_limit = it_location->get_limit_except().begin(); it_limit != it_location->get_limit_except().end(); it_limit++) {
                     if (*it_limit == request) {
-                        std::cout << "debug2\n";
                         return (1);
                     }
                 }
-                std::cout << "debug3\n";
                 return (-1);
             }
         }
     }
-    print("JE SUIS LU");
-    return (-1);
+    return (0);
 }
 
 bool    httpRequest::isTimedOut(int fd)
 {
     time_t  currentTime = time(NULL);
     std::cout << currentTime - _requestTimer << "isTimedOut() call for fd " << fd << "\n";
+    std::cout << "path of fd " << fd << _path << "\n";
+    std::cout << "method of fd " << fd << _method << "\n\n";
     if (currentTime - _requestTimer > 10)
     {
         std::cout << " connection timed out\n";

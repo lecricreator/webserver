@@ -97,24 +97,23 @@ int manage_events(std::map<int, Server> &servers, Conf &conf_c)
       perror("epoll_wait");
       return ERROR;
     }
-std::map<int, t_parse_data>::iterator it = client_infos.begin();
-while (it != client_infos.end())
-{
-    if (it->second.request.isTimedOut(it->first))
-    {
-        int fd = it->first;
-        ++it;                          // advance before erasing
-        end_connection(fd, epoll_fd, client_infos);
-    }
-    else
-    {
-        ++it;
-    }
-}
-
     for (int i = 0; i < nfds; i++)
       manage_requests(events[i], epoll_fd, conf_c, servers, client_infos);
+
+    std::map<int, t_parse_data>::iterator it = client_infos.begin();
+    while (it != client_infos.end())
+    {
+        if (it->second.request.isTimedOut(it->first))
+        {
+            int fd = it->first;
+            ++it;                          // advance before erasing
+            end_connection(fd, epoll_fd, client_infos);
+        }
+        else
+          ++it;
+    }
   }
+
   for (std::map<int, Server>::iterator it = servers.begin(); it != servers.end(); ++it) {
     close(it->first);
   }
