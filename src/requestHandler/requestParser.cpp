@@ -478,8 +478,8 @@ int	httpRequest::parseRequest(std::string& str, int bodyMax, const Server &serve
 	}
 	if (_status == REQ_PARSED)
 	{
-		if (_method == "POST")
-			close(_fileFd);
+		////if (_method == "POST")
+		////	close(_fileFd);
 		return SUCCESS;
 	}
 	//std::cout << "parseRequest() return\n";
