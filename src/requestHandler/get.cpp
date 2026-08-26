@@ -152,7 +152,7 @@ static int validate_file(const Server &server, std::string &path, std::ifstream 
   return 200;
 }
 
-unsigned int	httpRequest::getRequest(const Server &server, t_response_data &data)
+unsigned int	httpRequest::getRequest(const Server &server, t_response_data &response_data, t_parse_data &parse_data)
 {
 	std::ifstream file;
 
@@ -171,19 +171,19 @@ unsigned int	httpRequest::getRequest(const Server &server, t_response_data &data
 
     if (is_cgi(_path, script_name)) {
       char **env = set_cgi_env(script_name);
-      status_code = cgi(_path, data, env, NULL);
+      status_code = cgi(_path, parse_data, env, NULL);
       free_env(env);
     } else {
-      data.content_type = choice_content_type(path);
-      data.body = copy_file_to_str(file);
+      response_data.content_type = choice_content_type(path);
+      response_data.body = copy_file_to_str(file);
     }
   } else if (status_code == 404 && exec_listing_dir(server, path)) {
-    data.body = listing_directory(server, _path);
-    data.content_type = "text/html";
+    response_data.body = listing_directory(server, _path);
+    response_data.content_type = "text/html";
     status_code = 200;
   } else if (is_favicon) {
-    data.content_type = "text/plain";
-    data.status = "200 OK";
+    response_data.content_type = "text/plain";
+    response_data.status = "200 OK";
     status_code = 200;
   }
   return status_code;
