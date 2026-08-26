@@ -107,7 +107,7 @@ std::string remove_sup_after_slash(std::string path) {
 // return = 1 == Can Get / -1 block and error 405 / 0 can't get but can continue
 int    httpRequest::can_requested(const Server &server, const std::string request) {
     std::string path = this->_path;
-    if (path == "/favicon.ico") {return true;}
+    if (path == "/favicon.ico") {return 1;}
     if (path.find(".") != std::string::npos) {
         path = remove_sup_after_slash(path);
     }
@@ -130,7 +130,8 @@ int    httpRequest::can_requested(const Server &server, const std::string reques
             }
         }
     }
-    return (0);
+    print("JE SUIS LU");
+    return (-1);
 }
 
 
