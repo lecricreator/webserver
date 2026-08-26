@@ -18,7 +18,7 @@ httpRequest::httpRequest() : _headers()
     _isChunkedPost = false;
     _bytesWritten = 0;
     _bodyMax = 0;
-    _requestTimer = time(NULL);
+    _lastActivity = time(NULL);
     _timeout = false;
 }
 
@@ -39,7 +39,7 @@ httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
     _isChunkedPost = copy._isChunkedPost;
     _bytesWritten = copy._bytesWritten;
     _bodyMax = copy._bodyMax;
-    _requestTimer = copy._requestTimer;
+    _lastActivity = copy._lastActivity;
     _timeout = copy._timeout;
 }
 
@@ -61,7 +61,7 @@ httpRequest&	httpRequest::operator=(const httpRequest& copy)
     _isChunkedPost = copy._isChunkedPost;
     _bytesWritten = copy._bytesWritten;
     _bodyMax = copy._bodyMax;
-    _requestTimer = copy._requestTimer;
+    _lastActivity = copy._lastActivity;
     _timeout = copy._timeout;
 	return *this;
 }
@@ -94,7 +94,7 @@ bool    httpRequest::getTimeout(int fd)
     return false;
 }
 
-void    httpRequest::setTimeout() { _timeout = true; }
+void    httpRequest::setTimeout(bool timeout) { _timeout = timeout; _errorCode = 408; }
 
 void	httpRequest::printRequest()
 {
@@ -162,16 +162,19 @@ int    httpRequest::can_requested(const Server &server, const std::string reques
 bool    httpRequest::isTimedOut(int fd)
 {
     time_t  currentTime = time(NULL);
-    std::cout << currentTime - _requestTimer << "isTimedOut() call for fd " << fd << "\n";
-    if (currentTime - _requestTimer > 10)
+    std::cout << currentTime - _lastActivity << "isTimedOut() call for fd " << fd << "\n";
+    if (currentTime - _lastActivity > 10)
     {
-        std::cout << " connection timed out, setting error code to 408\n";
-        _errorCode = 408;
+        std::cout << " connection timed out\n";
         return true;
     }
     return false;
 }
 
+void    httpRequest::resetTimer()
+{
+    _lastActivity = time(NULL);
+}
 
 /**********************************************************************************************/
 

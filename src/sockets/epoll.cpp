@@ -38,8 +38,6 @@ static void manage_requests(struct epoll_event event,
             std::map<int, t_parse_data> &client_infos)
 {
   int fd = event.data.fd;
-  if (client_infos[fd].request.getTimeout(fd))
-    print("debug");
   if (servers.find(fd) != servers.end())
   {
     int client_fd = accept_client(fd);
@@ -57,6 +55,7 @@ static void manage_requests(struct epoll_event event,
     end_connection(fd, epoll_fd, client_infos);
   else if (event.events & EPOLLIN)
   {
+    client_infos[fd].request.resetTimer();
     if (handle_request(fd, client_infos[fd]) == SUCCESS)
       if (set_epoll_event(event, fd, epoll_fd, EPOLLOUT, EPOLL_CTL_MOD) == ERROR)
         return ;
@@ -92,7 +91,7 @@ int manage_events(std::map<int, Server> &servers, Conf &conf_c)
   while (gSignalStatus != 2)
   {
     std::cout << "\n--------------------EPOLL ITERATION--------------------\n\n";
-    int nfds = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
+    int nfds = epoll_wait(epoll_fd, events, MAX_EVENTS, 1000);
     if (nfds == ERROR)
     {
       if (errno == EINTR) continue;
@@ -104,13 +103,14 @@ int manage_events(std::map<int, Server> &servers, Conf &conf_c)
     {
         if (it->second.request.isTimedOut(it->first))
         {
-            //int fd = it->first;
-            //++it;                          // advance before erasing
-            //end_connection(fd, epoll_fd, client_infos);
-            it->second.request.setTimeout();
-            //std::cout << "errorcode for fd " << it->first << ": " << it->second.request.getErrorCode() << "\n";
+            int fd = it->first;
+            ++it; // advance before erasing to keep iterator valid
+            end_connection(fd, epoll_fd, client_infos);
         }
-        ++it;
+        else
+        {
+            ++it;
+        }
     }
     for (int i = 0; i < nfds; i++)
       manage_requests(events[i], epoll_fd, conf_c, servers, client_infos);
