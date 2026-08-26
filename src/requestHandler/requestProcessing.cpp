@@ -14,21 +14,62 @@
 //  print("-----------");
 //}
 
-static bool is_response_data_valid(t_response_data &response_data)
+//catches malformed errors
+//static bool is_response_data_valid(t_response_data &response_data)
+//{
+  //bool status = !response_data.status.empty();
+  //bool content_type = !response_data.content_type.empty();
+  //bool location = !response_data.location.empty();
+  //bool body = !response_data.body.empty();
+//
+  //bool has_body = content_type && body;
+  //bool has_no_body = !content_type && !body;
+//
+  //bool is_200 = response_data.status == "200 ok" && !location && (has_body || has_no_body);
+  //bool is_301 = response_data.status == "301 moved permanently" && location;
+//
+  //bool is_valid = status && (is_200 || (!content_type && !body && (is_301 || (!is_301 && !location))));
+  //return is_valid;
+//}
+
+t_response_data set_response_data(
+                const std::string &status,
+                const std::string &location,
+                const std::string &content_type,
+                const std::string &body
+                )
 {
-  bool status = !response_data.status.empty();
-  bool content_type = !response_data.content_type.empty();
-  bool location = !response_data.location.empty();
-  bool body = !response_data.body.empty();
+  t_response_data result;
+  result.status = status;
+  result.location = location;
+  result.content_type = content_type;
+  result.body = body;
+  return result;
+}
 
-  bool has_body = content_type && body;
-  bool has_no_body = !content_type && !body;
+t_response_data set_error_response(const Server &server, int &status_code, const std::string &path)
+{
+  std::string status;
+  std::string location;
+  std::string content_type;
+  std::string body;
 
-  bool is_200 = response_data.status == "200 OK" && !location && (has_body || has_no_body);
-  bool is_301 = response_data.status == "301 Moved Permanently" && location;
-
-  bool is_valid = status && (is_200 || (!content_type && !body && (is_301 || (!is_301 && !location))));
-  return is_valid;
+  if (status_code == 301)
+    location = path + "/";
+  if (server.get_error_page().find(status_code) != server.get_error_page().end()) {
+    std::ifstream file;
+    std::string error_page_path = "www/" + server.get_error_page().find(status_code)->second;
+    file.open(error_page_path.c_str());
+    if (access(error_page_path.c_str(), F_OK) == -1) {
+      status_code = 404;
+    } else if (access(error_page_path.c_str(), R_OK) == -1 || !file.is_open()) {
+      status_code = 500;
+    }
+  }
+  status = to_str((int)status_code) + " " + code_to_string(status_code);
+  content_type = "text/html";
+  body = "<body style=\"background-color: green;\"><h1 style=\"position: absolute; left: 20%; top: 30%; text-align: center;color:red; transform: rotate(150deg);\">" + status + "</h1></body>\n";
+  return set_response_data(status, location, content_type, body);
 }
 
 //POST method is implemented/called in the parsing therefore not needed here
@@ -37,58 +78,28 @@ t_response_data httpRequest::generateResponseData(const Server &server, t_parse_
   int             status_code = _errorCode;
   std::string     script_name;
 
-  //check existence
-  if (response_data.body.empty())
+  if (_method == "GET")
+    status_code = getRequest(server, response_data, parse_data);
+  else if (_method == "DELETE")
+    status_code = deleteRequest();
+  else if (_method == "POST" && is_cgi(_path, script_name))
   {
-    if (_method == "GET")
-      status_code = getRequest(server, response_data, parse_data);
-    else if (_method == "DELETE")
-      status_code = deleteRequest();
-    else if (_method == "POST" && is_cgi(_path, script_name))
-    {
-      if (_path[0] != '/')
-        _path = "/" + _path;
-      char **env = set_cgi_env(script_name);
-      status_code = cgi(_path, parse_data, env, _body.c_str());
-      free_env(env);
-    }
-    else
-      print("body was filled");
+    if (_path[0] != '/')
+      _path = "/" + _path;
+    char **env = set_cgi_env(script_name);
+    status_code = cgi(_path, parse_data, env, _body.c_str());
+    free_env(env);
   }
   //when cgi is triggered only cgi_fd must be returned as we must wait for cgi response before responding
   //we try to give fd to epoll loop to offer it to the holy epoll
-  if (status_code == 200 && parse_data.cgi_fd != ERROR)
-    return print("cgi exited nicely"), response_data;
+  
   print("SSSSSSSSSSSTATUS: " + to_str(status_code));
+  if (status_code == 200 && parse_data.cgi_fd != ERROR)
+    return response_data;
 
+  if (status_code != 200)
+    return set_error_response(server, status_code, _path);
   response_data.status = to_str((int)status_code) + " " + code_to_string(status_code);
-  if (response_data.status == "301 Moved Permanently")
-    response_data.location = _path + "/";
-  if (!is_response_data_valid(response_data))
-  {
-    response_data.status = "500 Internal Server Error";
-    response_data.content_type.erase(0);
-  }
-  if (response_data.status != "200 OK") {
-    if (server.get_error_page().find(status_code) != server.get_error_page().end()) {
-      std::ifstream file;
-      std::string path = "www/" + server.get_error_page().find(status_code)->second;
-      file.open(path.c_str());
-  	  if (access(path.c_str(), F_OK) == -1) {
-        response_data.status = "404" + code_to_string(404);
-      }
-      if (access(path.c_str(), R_OK) == -1 || !file.is_open()) {
-        response_data.status = "500" + code_to_string(500);
-      }
-
-      std::string copy_file_to_str(std::ifstream &file);
-    }
-  }
-  if (response_data.status != "200 OK" && response_data.body.empty())
-  {
-    response_data.content_type = "text/html";
-    response_data.body = "<body style=\"background-color: green;\"><h1 style=\"position: absolute; left: 20%; top: 30%; text-align: center;color:red; transform: rotate(150deg);\">" + response_data.status + "</h1></body>\n";
-  }
   return response_data;
 }
 
