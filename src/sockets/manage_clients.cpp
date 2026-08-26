@@ -36,9 +36,10 @@ int handle_request(int client_fd, t_parse_data &client_infos,
   if (status_parsing == UNFINISHED)
     return UNFINISHED;
   client_infos.response = client_infos.request.executeRequest(*client_infos.server, client_infos, response_data);
-  if (client_infos.cgi_fd != INIT_CGI_FD)
+  if (client_infos.cgi_fd != INIT_CGI_FD) {
+    client_infos.client_fd = client_fd;
     return UNFINISHED;
-  if (client_infos.response.empty())
+  } if (client_infos.response.empty())
     return ERROR;
   return SUCCESS;
 }

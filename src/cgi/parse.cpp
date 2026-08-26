@@ -99,6 +99,8 @@ int parse_cgi(const std::string &cgi_output, t_response_data &data)
   if (parse_cgi_header(header, data) == SUCCESS)
   {
     data.body = body;
+    if (data.status.empty())
+      data.status = "200 OK";
     return SUCCESS;
   }
   return FAILURE;
