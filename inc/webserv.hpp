@@ -35,6 +35,7 @@ typedef struct s_parse_data
   Conf        *conf;
   std::string response;
   httpRequest request;
+  time_t  last_activity;
 } t_parse_data;
 
 
