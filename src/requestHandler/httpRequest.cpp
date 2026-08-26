@@ -66,7 +66,7 @@ httpRequest&	httpRequest::operator=(const httpRequest& copy)
 	return *this;
 }
 
-httpRequest::~httpRequest() 
+httpRequest::~httpRequest()
 {
     if (_fileFd != -1)
         close(_fileFd);
