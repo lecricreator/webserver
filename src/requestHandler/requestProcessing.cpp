@@ -41,7 +41,10 @@ t_response_data httpRequest::generateResponseData(const Server &server)
   if (_method == "GET")
     status_code = getRequest(server, data);
   else if (_method == "DELETE")
-    status_code = deleteRequest();
+  {
+    status_code = deleteRequest(server);
+    print("STATUS: " + to_str(status_code));
+  }
   else if (_method == "POST" && is_cgi(_path, script_name))
   {
     if (_path[0] != '/')
@@ -50,7 +53,7 @@ t_response_data httpRequest::generateResponseData(const Server &server)
     status_code = cgi(_path, data, env, _body.c_str());
     free_env(env);
   }
-  print("SSSSSSSSSSSTATUS: " + to_str(status_code));
+ 
 
   data.status = to_str((int)status_code) + " " + code_to_string(status_code);
   if (data.status == "301 Moved Permanently")
@@ -63,16 +66,17 @@ t_response_data httpRequest::generateResponseData(const Server &server)
   if (data.status != "200 OK") {
     if (server.get_error_page().find(status_code) != server.get_error_page().end()) {
       std::ifstream file;
-      std::string path = "www/" + server.get_error_page().find(status_code)->second;
+      std::string path = "www" + server.get_error_page().find(status_code)->second;
       file.open(path.c_str());
   	  if (access(path.c_str(), F_OK) == -1) {
         data.status = "404" + code_to_string(404);
       }
-      if (access(path.c_str(), R_OK) == -1 || !file.is_open()) {
+      if (access(path.c_str(), R_OK) == -1 && !file.is_open()) {
+        std::cout << "errno: " << errno << "\n";
         data.status = "500" + code_to_string(500);
       }
-
-      std::string copy_file_to_str(std::ifstream &file);
+      data.body = copy_file_to_str(file);
+      file.close();
     }
   }
   if (data.status != "200 OK" && data.body.empty())

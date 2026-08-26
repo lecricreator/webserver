@@ -31,7 +31,7 @@ int handle_request(int client_fd, t_parse_data &client_infos)
   //print("\n--- PACKET START ---\n");
   //print(buf);
   //print("\n--- PACKET END ---\n");
-  int status_parsing = client_infos.request.parseRequest(request_packet, client_infos.server->get_client_max_body_size());
+  int status_parsing = client_infos.request.parseRequest(request_packet, client_infos.server->get_client_max_body_size(), *client_infos.server);
   if (status_parsing == UNFINISHED)
     return UNFINISHED;
   client_infos.response = client_infos.request.executeRequest(*client_infos.server);
@@ -43,7 +43,7 @@ int handle_request(int client_fd, t_parse_data &client_infos)
 int send_response(int client_fd, std::string &response)
 {
   ssize_t bytes_sent = send(client_fd, response.data(), response.size(), 0);
-  if (bytes_sent == ERROR && errno != EAGAIN)
+  if (bytes_sent == ERROR)
     return print_error("Failed to send response"), ERROR;
   if (bytes_sent == (ssize_t)response.size())
     return SUCCESS;

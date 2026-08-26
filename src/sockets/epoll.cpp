@@ -34,16 +34,18 @@ void end_connection(int fd, int epoll_fd, std::map<int, t_parse_data> &client_in
 }
 
 static void manage_requests(struct epoll_event event,
-            int epoll_fd, Conf &conf_c, std::map<int, Server> &servers)
+            int epoll_fd, Conf &conf_c, std::map<int, Server> &servers,
+            std::map<int, t_parse_data> &client_infos)
 {
-  static std::map<int, t_parse_data> client_infos;
   int fd = event.data.fd;
 
   if (servers.find(fd) != servers.end())
   {
     int client_fd = accept_client(fd);
-    if (client_fd == ERROR)
-      return ;
+    if (client_fd == ERROR) {
+      close(client_fd);
+      return;
+    }
     set_nonblocking(client_fd);
     struct epoll_event s_event;
     if (set_epoll_event(s_event, client_fd, epoll_fd, EPOLLIN, EPOLL_CTL_ADD) == ERROR)
@@ -72,6 +74,7 @@ static void manage_requests(struct epoll_event event,
 
 int manage_events(std::map<int, Server> &servers, Conf &conf_c)
 {
+  std::map<int, t_parse_data> client_infos;
   int epoll_fd = epoll_create1(0);
   if (epoll_fd == ERROR)
     return ERROR;
@@ -85,7 +88,7 @@ int manage_events(std::map<int, Server> &servers, Conf &conf_c)
   }
 
   struct epoll_event events[MAX_EVENTS];
-  while (true)
+  while (gSignalStatus != 2)
   {
     int nfds = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
     if (nfds == ERROR)
@@ -94,8 +97,26 @@ int manage_events(std::map<int, Server> &servers, Conf &conf_c)
       perror("epoll_wait");
       return ERROR;
     }
+std::map<int, t_parse_data>::iterator it = client_infos.begin();
+while (it != client_infos.end())
+{
+    if (it->second.request.isTimedOut(it->first))
+    {
+        int fd = it->first;
+        ++it;                          // advance before erasing
+        end_connection(fd, epoll_fd, client_infos);
+    }
+    else
+    {
+        ++it;
+    }
+}
+
     for (int i = 0; i < nfds; i++)
-      manage_requests(events[i], epoll_fd, conf_c, servers);
+      manage_requests(events[i], epoll_fd, conf_c, servers, client_infos);
+  }
+  for (std::map<int, Server>::iterator it = servers.begin(); it != servers.end(); ++it) {
+    close(it->first);
   }
   close(epoll_fd);
   return SUCCESS;
