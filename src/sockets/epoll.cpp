@@ -38,6 +38,7 @@ static void manage_requests(struct epoll_event event,
             std::map<int, t_parse_data> &client_infos)
 {
   int fd = event.data.fd;
+  std::cout << "manage_request called on fd " << fd << "\n";
   if (servers.find(fd) != servers.end())
   {
     int client_fd = accept_client(fd);
@@ -92,6 +93,7 @@ int manage_events(std::map<int, Server> &servers, Conf &conf_c)
   {
     std::cout << "\n--------------------EPOLL ITERATION--------------------\n\n";
     int nfds = epoll_wait(epoll_fd, events, MAX_EVENTS, 1000);
+    std::cout << "nfds: "  << nfds << "\n";
     if (nfds == ERROR)
     {
       if (errno == EINTR) continue;
