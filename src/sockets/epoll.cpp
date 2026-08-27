@@ -40,7 +40,8 @@ int read_fd(const int &fd, std::string &response)
   char buf[4096];
 
   int n = read(fd, buf, sizeof(buf));
-  response.append(buf, n);
+  if (n != ERROR)
+    response.append(buf, n);
   return n;
 }
 
@@ -86,6 +87,7 @@ static void manage_requests(struct epoll_event event,
     if (set_epoll_event(event, client_fd, epoll_fd, EPOLLIN, EPOLL_CTL_ADD) == ERROR)
       return ;
     client_infos.insert(std::pair<int, t_parse_data>(client_fd, create_parse_data(conf_c, servers[fd])));
+    client_infos[client_fd].client_fd = client_fd;
   }
   else if (cgi_response_fds.find(fd) != cgi_response_fds.end()) {
     int status_cgi = cgi_event(fd, client_infos[fd].cgi_pid, client_infos[client_infos[fd].client_fd].response);
@@ -113,6 +115,7 @@ static void manage_requests(struct epoll_event event,
         return ;
       cgi_response_fds.insert(std::pair<int, int>(client_infos[fd].cgi_fd, fd));
       client_infos.insert(std::pair<int, t_parse_data>(client_infos[fd].cgi_fd, client_infos[fd]));
+      client_infos[client_infos[fd].cgi_fd].cgi_fd = -2;
       //print("cgi was registered in epoll");
     }
   }
@@ -162,8 +165,24 @@ int manage_events(std::map<int, Server> &servers, Conf &conf_c)
         if (it->second.request.isTimedOut(it->first))
         {
             int fd = it->first;
-            ++it; // advance before erasing to keep iterator valid
-            end_connection(fd, epoll_fd, client_infos);
+            ++it;
+            if (client_infos[fd].cgi_fd == -2)
+            {
+              end_connection(fd, epoll_fd, client_infos);
+              //end_connection(client_infos[fd].client_fd, epoll_fd, client_infos);
+            }
+            else {
+              if (client_infos[fd].cgi_fd != 0)
+                kill(client_infos[fd].cgi_pid, SIGKILL);
+              int status_code;
+              if (client_infos[fd].cgi_fd == -1)
+                status_code = 408;
+              else 
+                status_code = 504;
+              client_infos[fd].response = create_response(set_error_response(*client_infos[fd].server, status_code, std::string()));
+              if (set_epoll_event(event, fd, epoll_fd, EPOLLOUT, EPOLL_CTL_MOD) == ERROR)
+                continue ;
+            }
         }
         else
         {
