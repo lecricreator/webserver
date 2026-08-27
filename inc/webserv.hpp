@@ -1,0 +1,67 @@
+#ifndef WEBSERV
+# define WEBSERV
+
+# include "support.hpp"
+# include "conf/Conf.hpp"
+# include "httpRequest.hpp"
+
+# include <cerrno>
+# include <fcntl.h>
+# include <stdio.h>
+# include <string.h>
+# include <unistd.h>
+# include <sys/socket.h>
+# include <sys/epoll.h>
+# include <arpa/inet.h>
+# include <iostream>
+# include <fstream>
+# include <list>
+# include <algorithm>
+# include <vector>
+# include <map>
+# include <cstring>
+# include <utility>
+
+# define INIT_CGI_FD -1
+# define ERROR -1
+# define SUCCESS 0
+# define FAILURE 1
+# define UNFINISHED 2
+# define ISDEBUG 0
+
+extern volatile int gSignalStatus;
+
+typedef struct s_parse_data
+{
+  Server      *server;
+  Conf        *conf;
+  std::string response;
+  httpRequest request;
+  time_t  last_activity;
+  //for cgi
+  std::string cgi_response;
+  int         client_fd;
+  int         cgi_fd;
+  pid_t       cgi_pid;
+} t_parse_data;
+
+//socket
+int   create_listening_socket(int port, std::string server_name);
+int   accept_client(int server_fd);
+int   handle_request(int client_fd, t_parse_data &client_infos,
+                    t_response_data response_data);
+int   send_response(int client_fd, std::string &response);
+
+//socket support
+void  print_function_error(std::string function_name);
+void  print_success(std::string function_name, std::string output_name, int output);
+void  set_nonblocking(int fd);
+
+//epoll
+int   manage_events(std::map<int, Server> &servers, Conf &conf_c);
+
+//conf
+void  parse_conf(char *argv);
+Conf  *init_conf(char *path_conf);
+
+#endif
