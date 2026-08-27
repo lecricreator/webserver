@@ -27,6 +27,7 @@
 # define SUCCESS 0
 # define FAILURE 1
 # define UNFINISHED 2
+# define ISDEBUG 1
 
 extern volatile int gSignalStatus;
 

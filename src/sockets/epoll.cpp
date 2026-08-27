@@ -28,7 +28,8 @@ t_parse_data create_parse_data(Conf& conf_c, Server &server)
 
 void end_connection(int fd, int epoll_fd, std::map<int, t_parse_data> &client_infos)
 {
-  print("Connection ceased with fd " + to_str(fd));
+  if (ISDEBUG)
+    print("Connection ceased with fd " + to_str(fd));
   epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
   close(fd);
   client_infos.erase(fd);
@@ -150,9 +151,7 @@ int manage_events(std::map<int, Server> &servers, Conf &conf_c)
   struct epoll_event events[MAX_EVENTS];
   while (gSignalStatus != 2)
   {
-    std::cout << "\n--------------------EPOLL ITERATION--------------------\n\n";
     int nfds = epoll_wait(epoll_fd, events, MAX_EVENTS, 1000);
-    std::cout << "nfds: "  << nfds << "\n";
     if (nfds == ERROR)
     {
       if (errno == EINTR) continue;
@@ -177,7 +176,7 @@ int manage_events(std::map<int, Server> &servers, Conf &conf_c)
               int status_code;
               if (client_infos[fd].cgi_fd == -1)
                 status_code = 408;
-              else 
+              else
                 status_code = 504;
               client_infos[fd].response = create_response(set_error_response(*client_infos[fd].server, status_code, std::string()));
               if (set_epoll_event(event, fd, epoll_fd, EPOLLOUT, EPOLL_CTL_MOD) == ERROR)

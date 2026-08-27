@@ -10,25 +10,20 @@ logique separee en fonction de si le fichier doit etre write en chunk ou non, po
 */
 bool is_directory(const std::string& path) {
     //assert(path.empty() == false && "String contains an actual path");
-	std::cout << "path:" << path << ";\n";
     struct stat path_stat;
     std::memset(&path_stat, 0, sizeof(path_stat));
-    if (stat(path.c_str(), &path_stat) != 0) 
+    if (stat(path.c_str(), &path_stat) != 0)
 	{
-		std::cout << "debug1\n";
-        std::cout << "errno: " << errno << "\n";
         return false;
 	}
 
-    if (!S_ISDIR(path_stat.st_mode)) 
+    if (!S_ISDIR(path_stat.st_mode))
 	{
-		std::cout << "debug2\n";
         return false;
 	}
 
-    if (access(path.c_str(), W_OK) != 0) 
+    if (access(path.c_str(), W_OK) != 0)
 	{
-		std::cout << "debug3\n";
         return false;
 	}
 

@@ -69,7 +69,8 @@ bool	httpRequest::parseChunkData()
 
 bool	httpRequest::parseChunked()
 {
-	std::cout << "parseChunked() call\n";
+	if (ISDEBUG)
+		std::cout << "parseChunked() call\n";
 	if (_headers["Transfer-Encoding"] != "chunked")
 	{
 		setErrorCode(400);
@@ -450,7 +451,6 @@ int	httpRequest::parseRequest(std::string& str, int bodyMax, const Server &serve
 		{
 			if (can_requested(server, _method) == -1)
 			{
-				std::cout << _method << "lol\n";
 				setErrorCode(405);
 				return ERROR;
 			}

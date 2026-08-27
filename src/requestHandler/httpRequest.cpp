@@ -86,9 +86,9 @@ unsigned int	httpRequest::getErrorCode() const { return _errorCode; }
 
 void	httpRequest::setErrorCode(unsigned int code) { _errorCode = code; }
 
-bool    httpRequest::getTimeout(int fd) 
+bool    httpRequest::getTimeout(int fd)
 {
-    std::cout << "getTimeout call for fd " << fd << ": " << _errorCode << "\n";
+    (void)fd;
     if (_errorCode == 408)
         return true;
     return false;
@@ -166,10 +166,13 @@ int    httpRequest::can_requested(const Server &server, const std::string reques
 bool    httpRequest::isTimedOut(int fd)
 {
     time_t  currentTime = time(NULL);
-    std::cout << currentTime - _lastActivity << "isTimedOut() call for fd " << fd << "\n";
+    if (ISDEBUG)
+        std::cout << currentTime - _lastActivity << "isTimedOut() call for fd " << fd << "\n";
     if (currentTime - _lastActivity > 10)
     {
-        std::cout << " connection timed out\n";
+        if (ISDEBUG) {
+            std::cout << " connection timed out\n";
+        }
         return true;
     }
     return false;
