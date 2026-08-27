@@ -47,5 +47,6 @@ int main(int argc, char **argv) {
   delete conf_c;
   if (status == ERROR)
     return FAILURE;
+  std::cout << "\nexited webserv cleanly\n";
   return SUCCESS;
 }

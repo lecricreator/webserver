@@ -18,7 +18,8 @@ httpRequest::httpRequest() : _headers()
     _isChunkedPost = false;
     _bytesWritten = 0;
     _bodyMax = 0;
-    _requestTimer = time(NULL);
+    _lastActivity = time(NULL);
+    _timeout = false;
 }
 
 httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
@@ -38,7 +39,8 @@ httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
     _isChunkedPost = copy._isChunkedPost;
     _bytesWritten = copy._bytesWritten;
     _bodyMax = copy._bodyMax;
-    _requestTimer = copy._requestTimer;
+    _lastActivity = copy._lastActivity;
+    _timeout = copy._timeout;
 }
 
 httpRequest&	httpRequest::operator=(const httpRequest& copy)
@@ -59,11 +61,12 @@ httpRequest&	httpRequest::operator=(const httpRequest& copy)
     _isChunkedPost = copy._isChunkedPost;
     _bytesWritten = copy._bytesWritten;
     _bodyMax = copy._bodyMax;
-    _requestTimer = copy._requestTimer;
+    _lastActivity = copy._lastActivity;
+    _timeout = copy._timeout;
 	return *this;
 }
 
-httpRequest::~httpRequest() 
+httpRequest::~httpRequest()
 {
     if (_fileFd != -1)
         close(_fileFd);
@@ -82,6 +85,16 @@ void			httpRequest::setStatus(RequestStatus newStatus) { _status = newStatus; }
 unsigned int	httpRequest::getErrorCode() const { return _errorCode; }
 
 void	httpRequest::setErrorCode(unsigned int code) { _errorCode = code; }
+
+bool    httpRequest::getTimeout(int fd) 
+{
+    std::cout << "getTimeout call for fd " << fd << ": " << _errorCode << "\n";
+    if (_errorCode == 408)
+        return true;
+    return false;
+}
+
+void    httpRequest::setTimeout(bool timeout) { _timeout = timeout; _errorCode = 408; }
 
 void	httpRequest::printRequest()
 {
@@ -124,43 +137,33 @@ int    httpRequest::can_requested(const Server &server, const std::string reques
     if (path[path.length() - 1] != '/') {
         path += "/";
     }
-    std::cout << path <<" 2\n";
 
     std::vector<Location>::const_iterator it_location;
     for (it_location = server.get_location().begin(); it_location != server.get_location().end(); it_location++) {
         if (it_location->get_path_location() + "/" == path || (path == "/" && it_location->get_path_location() == "/")) {
-            std::cout << path <<" 3\n";
             if (it_location->get_limit_except().empty())
-            {
-                std::cout << "debug1\n";
                 return (-1);
-            }
             if (it_location->get_limit_except()[0] == "UNINITIALIZED") {
-                //std::cout << "can_requested\n";
-                std::cout << "debug5\n";
                 return (1);
             } else {
                 std::vector<std::string>::const_iterator it_limit;
                 for (it_limit = it_location->get_limit_except().begin(); it_limit != it_location->get_limit_except().end(); it_limit++) {
                     if (*it_limit == request) {
-                        std::cout << "debug2\n";
                         return (1);
                     }
                 }
-                std::cout << "debug3\n";
                 return (-1);
             }
         }
     }
-    std::cout << "debug4\n";
     return (0);
 }
 
 bool    httpRequest::isTimedOut(int fd)
 {
     time_t  currentTime = time(NULL);
-    std::cout << currentTime - _requestTimer << "isTimedOut() call for fd " << fd << "\n";
-    if (currentTime - _requestTimer > 10)
+    std::cout << currentTime - _lastActivity << "isTimedOut() call for fd " << fd << "\n";
+    if (currentTime - _lastActivity > 10)
     {
         std::cout << " connection timed out\n";
         return true;
@@ -168,6 +171,10 @@ bool    httpRequest::isTimedOut(int fd)
     return false;
 }
 
+void    httpRequest::resetTimer()
+{
+    _lastActivity = time(NULL);
+}
 
 /**********************************************************************************************/
 

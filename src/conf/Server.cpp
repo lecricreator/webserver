@@ -2,10 +2,56 @@
 #include "conf/Server.hpp"
 
 Server::Server() {
-    this->_port_listen = ERROR;
-    this->_client_max_body_size = 1024;
+    _port_listen = ERROR;
+    _client_max_body_size = 1024;
+
+	_server_name = "";
+	_include = "";
+	_default_type = "";
+	_log_format = "";
+	_sendfile = "";
+	_keepalive_timeout = "";
+	_gzip = "";
 }
 
+Server::Server(const Server& copy)
+{
+	_port_listen = copy._port_listen;
+	_client_max_body_size = copy._client_max_body_size;
+
+	_server_name = copy._server_name;
+	_include = copy._include;
+	_default_type = copy._default_type;
+	_log_format =  copy._log_format;
+	_sendfile = copy._sendfile;
+	_keepalive_timeout = copy._keepalive_timeout;
+	_gzip = copy._gzip;
+
+	_access_log = copy._access_log;
+	_locations = copy._locations;
+	_error_page =  copy._error_page;
+}
+
+Server&	Server::operator=(const Server& copy)
+{
+	_port_listen = copy._port_listen;
+	_client_max_body_size = copy._client_max_body_size;
+
+	_server_name = copy._server_name;
+	_include = copy._include;
+	_default_type = copy._default_type;
+	_log_format =  copy._log_format;
+	_sendfile = copy._sendfile;
+	_keepalive_timeout = copy._keepalive_timeout;
+	_gzip = copy._gzip;
+
+	_access_log = copy._access_log;
+	_locations = copy._locations;
+	_error_page =  copy._error_page;
+	return *this;
+}
+
+Server::~Server() {}
 
 bool    Server::parse_server(std::ifstream *fd_file) {
     std::string line;

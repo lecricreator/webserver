@@ -2,9 +2,24 @@
 #include "conf/Events.hpp"
 
 Events::Events() {
-    this->_worker_connections = 5000;
+    _worker_connections = 5000;
+	_use = "";
 }
 
+Events::Events(const Events& copy)
+{
+	_worker_connections = copy._worker_connections;
+	_use = copy._use;
+}
+
+Events	&Events::operator=(const Events& copy)
+{
+	_worker_connections = copy._worker_connections;
+	_use = copy._use;
+	return *this;	
+}
+
+Events::~Events() {}
 
 bool    Events::parse_events(std::ifstream *fd_file) {
     std::string line;

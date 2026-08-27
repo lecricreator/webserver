@@ -68,7 +68,7 @@ class httpRequest
 		int				_bodySize;
 		int				_chunkSize;
 		int				_bodyMax;
-		time_t			_requestTimer;
+		time_t			_lastActivity;
 
 		//post request variables
 		int		_fileFd;
@@ -78,6 +78,7 @@ class httpRequest
 
 		//response-related variables
 		std::string	_responseBody;
+		bool		_timeout;
 
 		//requestParser
 		bool	parseHexSize();
@@ -122,6 +123,9 @@ class httpRequest
 		void			setErrorCode(unsigned int code);
 		void			printRequest();
 		bool			isTimedOut(int fd);
+		bool			getTimeout(int fd);
+		void			setTimeout(bool timeout);
+		void			resetTimer();
 
 		int		        parseRequest(std::string& str, int bodyMax, const Server &server);
     	std::string	  	executeRequest(const Server &server);

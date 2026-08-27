@@ -6,6 +6,8 @@
 class Server {
     private:
         int                                 _port_listen;
+        int                                 _client_max_body_size;
+
         std::string                         _server_name;
         std::string                         _include;
         std::string                         _default_type;
@@ -13,12 +15,15 @@ class Server {
         std::string                         _sendfile;
         std::string                         _keepalive_timeout;
         std::string                         _gzip;
+
         std::vector<std::string>            _access_log;
         std::vector<Location>               _locations;
         std::map<int, std::string>          _error_page;
-        int                                 _client_max_body_size;
     public:
         Server();
+		Server(const Server& copy);
+		Server	&operator=(const Server& copy);
+		~Server();
         bool                                parse_server(std::ifstream *fd_file);
         Set_variable                        set;
 

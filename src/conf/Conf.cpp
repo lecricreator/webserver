@@ -1,6 +1,60 @@
 #include "conf/Conf.hpp"
 //# include "support.hpp"
 
+Conf::Conf() {
+    this->_user = "";
+    this->_worker_process = -1;
+    this->_pid = "";
+    this->_include = "";
+    this->_default_type = "";
+    this->_log_format = "";
+    this->_sendfile = "";
+    this->_gzip = false;
+    this->_http = false;
+    this->_end_http = false;
+}
+
+Conf::Conf(const Conf& copy)
+{
+	_user = copy._user;
+	_worker_process = copy._worker_process;
+	_error_log = copy._error_log;
+	_error_page = copy._error_page;
+	_access_log = copy._access_log;
+	_pid = copy._pid;
+	_include = copy._include;
+	_default_type = copy._default_type;
+	_log_format = copy._log_format;
+	_sendfile = copy._sendfile;
+	_keepalive_timeout = copy._keepalive_timeout;
+	_gzip = copy._gzip;
+	_http = copy._http;
+	_events = copy._events;
+	_servers = copy._servers;
+	_end_http = copy._end_http;
+}
+
+Conf&	Conf::operator=(const Conf& copy)
+{
+	_user = copy._user;
+	_worker_process = copy._worker_process;
+	_error_log = copy._error_log;
+	_error_page = copy._error_page;
+	_access_log = copy._access_log;
+	_pid = copy._pid;
+	_include = copy._include;
+	_default_type = copy._default_type;
+	_log_format = copy._log_format;
+	_sendfile = copy._sendfile;
+	_keepalive_timeout = copy._keepalive_timeout;
+	_gzip = copy._gzip;
+	_http = copy._http;
+	_events = copy._events;
+	_servers = copy._servers;
+	_end_http = copy._end_http;
+	return *this;	
+}
+
 size_t  put_index_after_space(std::string line, size_t index) {
     for (size_t i = index; i < line.length(); i++) {
         if (line[i] != ' '){
@@ -10,23 +64,6 @@ size_t  put_index_after_space(std::string line, size_t index) {
         }
     }
     return (0);
-}
-
-Conf::Conf() {
-    this->_user = "";
-    this->_worker_process = -1;
-    //this->_error_log = NULL;
-    //this->_error_page = NULL;
-    //this->_access_log = NULL;
-    this->_pid = "";
-    this->_include = "";
-    this->_default_type = "";
-    this->_log_format = "";
-    this->_sendfile = "";
-    //this->_keepalive_timeout = NULL;
-    this->_gzip = false;
-    this->_http = false;
-    this->_end_http = false;
 }
 
 bool    Conf::parse(std::ifstream &fd_file) {

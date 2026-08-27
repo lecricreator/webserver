@@ -49,6 +49,8 @@ class Conf {
         bool                        _end_http;
     public:
         Conf();
+		Conf(const Conf& copy);
+		Conf	&operator=(const Conf& copy);
         ~Conf() {};
         Set_variable            set;
         bool                    parse(std::ifstream &fd_file);
