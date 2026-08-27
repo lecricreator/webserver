@@ -136,6 +136,7 @@ int     cgi(const std::string &path, t_parse_data &parse_data, char *env[], cons
 void    free_env(char** env);
 std::string     copy_file_to_str(std::ifstream &file);
 t_response_data set_error_response(const Server &server, int &status_code, const std::string &path);
+int             validate_file(const Server &server, std::string &path, std::ifstream &file);
 std::string     create_response(const t_response_data &data);
 
 #endif

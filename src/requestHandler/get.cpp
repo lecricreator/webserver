@@ -131,7 +131,7 @@ static bool exec_listing_dir(const Server &server, const std::string &path)
   return false;
 }
 
-static int validate_file(const Server &server, std::string &path, std::ifstream &file)
+int validate_file(const Server &server, std::string &path, std::ifstream &file)
 {
   Location location_of_path = get_location_of_path(server, path);
   if (location_of_path.empty())

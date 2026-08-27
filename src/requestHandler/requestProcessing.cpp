@@ -84,11 +84,15 @@ t_response_data httpRequest::generateResponseData(const Server &server, t_parse_
     status_code = deleteRequest();
   else if (_method == "POST" && is_cgi(_path, script_name))
   {
-    if (_path[0] != '/')
-      _path = "/" + _path;
-    char **env = set_cgi_env(script_name);
-    status_code = cgi(_path, parse_data, env, _body.c_str());
-    free_env(env);
+    std::ifstream file;
+    status_code = validate_file(server, _path, file);
+    if (status_code == 200) {
+      if (_path[0] != '/')
+        _path = "/" + _path;
+      char **env = set_cgi_env(script_name);
+      status_code = cgi(_path, parse_data, env, _body.c_str());
+      free_env(env);
+    }
   }
   //when cgi is triggered only cgi_fd must be returned as we must wait for cgi response before responding
   //we try to give fd to epoll loop to offer it to the holy epoll
