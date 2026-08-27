@@ -18,7 +18,8 @@ int accept_client(int server_fd)
 
 //connection closed by client, error and no data received is answered the same way for now
 //recv([...], MSG_PEEK) wouldn't consume the buffer
-int handle_request(int client_fd, t_parse_data &client_infos)
+int handle_request(int client_fd, t_parse_data &client_infos,
+                    t_response_data response_data)
 {
   char            buf[1024];
   int             bytes_received = recv(client_fd, buf, sizeof(buf) - 1, 0);
@@ -34,12 +35,15 @@ int handle_request(int client_fd, t_parse_data &client_infos)
   int status_parsing = client_infos.request.parseRequest(request_packet, client_infos.server->get_client_max_body_size(), *client_infos.server);
   if (client_infos.request.getErrorCode() != 408)
   {
-    std::cout << "error code for fd " << client_fd << ": " << client_infos.request.getErrorCode() << "\n";
+  std::cout << "error code for fd " << client_fd << ": " << client_infos.request.getErrorCode() << "\n";
     if (status_parsing == UNFINISHED)
       return UNFINISHED;
   }
-  client_infos.response = client_infos.request.executeRequest(*client_infos.server);
-  if (client_infos.response.empty())
+  client_infos.response = client_infos.request.executeRequest(*client_infos.server, client_infos, response_data);
+  if (client_infos.cgi_fd != INIT_CGI_FD) {
+    client_infos.client_fd = client_fd;
+    return UNFINISHED;
+  } if (client_infos.response.empty())
     return ERROR;
   return SUCCESS;
 }

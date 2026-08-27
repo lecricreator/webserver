@@ -140,10 +140,13 @@ int    httpRequest::can_requested(const Server &server, const std::string reques
 
     std::vector<Location>::const_iterator it_location;
     for (it_location = server.get_location().begin(); it_location != server.get_location().end(); it_location++) {
+        std::vector<std::string>::const_iterator it_limit;
+        //std::cout << path << " / " << it_location->get_path_location() + "/" << "in location\n";
         if (it_location->get_path_location() + "/" == path || (path == "/" && it_location->get_path_location() == "/")) {
             if (it_location->get_limit_except().empty())
                 return (-1);
             if (it_location->get_limit_except()[0] == "UNINITIALIZED") {
+                //std::cout << "can_requested\n";
                 return (1);
             } else {
                 std::vector<std::string>::const_iterator it_limit;
@@ -156,6 +159,7 @@ int    httpRequest::can_requested(const Server &server, const std::string reques
             }
         }
     }
+    //std::cout << _path << "//can_requested 0\n";
     return (0);
 }
 

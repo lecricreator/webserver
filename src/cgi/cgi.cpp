@@ -13,17 +13,15 @@ static std::string  get_relative_path(const std::string &path, const std::string
   return (relative_path);
 }
 
-int cgi(const std::string &path, t_response_data &data, char *env[], const char *cgi_data)
+int cgi(const std::string &path, t_parse_data &parse_data, char *env[], const char *cgi_input_data)
 {
-	std::string cgi_output;
-
   std::string relative_path = get_relative_path(path, CGI_ROOT);
   if (relative_path.empty())
     return 401;
-	cgi_output = execute_cgi(relative_path, env, cgi_data);
-	if (cgi_output == std::string())
+	if (execute_cgi(relative_path, env, cgi_input_data, parse_data) == ERROR)
 		return 500;
-	if (parse_cgi(cgi_output, data) == FAILURE)
-		return 502;
   return 200;
 }
+
+//if (parse_cgi(cgi_output, data) == FAILURE)
+//	return 502;

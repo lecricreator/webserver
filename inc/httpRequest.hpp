@@ -49,6 +49,8 @@ typedef struct s_response_data
   std::string location;
 } t_response_data;
 
+typedef struct s_parse_data t_parse_data;
+
 typedef std::map<std::string, std::string> HeaderMap;
 
 class httpRequest
@@ -98,8 +100,8 @@ class httpRequest
 		bool		parseStartLine(std::string& startLine);
 
 		//getRequest
-    	unsigned int    getRequest(const Server &server, t_response_data &data);
-    	t_response_data generateResponseData(const Server &server);
+    unsigned int	  getRequest(const Server &server, t_response_data &response_data, t_parse_data &parse_data);
+    t_response_data generateResponseData(const Server &server, t_parse_data &parse_data, t_response_data response_data);
 
 		//postRequest
 		//int	postRequest();
@@ -128,18 +130,20 @@ class httpRequest
 		void			resetTimer();
 
 		int		        parseRequest(std::string& str, int bodyMax, const Server &server);
-    	std::string	  	executeRequest(const Server &server);
+    std::string   executeRequest(const Server &server, t_parse_data &parse_data, t_response_data &response_data);
 		int				can_requested(const Server &server, const std::string request);
 
-    	char	        **set_cgi_env(const std::string &script_name);
+    char	        **set_cgi_env(const std::string &script_name);
 };
 
 std::string code_to_string(const unsigned int code);
 int			ft_stoi(std::string n);
 int 		hexToInt(const std::string& hexStr);
-int     cgi(const std::string &path, t_response_data &data, char *env[], const char *cgi_data);
+int     cgi(const std::string &path, t_parse_data &parse_data, char *env[], const char *cgi_input_data);
 void    free_env(char** env);
-std::string copy_file_to_str(std::ifstream &file);
-std::string create_response(const t_response_data &data);
+std::string     copy_file_to_str(std::ifstream &file);
+t_response_data set_error_response(const Server &server, int &status_code, const std::string &path);
+int             validate_file(const Server &server, std::string &path, std::ifstream &file);
+std::string     create_response(const t_response_data &data);
 
 #endif
