@@ -14,13 +14,13 @@ static void  execute_child(std::string path, int stdin_pipe[2], int stdout_pipe[
   exit(ERROR);
 }
 
-//return SUCCESS even if cgi_data is empty
-static int write_to_child(int stdin_pipe[2], int stdout_pipe[2], const char *cgi_data)
+//return SUCCESS even if parse_data is empty
+static int write_to_child(int stdin_pipe[2], int stdout_pipe[2], const char *cgi_input_data)
 {
-  if (cgi_data && cgi_data[0])
+  if (cgi_input_data && cgi_input_data[0])
   {
-    ssize_t len = strlen(cgi_data);
-    if (write(stdin_pipe[1], cgi_data, len) != len)
+    ssize_t len = strlen(cgi_input_data);
+    if (write(stdin_pipe[1], cgi_input_data, len) != len)
     {
       close(stdin_pipe[1]);
       close(stdout_pipe[0]);
@@ -30,7 +30,7 @@ static int write_to_child(int stdin_pipe[2], int stdout_pipe[2], const char *cgi
   return SUCCESS;
 }
 
-static std::string get_cgi_output(int pid, int output_fd)
+std::string get_cgi_output(int pid, int output_fd)
 {
   ssize_t     bytes_read;
   char        buf[4096];
@@ -48,32 +48,34 @@ static std::string get_cgi_output(int pid, int output_fd)
   return output;
 }
 
-std::string execute_parent(int stdin_pipe[2], int stdout_pipe[2], const char *cgi_data, pid_t pid)
+int execute_parent(int stdin_pipe[2], int stdout_pipe[2], const char *cgi_input_data)
 {
   close(stdin_pipe[0]);
   close(stdout_pipe[1]);
 
-  if (write_to_child(stdin_pipe, stdout_pipe, cgi_data) == ERROR)
-    return std::string();
+  if (write_to_child(stdin_pipe, stdout_pipe, cgi_input_data) == ERROR)
+    return ERROR;
   close(stdin_pipe[1]);
-
-  std::string output = get_cgi_output(pid, stdout_pipe[0]);
-  close(stdout_pipe[0]);
-  return output;
+  return SUCCESS;
 }
 
-std::string execute_cgi(std::string path, char **env, const char *cgi_data)
+int execute_cgi(std::string path, char **env, const char *cgi_input_data, t_parse_data &parse_data)
 {
   int   stdin_pipe[2];
   int   stdout_pipe[2];
 
   if (pipe(stdin_pipe) == ERROR || pipe(stdout_pipe) == ERROR)
-    return std::string();
+    return ERROR;
 
   pid_t pid = fork();
   if (pid == -1)
-    return std::string();
+    return ERROR;
   else if (pid == 0)
     execute_child(path, stdin_pipe, stdout_pipe, env);
-  return execute_parent(stdin_pipe, stdout_pipe, cgi_data, pid);
+  if (execute_parent(stdin_pipe, stdout_pipe, cgi_input_data) == ERROR)
+    return ERROR;
+  //print("cgi fd: " + stdout_pipe[0]);
+  parse_data.cgi_fd = stdout_pipe[0];
+  parse_data.cgi_pid = pid;
+  return SUCCESS;
 }
