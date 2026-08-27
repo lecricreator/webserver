@@ -71,7 +71,6 @@ static void manage_requests(struct epoll_event event,
             int epoll_fd, Conf &conf_c, std::map<int, Server> &servers,
             std::map<int, t_parse_data> &client_infos)
 {
-  static std::map<int, t_parse_data>  client_infos;
   static std::map<int, int>           cgi_response_fds;
   int                                 fd = event.data.fd;
   t_response_data                     response_data;
@@ -101,7 +100,7 @@ static void manage_requests(struct epoll_event event,
   }
   else if (event.events & EPOLLIN) {
     client_infos[fd].cgi_fd = INIT_CGI_FD;
-    lient_infos[fd].request.resetTimer();
+    client_infos[fd].request.resetTimer();
     int request_status = handle_request(fd, client_infos[fd], response_data);
     if (request_status == SUCCESS) {
       if (set_epoll_event(event, fd, epoll_fd, EPOLLOUT, EPOLL_CTL_MOD) == ERROR)

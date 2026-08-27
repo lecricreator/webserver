@@ -81,7 +81,7 @@ t_response_data httpRequest::generateResponseData(const Server &server, t_parse_
   if (_method == "GET")
     status_code = getRequest(server, response_data, parse_data);
   else if (_method == "DELETE")
-    status_code = deleteRequest();
+    status_code = deleteRequest(server);
   else if (_method == "POST" && is_cgi(_path, script_name))
   {
     std::ifstream file;
