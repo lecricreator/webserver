@@ -1,16 +1,18 @@
 #include "webserv.hpp"
 
-unsigned int    httpRequest::deleteRequest()
+unsigned int    httpRequest::deleteRequest(const Server &server)
 {
 	//std::cout << "deleteRequest() call\n";
-	_path.erase(0, 1);
 
-	if (_path.find("www/upload/") != 0)
+	if (_errorCode == 200 || _errorCode == 0)
 	{
-		//std::cout << _path << " deleteRequest invalid path\n";
-		setErrorCode(400);
-		return _errorCode;
+		if (can_requested(server, _method) == -1)
+		{
+			setErrorCode(405);
+			return _errorCode;
+		}
 	}
+	_path.erase(0, 1);
     if (remove(_path.c_str()) < 0)
     {
         if (errno == ENOENT) {

@@ -101,10 +101,11 @@ std::string listing_directory(const Server &server, std::string _path) {
       body += _path + entry->d_name;
       body += ">";
       body += entry->d_name;
-      body += "     trereterterter</a></li>";
+      body += "</a></li>";
     }
   }
   body += "</ul></pre><hr></body>";
+  closedir(folder);
   return (body);
 }
 
@@ -186,5 +187,6 @@ unsigned int	httpRequest::getRequest(const Server &server, t_response_data &resp
     response_data.status = "200 OK";
     status_code = 200;
   }
+  file.close();
   return status_code;
 }

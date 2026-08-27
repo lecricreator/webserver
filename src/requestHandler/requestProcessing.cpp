@@ -81,7 +81,7 @@ t_response_data httpRequest::generateResponseData(const Server &server, t_parse_
   if (_method == "GET")
     status_code = getRequest(server, response_data, parse_data);
   else if (_method == "DELETE")
-    status_code = deleteRequest();
+    status_code = deleteRequest(server);
   else if (_method == "POST" && is_cgi(_path, script_name))
   {
     std::ifstream file;
@@ -96,8 +96,7 @@ t_response_data httpRequest::generateResponseData(const Server &server, t_parse_
   }
   //when cgi is triggered only cgi_fd must be returned as we must wait for cgi response before responding
   //we try to give fd to epoll loop to offer it to the holy epoll
-  
-  print("SSSSSSSSSSSTATUS: " + to_str(status_code));
+
   if (status_code == 200 && parse_data.cgi_fd != ERROR)
     return response_data;
 

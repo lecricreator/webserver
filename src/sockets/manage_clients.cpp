@@ -10,9 +10,11 @@ int accept_client(int server_fd)
     return print_function_error("accept"), ERROR;
   if (fcntl(client_fd, F_SETFL, fcntl(client_fd, F_GETFL) | O_NONBLOCK) == ERROR)
     return print_function_error("fcntl"), ERROR;
-  print_success("New client", "fd", client_fd);
-  print_success("New client", "ip", (int)client_addr.sin_addr.s_addr);
-  print("\n");
+  if (ISDEBUG) {
+    print_success("New client", "fd", client_fd);
+    print_success("New client", "ip", (int)client_addr.sin_addr.s_addr);
+    print("\n");
+  }
   return client_fd;
 }
 
@@ -29,12 +31,17 @@ int handle_request(int client_fd, t_parse_data &client_infos,
   if (bytes_received <= 0)
     return ERROR;
   buf[bytes_received] = '\0';
-  //print("\n--- PACKET START ---\n");
-  //print(buf);
-  //print("\n--- PACKET END ---\n");
+  if (ISDEBUG) {
+    std::cout << "\n--- PACKET START " << client_fd << " ---\n";
+    print(buf);
+    print("\n--- PACKET END ---\n");
+  }
   int status_parsing = client_infos.request.parseRequest(request_packet, client_infos.server->get_client_max_body_size(), *client_infos.server);
-  if (status_parsing == UNFINISHED)
-    return UNFINISHED;
+  if (client_infos.request.getErrorCode() != 408)
+  {
+    if (status_parsing == UNFINISHED)
+      return UNFINISHED;
+  }
   client_infos.response = client_infos.request.executeRequest(*client_infos.server, client_infos, response_data);
   if (client_infos.cgi_fd != INIT_CGI_FD) {
     client_infos.client_fd = client_fd;

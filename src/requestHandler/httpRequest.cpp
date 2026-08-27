@@ -18,6 +18,8 @@ httpRequest::httpRequest() : _headers()
     _isChunkedPost = false;
     _bytesWritten = 0;
     _bodyMax = 0;
+    _lastActivity = time(NULL);
+    _timeout = false;
 }
 
 httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
@@ -37,6 +39,8 @@ httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
     _isChunkedPost = copy._isChunkedPost;
     _bytesWritten = copy._bytesWritten;
     _bodyMax = copy._bodyMax;
+    _lastActivity = copy._lastActivity;
+    _timeout = copy._timeout;
 }
 
 httpRequest&	httpRequest::operator=(const httpRequest& copy)
@@ -57,10 +61,16 @@ httpRequest&	httpRequest::operator=(const httpRequest& copy)
     _isChunkedPost = copy._isChunkedPost;
     _bytesWritten = copy._bytesWritten;
     _bodyMax = copy._bodyMax;
+    _lastActivity = copy._lastActivity;
+    _timeout = copy._timeout;
 	return *this;
 }
 
-httpRequest::~httpRequest() {}
+httpRequest::~httpRequest()
+{
+    if (_fileFd != -1)
+        close(_fileFd);
+}
 
 /**********************************************************************************************/
 
@@ -75,6 +85,16 @@ void			httpRequest::setStatus(RequestStatus newStatus) { _status = newStatus; }
 unsigned int	httpRequest::getErrorCode() const { return _errorCode; }
 
 void	httpRequest::setErrorCode(unsigned int code) { _errorCode = code; }
+
+bool    httpRequest::getTimeout(int fd)
+{
+    (void)fd;
+    if (_errorCode == 408)
+        return true;
+    return false;
+}
+
+void    httpRequest::setTimeout(bool timeout) { _timeout = timeout; _errorCode = 408; }
 
 void	httpRequest::printRequest()
 {
@@ -108,23 +128,28 @@ std::string remove_sup_after_slash(std::string path) {
 int    httpRequest::can_requested(const Server &server, const std::string request) {
     std::string path = this->_path;
     if (path == "/favicon.ico") {return true;}
+    if (path.find("/www/") != std::string::npos && path[4] == '/') {
+        path.erase(0 + path.begin(), path.begin() + 4);
+    }
     if (path.find(".") != std::string::npos) {
         path = remove_sup_after_slash(path);
-        print(path);
     }
     if (path[path.length() - 1] != '/') {
         path += "/";
     }
+
     std::vector<Location>::const_iterator it_location;
     for (it_location = server.get_location().begin(); it_location != server.get_location().end(); it_location++) {
         std::vector<std::string>::const_iterator it_limit;
         //std::cout << path << " / " << it_location->get_path_location() + "/" << "in location\n";
         if (it_location->get_path_location() + "/" == path || (path == "/" && it_location->get_path_location() == "/")) {
-            
+            if (it_location->get_limit_except().empty())
+                return (-1);
             if (it_location->get_limit_except()[0] == "UNINITIALIZED") {
                 //std::cout << "can_requested\n";
                 return (1);
             } else {
+                std::vector<std::string>::const_iterator it_limit;
                 for (it_limit = it_location->get_limit_except().begin(); it_limit != it_location->get_limit_except().end(); it_limit++) {
                     if (*it_limit == request) {
                         return (1);
@@ -138,6 +163,25 @@ int    httpRequest::can_requested(const Server &server, const std::string reques
     return (0);
 }
 
+bool    httpRequest::isTimedOut(int fd)
+{
+    time_t  currentTime = time(NULL);
+    if (ISDEBUG)
+        std::cout << currentTime - _lastActivity << "isTimedOut() call for fd " << fd << "\n";
+    if (currentTime - _lastActivity > 10)
+    {
+        if (ISDEBUG) {
+            std::cout << " connection timed out\n";
+        }
+        return true;
+    }
+    return false;
+}
+
+void    httpRequest::resetTimer()
+{
+    _lastActivity = time(NULL);
+}
 
 /**********************************************************************************************/
 
