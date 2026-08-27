@@ -101,7 +101,7 @@ std::string listing_directory(const Server &server, std::string _path) {
       body += _path + entry->d_name;
       body += ">";
       body += entry->d_name;
-      body += "     trereterterter</a></li>";
+      body += "</a></li>";
     }
   }
   body += "</ul></pre><hr></body>";
