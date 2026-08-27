@@ -3,7 +3,6 @@ import os
 import sys
 import os.path
 
-a
 print("Content-Type: text/html")
 print()
 print("<html><body style='text-align:center;'>")

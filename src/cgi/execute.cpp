@@ -74,8 +74,7 @@ int execute_cgi(std::string path, char **env, const char *cgi_input_data, t_pars
     execute_child(path, stdin_pipe, stdout_pipe, env);
   if (execute_parent(stdin_pipe, stdout_pipe, cgi_input_data) == ERROR)
     return ERROR;
-  print("cgi fd:");
-  print(stdout_pipe[0]);
+  //print("cgi fd: " + stdout_pipe[0]);
   parse_data.cgi_fd = stdout_pipe[0];
   parse_data.cgi_pid = pid;
   return SUCCESS;

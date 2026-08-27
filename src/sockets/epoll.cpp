@@ -45,26 +45,26 @@ int read_fd(const int &fd, std::string &response)
 }
 
 //leaves cgi_response empty if all wasn't received or an err occured
-int  cgi_event(int cgi_fd, pid_t cgi_pid, std::string cgi_response)
+int  cgi_event(const int &cgi_fd, const pid_t &cgi_pid, std::string &cgi_response)
 {
   //int client_fd = cgi_response_fds[fd];
-  std::string cgi_output;
-  int bytes_read = read_fd(cgi_fd, cgi_output);
+  int bytes_read = read_fd(cgi_fd, cgi_response);
   if (bytes_read == 0) {
     t_response_data parsed_data;
     int status;
 
     //print("got full cgi response");
     waitpid(cgi_pid, &status, 0);
-    if (cgi_output.empty()) {
+    if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
       return 502;
-    } else if (parse_cgi(cgi_output, parsed_data) == FAILURE) {
+    } else if (cgi_response.empty() || parse_cgi(cgi_response, parsed_data) == FAILURE) {
       return 500;
     } else {
       cgi_response = create_response(parsed_data);
     }
+    return 200;
   }
-  return 200;
+  return UNFINISHED;
 }
 
 static void manage_requests(struct epoll_event event,
@@ -87,7 +87,9 @@ static void manage_requests(struct epoll_event event,
   }
   else if (cgi_response_fds.find(fd) != cgi_response_fds.end()) {
     int status_cgi = cgi_event(fd, client_infos[fd].cgi_pid, client_infos[client_infos[fd].client_fd].response);
-    if (status_cgi != 200) {
+    if (status_cgi == UNFINISHED) {
+      return ;
+    } if (status_cgi != 200) {
       client_infos[client_infos[fd].client_fd].response = create_response(set_error_response(*client_infos[fd].server, status_cgi, std::string()));
     }
     if (set_epoll_event(event, client_infos[fd].client_fd, epoll_fd, EPOLLOUT, EPOLL_CTL_MOD) == ERROR)
