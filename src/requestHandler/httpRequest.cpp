@@ -18,7 +18,8 @@ httpRequest::httpRequest() : _headers()
     _isChunkedPost = false;
     _bytesWritten = 0;
     _bodyMax = 0;
-    _requestTimer = time(NULL);
+    _lastActivity = time(NULL);
+    _timeout = false;
 }
 
 httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
@@ -38,7 +39,8 @@ httpRequest::httpRequest(const httpRequest& copy) : _headers(copy._headers)
     _isChunkedPost = copy._isChunkedPost;
     _bytesWritten = copy._bytesWritten;
     _bodyMax = copy._bodyMax;
-    _requestTimer = copy._requestTimer;
+    _lastActivity = copy._lastActivity;
+    _timeout = copy._timeout;
 }
 
 httpRequest&	httpRequest::operator=(const httpRequest& copy)
@@ -59,7 +61,8 @@ httpRequest&	httpRequest::operator=(const httpRequest& copy)
     _isChunkedPost = copy._isChunkedPost;
     _bytesWritten = copy._bytesWritten;
     _bodyMax = copy._bodyMax;
-    _requestTimer = copy._requestTimer;
+    _lastActivity = copy._lastActivity;
+    _timeout = copy._timeout;
 	return *this;
 }
 
@@ -82,6 +85,16 @@ void			httpRequest::setStatus(RequestStatus newStatus) { _status = newStatus; }
 unsigned int	httpRequest::getErrorCode() const { return _errorCode; }
 
 void	httpRequest::setErrorCode(unsigned int code) { _errorCode = code; }
+
+bool    httpRequest::getTimeout(int fd) 
+{
+    std::cout << "getTimeout call for fd " << fd << ": " << _errorCode << "\n";
+    if (_errorCode == 408)
+        return true;
+    return false;
+}
+
+void    httpRequest::setTimeout(bool timeout) { _timeout = timeout; _errorCode = 408; }
 
 void	httpRequest::printRequest()
 {
@@ -149,10 +162,8 @@ int    httpRequest::can_requested(const Server &server, const std::string reques
 bool    httpRequest::isTimedOut(int fd)
 {
     time_t  currentTime = time(NULL);
-    std::cout << currentTime - _requestTimer << "isTimedOut() call for fd " << fd << "\n";
-    std::cout << "path of fd " << fd << _path << "\n";
-    std::cout << "method of fd " << fd << _method << "\n\n";
-    if (currentTime - _requestTimer > 10)
+    std::cout << currentTime - _lastActivity << "isTimedOut() call for fd " << fd << "\n";
+    if (currentTime - _lastActivity > 10)
     {
         std::cout << " connection timed out\n";
         return true;
@@ -160,6 +171,10 @@ bool    httpRequest::isTimedOut(int fd)
     return false;
 }
 
+void    httpRequest::resetTimer()
+{
+    _lastActivity = time(NULL);
+}
 
 /**********************************************************************************************/
 

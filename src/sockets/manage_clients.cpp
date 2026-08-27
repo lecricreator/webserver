@@ -32,8 +32,12 @@ int handle_request(int client_fd, t_parse_data &client_infos)
   print(buf);
   print("\n--- PACKET END ---\n");
   int status_parsing = client_infos.request.parseRequest(request_packet, client_infos.server->get_client_max_body_size(), *client_infos.server);
-  if (status_parsing == UNFINISHED)
-    return UNFINISHED;
+  if (client_infos.request.getErrorCode() != 408)
+  {
+    std::cout << "error code for fd " << client_fd << ": " << client_infos.request.getErrorCode() << "\n";
+    if (status_parsing == UNFINISHED)
+      return UNFINISHED;
+  }
   client_infos.response = client_infos.request.executeRequest(*client_infos.server);
   if (client_infos.response.empty())
     return ERROR;
