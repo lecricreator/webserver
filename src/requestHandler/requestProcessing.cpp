@@ -65,10 +65,16 @@ t_response_data set_error_response(const Server &server, int &status_code, const
     } else if (access(error_page_path.c_str(), R_OK) == -1 || !file.is_open()) {
       status_code = 500;
     }
+      body = copy_file_to_str(file);
+      file.close();
+  } else {
+    status = to_str(status_code) + " " + code_to_string(status_code);
   }
-  status = to_str((int)status_code) + " " + code_to_string(status_code);
-  content_type = "text/html";
-  body = "<body style=\"background-color: green;\"><h1 style=\"position: absolute; left: 20%; top: 30%; text-align: center;color:red; transform: rotate(150deg);\">" + status + "</h1></body>\n";
+  if (body.empty())
+  {
+    content_type = "text/html";
+    body = "<body style=\"background-color: green;\"><h1 style=\"position: absolute; left: 20%; top: 30%; text-align: center;color:red; transform: rotate(150deg);\">" + status + "</h1></body>\n";
+  }
   return set_response_data(status, location, content_type, body);
 }
 
